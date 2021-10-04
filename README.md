@@ -8,6 +8,7 @@ Initialise a Mongo database and insert entries from a csv file
 - db: database
 - create_db.py: code to initialise Mongo database with sample data
 - db.sh: start up database
+- z5165205.txt: work diary
 
 ## Python and MongoDB Setup
 1. Have Python 3.6 or greater and pip3 installed.
@@ -20,4 +21,3 @@ Initialise a Mongo database and insert entries from a csv file
 
 ## Notes
 - Ensure port in create_db.py and db.sh are the same (12345)
-- Do not delete existing entries in .gitignore
