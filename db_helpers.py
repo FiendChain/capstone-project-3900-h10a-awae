@@ -1,85 +1,71 @@
-from pymongo import MongoClient
+import sqlite3
 import pandas as pd
 
-def init_db(port):
-    print("Creating ecommerce db...")
-    # Local DB
-    client = MongoClient(f"mongodb://localhost:{port}/")
-    # Online DB
-    # client = pymongo.MongoClient("mongodb+srv://admin:admin@ecommerce.atmzr.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-    if "ecommerce" in client.list_database_names():
-        print("Existing ecommerce db found, dropping...")
-        client.drop_database("ecommerce")
-        print("Existing ecommerce db dropped.")
-    db = client["ecommerce"]    # Connect to ecommerce database
-    print("Ecommerce db created")
-    return db
+def db_connect(path_db):
+    db = sqlite3.connect(path_db)
+    cur = db.cursor()
+    return db, cur
 
-def init_collection_products(db):
-    collection_products = db["products"]
-    return collection_products
+def table_drop(cur, table_name):
+    try:
+        cur.execute(f"DROP TABLE {table_name}")
+    except Exception as e:
+        print(e)
 
-def insert_sample_products(sample_products_csv, collection_products):
-    df_coffee = pd.read_csv(sample_products_csv)
-    products = []
-    for index, row in df_coffee.iterrows():
-        product = {
-            "name": row["name"],
-            "price": row["price"],
-            "category": row["category"],
-            "description": row["description"],
-            "delivery": row["delivery"],
-            "stock": row["stock"]
-        }
-        products.append(product)
-    collection_products.insert_many(products)
+def table_create(cur, table_name, identifiers):
+    # OK to use fstrings in this query because query is initiated by the system, not user
+    query = f"CREATE TABLE {table_name} ({identifiers})"
+    cur.execute(query)
+    print("table products created")
 
-def init_collection_accounts(db):
-    collection_accounts = db["accounts"]
-    return collection_accounts
+def table_fill(db, cur, table_name, wildcard, path_products):
+    df_coffee = pd.read_excel(path_products, engine = 'openpyxl')
+    products = df_coffee.to_numpy().tolist()
+    query = f"INSERT INTO {table_name} VALUES ({wildcard})"
+    params = products
+    cur.executemany(query, params)
+    db.commit()
+    print("Sample products filled")
 
-def insert_sample_accounts(sample_accounts_csv, collection_accounts):
-    df_accounts = pd.read_csv(sample_accounts_csv)
-    accounts = []
-    for index, row in df_accounts.iterrows():
-        account = {
-            "username": row["username"],
-            "first_name": row["first_name"],
-            "last_name": row["last_name"],
-            "dob": row["dob"]
-        }
-        accounts.append(account)
-    collection_accounts.insert_many(accounts)
+def db_close(db):
+    db.close()
+    print("db closed")
 
-def search_products(product_name, collection_products):
-    items = [x for x in collection_products.find({"name": {"$regex": f'{product_name}', "$options": "$i"}})]
-    return items
-
-def add_product(product_new, collection_products):
-    collection_products.insert_one(product_new)
-
-def update_product(product_old, product_new, collection_products):
-    collection_products.update_one({"_id": product_old["_id"]}, {"$set": product_new})
-
-def delete_products(products, collection_products):
-    if not isinstance(products, list):
-        products = [products]
-    for product in products:
-        collection_products.delete_one({"_id": product["_id"]})
+# Case insensitive, substring search
+def search_products_by_name(cur, name):
+    query = '''SELECT * FROM products WHERE name LIKE ?'''
+    params = f"%{name}%",   # comma is intentional
+    cur.execute(query, params)
+    return [row for row in cur]
 
 
-def search_accounts(account_name, collection_accounts):
-    items = [x for x in collection_accounts.find({"name": {"$regex": f'{account_name}', "$options": "$i"}})]
-    return items
+# Find highest uid in the table, add one, and return
+def get_next_uid(cur, table_name):
+    # OK to use fstring here because table_name is generated from the system and not user
+    query = f"SELECT uid FROM {table_name} ORDER BY uid desc LIMIT 1"
+    cur.execute(query)
+    return cur.fetchone()[0] + 1
 
-def add_account(account_new, collection_accounts):
-    collection_accounts.insert_one(account_new)
 
-def update_account(account_old, account_new, collection_account):
-    collection_account.update_one({"_id": account_old["_id"]}, {"$set": account_new})
+def table_add(db, cur, table_name, wildcard, entry):
+    # Assign a uid for the product
 
-def delete_accounts(accounts, collection_accounts):
-    if not isinstance(accounts, list):
-        accounts = [accounts]
-    for account in accounts:
-        collection_accounts.delete_one({"_id": account["_id"]})
+    query = f"INSERT INTO {table_name} VALUES ({wildcard})"
+    params = entry
+    cur.execute(query, params)
+    db.commit()
+    print(f"Entry {entry[0]} added")
+    
+def table_delete(db, cur, table_name, entry):
+    query = f"DELETE FROM {table_name} WHERE uid=?"
+    params = int(entry[0]), # comma is intentional
+    cur.execute(query, params)
+    db.commit()
+    print(f"Entry {entry[0]} deleted")
+
+def table_update(db, cur, table_name, wildcard, entry_old, entry_new):
+    # Updating all rows in an entry is easier by deleting and adding, than using update 
+    table_delete(db, cur, table_name, entry_old)
+    table_add(db, cur, table_name, wildcard, entry_new)
+    print(f"Entry {entry_new[0]} updated")
+
