@@ -2,6 +2,6 @@ database_venv/
 db/
 test.py
 test2.py
-data/
 __pycache__/
 db_sqlite/ecommerce.db
+testing_stuff/
