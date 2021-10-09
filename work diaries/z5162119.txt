@@ -1,0 +1,17 @@
+Week 1
+Deliberated over individual strengths and weaknesses in our skill sets. 
+Discussed various projects and ideas that we could come up for them. We decided on the ecommerce site.
+
+Week 2
+Decided on what novel functionalities to add to the ecommerce website.
+Introduced the review system and curator system. 
+Afterwards we discussed which frameworks we would use for the frontend (vanilla JS, jquery, css, Django templating) and backend (Django).
+
+Week 3
+Developed the user account, sign in, registration and product review wireframes. 
+Completed my parts of the report including my assigned wireframes and how objectives are met by user stories.
+
+Week 4
+Working on writing html templates for sprint 1 wireframes. 
+Decided that for sprint 1 we would just have basic bootstrap and jquery to get the basic functionality and design completed.
+Discussed how we would work as a team using the Django framework.
