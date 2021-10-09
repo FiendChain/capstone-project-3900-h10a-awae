@@ -1,0 +1,10 @@
+Week 1
+In the first lab, we had formation of the group, introduced ourselves and identified each other's strengths. We then deliberated over the various group projects presented and selected the one which adhered to the most to our strengths, which was the e-commerce project.
+
+Week 2
+
+
+Week 3
+Due to an urgent committment I was unable to attend the regular lab session. However as Scrum Master I had setup a brief agenda so my teammates knew what to do during the lab, and they were kind enough to cover for my absence. We had a catch-up session on that same day to ensure I was up to date with what happened during the lab. We finalised the project proposal over the weekend, and I had updated all of our user stories on Jira and assigned user stories and subtasks to each member so we could start coding.
+
+Week 4
