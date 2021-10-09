@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <link rel="stylesheet" href="homepage.css">
+  <title>Cafe AWAE Login Portal</title>
+</head>
+<body>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+<!--Header-->
+<header class="navbar navar-expand flex-column">
+  <div class="row w-100">
+    <!--Search bar-->
+    <div class="col align-self-start text-left">
+      <form class="w-75 d-flex align-items-center">
+        <input type="search" class="form-control" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off" spellcheck="false">
+      </form>
+    </div>
+    <div class="col align-self-center text-center">
+      <h2>Cafe AWAE</h2>
+    </div>
+    <!--Controls-->
+    <div class="col align-self-end text-right">
+      <div>
+        <div class="btn btn-primary">Cart</div>
+        <div class="btn btn-primary">Profile</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!--Homepage-->
+<div class="container-fluid">
+  <!--Navigation-->
+  <div class="row">
+    <div class="col align-self-center text-center">
+      <div class="btn-group">
+        <div class="btn btn-primary">Products</div>
+        <div class="btn btn-outline-primary">Reviews</div>
+        <div class="btn btn-outline-primary">Curators</div>
+      </div>
+    </div>
+  </div>
+  <!--Products-->
+  <div class="container">
+    <p class="my-1"><em>Recommended for you</em></p>
+    <div class="row" style="border-width: 2rem; border: solid #f7f7f9; padding: 1rem;">
+      <div class="col-sm-2 px-0 mx-1 rounded" style="border: solid #f7f7f7">
+        <div class="thumbnail">
+          <a href="/static/images/coffee_1.jpg" class="text-decoration-none">
+            <img src="/static/images/coffee_1.jpg" class="product-img rounded img-fluid">
+            <div class="text-center">
+              <h6>Decafe Blend</h6>
+              <p class="text-muted my-0">$10.00</p>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="col-sm-2 px-0 mx-1 rounded" style="border: solid #f7f7f7">
+        <div class="thumbnail">
+          <a href="/static/images/coffee_2.jpg" class="text-decoration-none">
+            <img src="/static/images/coffee_2.jpg" class="product-img rounded img-fluid">
+            <div class="text-center">
+              <h6>Decafe Blend</h6>
+              <p class="text-muted my-0">$10.00</p>
+            </div>
+          </a>
+        </div>
+      </div>
+      <div class="col-sm-2 px-0 mx-1 rounded" style="border: solid #f7f7f7">
+        <div class="thumbnail">
+          <a href="/static/images/coffee_3.jpg" class="text-decoration-none">
+            <img src="/static/images/coffee_3.jpg" class="product-img rounded img-fluid">
+            <div class="text-center">
+              <h6>Decafe Blend</h6>
+              <p class="text-muted my-0">$10.00</p>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
