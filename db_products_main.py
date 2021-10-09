@@ -70,5 +70,5 @@ product = table_products.search_by_name("Sample coffee product")[-1]
 table_products.delete(product)
 print(table_products.search_by_name("sample"))
 # %%
-db_close(db)
+db.close(db)
 # %%
