@@ -1,8 +1,8 @@
 # %%
 import sqlite3
 import pandas as pd
-from table import *
-from database import *
+from classes.table import *
+from classes.database import *
 
 
 # Create table

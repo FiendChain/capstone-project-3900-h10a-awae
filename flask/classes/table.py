@@ -19,25 +19,13 @@ class Table(object):
     def create(self):
         subquery1 = dict((i, self.cols[i]) for i in self.cols)
         subquery1 = ', '.join(f"{key} {val}" for (key,val) in subquery1.items())
-        query = f"CREATE TABLE {self.name} ({subquery1})"
+        query = f"CREATE TABLE IF NOT EXISTS {self.name} ({subquery1})"
         self.cur.execute(query)
         print(f"table {self.name} created")
 
 
     # Fill table initially with some products from a xlsx file
-    def fill(self, path_products):
-        df = pd.read_excel(path_products, engine = 'openpyxl')
-        entries = df.to_numpy().tolist()
-        cols_no_id = dict((i, self.cols[i]) for i in self.cols if i != "id")
-        subquery_1 = ', '.join(f"{key}" for key in cols_no_id.keys())
-        subquery_2 = ', '.join(f"?" for (i, col) in enumerate(cols_no_id))
-        query = f"INSERT INTO {self.name} ({subquery_1}) VALUES ({subquery_2})"
-        print(query)
-        print(entries)
-        params = entries
-        self.cur.executemany(query, params)
-        self.conn.commit()
-        print("Sample entries filled")
+
 
 
 
