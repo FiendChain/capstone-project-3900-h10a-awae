@@ -9,7 +9,6 @@ import os
 from flask import g
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
-app.jinja_options['auto_reload'] = True
 
 def get_db():
     db = getattr(g, '_database', None)
