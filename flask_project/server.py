@@ -48,6 +48,7 @@ with app.app_context():
     db.fill("products", "data/awae_products.xlsx")
     x = db.search_product_by_name("tall coffee")
     print(x)
+    db.conn.close()
 print("System finished setting up")
 # table_products = Table("products", table_cols["products"], conn, cur)
 # table_accounts = Table("accounts", table_cols["accounts"], conn, cur)
