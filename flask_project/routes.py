@@ -9,7 +9,12 @@ from flask import g
 @app.route('/', methods=["GET", "POST"])
 def home():
     data = {
-        'products': [{'image_url': f'/static/images/coffee_{i}.jpg'} for i in range(1,4)]
+        'products': [
+            {
+                'image_url': f'/static/images/coffee_{i}.jpg',
+                'product_url': url_for('product_page', id=f'coffee_{i}')
+            } for i in range(1,4)
+        ]
     }
     return render_template("homepage.html", **data)
 
@@ -21,6 +26,16 @@ def login():
 def register():
     return render_template('registration.html')
 
+@app.route('/products/<string:id>')
+def product_page(id):
+    product = {
+        'image_url': f'/static/images/{id}.jpg',
+        'name': id,
+        'cost': f'{10.25:.2f}',
+        'description': 'The finest lattee on the planet '*5
+    }
+    return render_template('product.html', product=product)
+
 @app.route('/logout')
 def logout():
     logout_user()
@@ -31,12 +46,12 @@ def logout():
 def load_user(name):
     pass
 
-@app.teardown_appcontext
-def close_connection(exception):
-    db = getattr(g, '_database', None)
-    if db is not None:
-        if db.conn is not None:
-            db.conn.close()
+# @app.teardown_appcontext
+# def close_connection(exception):
+#     db = getattr(g, '_database', None)
+#     if db is not None:
+#         if db.conn is not None:
+#             db.conn.close()
 
 # @app.teardown_appcontext
 # def close_connection(exception):

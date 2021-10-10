@@ -7,4 +7,4 @@ if __name__ == "__main__":
     app.config['TEMPLATES_AUTO_RELOAD'] = True
 
     server = Server(app.wsgi_app)
-    server.serve(port=5002, debug=True)
+    server.serve(port=5002, debug=True, liveport=5003)
