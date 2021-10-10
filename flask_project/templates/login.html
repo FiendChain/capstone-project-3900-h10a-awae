@@ -17,7 +17,9 @@
     <div class="container h-100">
       <div class="row">
         <div class="col text-center">
-          <h1>Cafe AWAE</h1>
+          <a href="{{ url_for('home') }}">
+            <h1>Cafe AWAE</h1>
+          </a>
         </div>
       </div>
       <div class="row my-auto">
@@ -58,7 +60,7 @@
               <h6>Register</h6>
             </div>
             <div class="card-body">
-              <form method="get" action="{% url 'registration' %}">
+              <form method="get" action="{{ url_for('register') }}">
                 <div class="form-group">
                   <label for="username">Username</label>
                   <input type="text" class="form-control" id="username" aria-describedby="usernameHelp" placeholder="Enter username">

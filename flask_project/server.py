@@ -1,5 +1,4 @@
 # %%
-
 from flask import Flask
 from flask_login import LoginManager
 import sqlite3
@@ -7,9 +6,11 @@ import pandas as pd
 from classes.table import *
 from classes.database import *
 import os
-
 from flask import g
-app = Flask(__name__)
+
+app = Flask(__name__, static_folder='static', static_url_path='/static')
+app.jinja_options['auto_reload'] = True
+
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
