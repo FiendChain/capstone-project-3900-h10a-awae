@@ -1,4 +1,4 @@
-{% extends 'user_page.html' %}
+{% extends 'base.html' %}
 
 {% block head %}
 <link rel="stylesheet" href="/static/css/homepage.css">
@@ -7,6 +7,8 @@
 
 
 {% block content %}
+{% include 'user_navbar.html' %}
+
 <!--Homepage-->
 <div class="container-fluid">
   <!--Navigation-->
