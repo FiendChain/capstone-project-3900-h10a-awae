@@ -6,7 +6,6 @@ class Database(object):
     def __init__(self, path):
         self.path = path
         self.tables = {}
-        print(self.path)
         conn = sqlite3.connect(self.path)
         cur = conn.cursor()
         self.conn = conn
@@ -37,12 +36,12 @@ class Database(object):
     def fill(self, table_name, path_products):
         df = pd.read_excel(path_products, engine = 'openpyxl')
         entries = df.to_numpy().tolist()
-        cols_no_id = dict((i, self.cols[i]) for i in self.cols if i != "id")
-        subquery_1 = ', '.join(f"{key}" for key in cols_no_id.keys())
+        cols_no_id = [x for x in self.tables[table_name] if x != "id"]
+        subquery_1 = ', '.join(f"{key}" for key in cols_no_id)
         subquery_2 = ', '.join(f"?" for (i, col) in enumerate(cols_no_id))
         query = f"INSERT INTO {table_name} ({subquery_1}) VALUES ({subquery_2})"
-        print(query)
-        print(entries)
+        # print(query)
+        # print(entries)
         params = entries
         self.cur.executemany(query, params)
         self.conn.commit()
@@ -70,7 +69,7 @@ class Database(object):
 
 
     # Case insensitive, substring search
-    def search_by_name(self, name):
+    def search_product_by_name(self, name):
         query = "SELECT * FROM products WHERE name LIKE ?"
         params = f"%{name}%",   # comma is intentional
         self.cur.execute(query, params)
