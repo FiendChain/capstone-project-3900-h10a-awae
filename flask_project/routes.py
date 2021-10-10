@@ -5,6 +5,8 @@ from flask_login import LoginManager, login_user, current_user, login_required, 
 from server import app, login_manager
 from flask import g
 
+import random
+
 # Product browsing
 @app.route('/', methods=["GET", "POST"])
 def home():
@@ -30,12 +32,59 @@ def product_page(id):
     }
     return render_template('product.html', product=product)
 
+# User account
+@app.route('/cart', methods=['GET'])
+def cart():
+    def get_product(i):
+        return {
+            'id': f'coffee_{i}',
+            'name': f'coffee_{i}',
+            'cost': f'{10.25:.2f}',
+            'description': 'The finest lattee on the planet',
+            'image_url': f'/static/images/coffee_{i}.jpg',
+            'product_url': url_for('product_page', id=f'coffee_{i}'),
+            'category': 'coffee',
+            'status': 'In stock',
+        }
+    products = [get_product(i) for i in range(1,4)]
+
+    summary = {
+        'total_cost': f'{10:.2f}',
+        'shipping_cost': f'{6:.2f}'
+    }
+
+    payment_details = {
+        'card_number_last_four': "0421",
+        'method': 'PayPal'
+    }
+
+    data = dict(
+        products=products, 
+        summary=summary, 
+        payment_details=payment_details)
+
+    return render_template('cart.html', **data)
+
 # Purchasing
 @app.route('/transaction/add', methods=['POST'])
 def product_add():
     form = request.form
     print(f'Adding: {form}')
+
     return jsonify(dict(success=True))
+
+@app.route('/transactions/update', methods=['POST'])
+def product_update():
+    form = request.form
+    # discard repeats of same input field
+    data = form.to_dict(flat=True)
+    print(f'Changing quantity: {data}')
+
+    quantity = int(data['quantity'])
+    if quantity > 10 or quantity < 0:
+        return jsonify(**dict(quantity=2), error='Invalid quantity'), 403
+
+    return jsonify(dict(quantity=quantity))
 
 @app.route('/transaction/buy', methods=['POST'])
 def product_buy():
