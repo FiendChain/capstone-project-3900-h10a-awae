@@ -15,7 +15,7 @@
     <div class="col-sm-2 thumbnail"><img src="{{ product.image_url }}" class="product-img rounded img-fluid"></div>
     <!--Product info-->
     <div class="col mr-auto">
-      <a href="{{ url_for('product_page', id=product.id) }}">
+      <a href="{{ url_for('user_bp.product_page', id=product.id) }}">
         <p class="text-left my-0"><strong>{{ product.name }}</strong> in {{ product.category }}</p>
       </a>
       <!--Stock status-->
@@ -34,7 +34,7 @@
       </div>
       <!--Quantity editing form-->
       <div class="row">
-        <form class='quantity_form' id="{{ product.id }}" method='POST' action="{{ url_for('product_update') }}">
+        <form class='quantity_form' id="{{ product.id }}" method='POST' action="{{ url_for('api_bp.product_update') }}">
           <input type="hidden" id="product_id" name="product_id" value="{{ product.id }}">
           <div class="form-group row">
             <label class="col text-center" for="quantity">Quantity</label>

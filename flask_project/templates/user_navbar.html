@@ -8,17 +8,17 @@
       </form>
     </div>
     <div class="col align-self-center text-center">
-      <a href="{{ url_for("home") }}">
+      <a href="{{ url_for("user_bp.home") }}">
         <h2>Cafe AWAE</h2>
       </a>
     </div>
     <!--Controls-->
     <div class="col align-self-end text-right">
       <div>
-        <a href='{{ url_for('cart') }}'>
+        <a href='{{ url_for('user_bp.cart') }}'>
           <div class="btn btn-primary">Cart</div>
         </a>
-        <a href='{{ url_for('login') }}'>
+        <a href='{{ url_for('user_bp.login') }}'>
           <div class="btn btn-primary">Profile</div>
         </a>
       </div>

@@ -11,7 +11,7 @@
 
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
     <li class="breadcrumb-item"><a href="#">Products</a></li>
     <li class="breadcrumb-item"><a href="#">Coffee</a></li>
   </ol>
@@ -56,8 +56,8 @@
           </div>
           <div class="col pr-0 text-right">
             <div class="btn-group">
-              <button type="submit" id='cart_add' href="{{ url_for('product_add') }}" class="btn btn-outline-primary mb-2">Add to Cart</button>
-              <button type="submit" id='buy_now' href="{{ url_for('product_buy') }}" class="btn btn-primary mb-2">Buy Now</button>
+              <button type="submit" id='cart_add' href="{{ url_for('api_bp.product_add') }}" class="btn btn-outline-primary mb-2">Add to Cart</button>
+              <button type="submit" id='buy_now' href="{{ url_for('api_bp.product_buy') }}" class="btn btn-primary mb-2">Buy Now</button>
             </div>
           </div>
         </div>
