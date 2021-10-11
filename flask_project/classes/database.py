@@ -10,7 +10,7 @@ class Database(object):
         cur = conn.cursor()
         self.conn = conn
         self.cur = cur
-        print("db connected, use db.conn and db.cur")
+        print("db initialised, use db.conn and db.cur")
     
     def tables_create(self, f):
         self.cur.executescript(f.read()) # Read sql schema and create tables
@@ -103,12 +103,3 @@ class Database(object):
         self.cur.execute(query, params)
         self.conn.commit()
         print(f"Entry {entry_new[0]} updated")
-
-
-
-
-# # To prevent SQL injection and for better database security, we must use wildcards instead of variable names in the query
-# wildcards = {
-#     "products": "?, ?, ?, ?, ?, ?, ?, ?",
-#     "accounts": "?, ?, ?, ?, ?, ?, ?"
-# }

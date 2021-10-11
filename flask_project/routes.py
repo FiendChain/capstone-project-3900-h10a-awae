@@ -5,6 +5,7 @@ from flask_login import LoginManager, login_user, current_user, login_required, 
 from server import app, login_manager
 from flask import g
 
+    
 # The first page displayed upon startup
 @app.route('/', methods = ["GET", "POST"])
 def login():
@@ -36,9 +37,3 @@ def close_connection(exception):
         if db.conn is not None:
             db.conn.close()
 
-
-# @app.teardown_appcontext
-# def close_connection(exception):
-#     db = getattr(g, '_db', None)
-#     if db is not None:
-#         db.close()

@@ -9,7 +9,10 @@ from classes.database import *
 import os
 
 from flask import g
+
 app = Flask(__name__)
+print("System setting up...")
+
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
@@ -27,7 +30,6 @@ login_manager.init_app(app)
 app.secret_key = 'very-secret-123' # must include
 
 # System setup
-print("System setup")
 # Create table
 table_name = "products"
 
@@ -55,6 +57,14 @@ print("System finished setting up")
 
 # table_products.drop()
 # table_products.create()
+# file_path = os.path.abspath(os.getcwd())+"\lmao.db"
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///'+file_path
+# db = SQLAlchemy(app)
+# db.create_all()
+# # %%
+# path_products = "data/awae_products.xlsx"
+# df = pd.read_excel(path_products, engine = 'openpyxl')
+# entries = df.to_numpy().tolist()
+# for entry in entries:
 
-
-# %%
+# db.session.add_all()
