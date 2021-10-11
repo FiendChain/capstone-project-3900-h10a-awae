@@ -1,5 +1,5 @@
 # %%
-from flask import Flask
+from flask import Flask, Blueprint
 from flask_login import LoginManager
 import sqlite3
 import pandas as pd
@@ -9,18 +9,16 @@ import os
 from flask import g
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
+app.secret_key = 'very-secret-123' # must include
 
+login_manager = LoginManager()
+
+# generate database
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
         db = g._database = Database("db/ecommerce.db")
     return db
-    
-
-# Flask setup
-login_manager = LoginManager()
-login_manager.init_app(app)
-app.secret_key = 'very-secret-123' # must include
 
 # Create product DB and fill it with products
 def create_database():

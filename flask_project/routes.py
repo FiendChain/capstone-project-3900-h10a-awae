@@ -2,26 +2,31 @@
 
 from flask import Flask, json, redirect, request, render_template, url_for, send_from_directory, jsonify
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
-from server import app, login_manager
 from flask import g
+from flask import Blueprint
 
-import random
+from server import login_manager
+
+
+user_bp  = Blueprint('user_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
+admin_bp = Blueprint('admin_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
+api_bp = Blueprint('api_bp', __name__)
 
 # Product browsing
-@app.route('/', methods=["GET", "POST"])
+@user_bp.route('/', methods=["GET", "POST"])
 def home():
     data = {
         'products': [
             {
                 'image_url': f'/static/images/coffee_{i}.jpg',
-                'product_url': url_for('product_page', id=f'coffee_{i}')
+                'product_url': url_for('user_bp.product_page', id=f'coffee_{i}')
             } for i in range(1,4)
         ]
     }
     return render_template("homepage.html", **data)
 
 
-@app.route('/products/<string:id>', methods=['GET', 'POST'])
+@user_bp.route('/products/<string:id>', methods=['GET', 'POST'])
 def product_page(id):
     product = {
         'id': id,
@@ -33,7 +38,7 @@ def product_page(id):
     return render_template('product.html', product=product)
 
 # User account
-@app.route('/cart', methods=['GET'])
+@user_bp.route('/cart', methods=['GET'])
 def cart():
     def get_product(i):
         return {
@@ -42,7 +47,7 @@ def cart():
             'cost': f'{10.25:.2f}',
             'description': 'The finest lattee on the planet',
             'image_url': f'/static/images/coffee_{i}.jpg',
-            'product_url': url_for('product_page', id=f'coffee_{i}'),
+            'product_url': url_for('user_bp.product_page', id=f'coffee_{i}'),
             'category': 'coffee',
             'status': 'In stock',
         }
@@ -66,14 +71,14 @@ def cart():
     return render_template('cart.html', **data)
 
 # Purchasing
-@app.route('/api_v1/transaction/add', methods=['POST'])
+@api_bp.route('/transaction/add', methods=['POST'])
 def product_add():
     form = request.form
     print(f'Adding: {form}')
 
     return jsonify(dict(success=True))
 
-@app.route('/api_v1/transactions/update', methods=['POST'])
+@api_bp.route('/transactions/update', methods=['POST'])
 def product_update():
     form = request.form
     # discard repeats of same input field
@@ -86,22 +91,22 @@ def product_update():
 
     return jsonify(dict(quantity=quantity))
 
-@app.route('/api_v1/transaction/buy', methods=['POST'])
+@api_bp.route('/transaction/buy', methods=['POST'])
 def product_buy():
     form = request.form
     print(f'Buying: {form}')
     return jsonify(dict(success=True))
 
 # Signin endpoints
-@app.route('/login', methods=['GET', 'POST'])
+@user_bp.route('/login', methods=['GET', 'POST'])
 def login():
     return render_template("login.html")
 
-@app.route('/register', methods=['GET', 'POST'])
+@user_bp.route('/register', methods=['GET', 'POST'])
 def register():
     return render_template('registration.html')
 
-@app.route('/logout')
+@user_bp.route('/logout')
 def logout():
     logout_user()
     return redirect(url_for("login"))
