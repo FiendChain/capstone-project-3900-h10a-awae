@@ -1,0 +1,50 @@
+
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Cart</title>
+{% endblock %}
+
+{% block content %}
+{% include 'user_navbar.html' %}
+<script src="/static/js/cart.js"></script>
+
+<div class="container w-75">
+  {% for product in products %}
+  <div class="row cart-product" id="{{ product.id }}">
+    <div class="col-sm-2 thumbnail"><img src="{{ product.image_url }}" class="product-img rounded img-fluid"></div>
+    <!--Product info-->
+    <div class="col mr-auto">
+      <a href="{{ url_for('product_page', id=product.id) }}">
+        <p class="text-left my-0"><strong>{{ product.name }}</strong> in {{ product.category }}</p>
+      </a>
+      <!--Stock status-->
+      {% if product.status == 'In stock' %}
+      <p class="text-left my-0 text-success">{{ product.status }}</p>
+      {% else %}
+      <p class="text-left my-0">{{ product.status }}</p>
+      {% endif %}
+      <!--Product description tags-->
+      <p class="text-left text-bottom">{{ product.description }}</p>
+    </div>
+    <!--Product cost and quantity control-->
+    <div class="col-md-3 text-right">
+      <div class="row text-right">
+        <p class="text-right"><strong class="text-right">${{ product.cost }}</strong></p>
+      </div>
+      <!--Quantity editing form-->
+      <div class="row">
+        <form class='quantity_form' id="{{ product.id }}" method='POST' action="{{ url_for('product_update') }}">
+          <input type="hidden" id="product_id" name="product_id" value="{{ product.id }}">
+          <div class="form-group row">
+            <label class="col text-center" for="quantity">Quantity</label>
+            <input class="col form-control" type="number" min="0" max="99" id="quantity" name="quantity" value=1> 
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+{% endblock %}

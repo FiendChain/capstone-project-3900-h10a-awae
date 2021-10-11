@@ -1,0 +1,27 @@
+<!--Header-->
+<header class="navbar navar-expand flex-column">
+  <div class="row w-100">
+    <!--Search bar-->
+    <div class="col align-self-start text-left">
+      <form class="w-75 d-flex align-items-center">
+        <input type="search" class="form-control" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off" spellcheck="false">
+      </form>
+    </div>
+    <div class="col align-self-center text-center">
+      <a href="{{ url_for("home") }}">
+        <h2>Cafe AWAE</h2>
+      </a>
+    </div>
+    <!--Controls-->
+    <div class="col align-self-end text-right">
+      <div>
+        <a href='{{ url_for('cart') }}'>
+          <div class="btn btn-primary">Cart</div>
+        </a>
+        <a href='{{ url_for('login') }}'>
+          <div class="btn btn-primary">Profile</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
