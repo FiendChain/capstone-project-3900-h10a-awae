@@ -8,7 +8,20 @@ from classes.database import *
 import os
 from flask import g
 
+import os
+import pathlib
+
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
 app = Flask(__name__, static_folder='static', static_url_path='/static')
+
+# setup path for saving uploaded files
+upload_folder = os.path.join(app.instance_path, 'uploads')
+print(f"Setting upload path: {upload_folder}")
+pathlib.Path(upload_folder).mkdir(exist_ok=True, parents=True)
+app.config["UPLOAD_FOLDER"] = upload_folder 
+
+
 app.secret_key = 'very-secret-123' # must include
 
 login_manager = LoginManager()
