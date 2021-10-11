@@ -10,8 +10,8 @@ $("document").ready(() => {
         let name_field = preview.find(".filename");
         let delete_btn = preview.find("[id='delete']");
 
-
-        let default_url = dropzone.find("input.dropzone-src-url").val();
+        let el_default_url = dropzone.find("input.dropzone-src-url");
+        let default_url = el_default_url.val();
         let image_changed = dropzone.find("input.dropzone-dirty");
 
         function show_image(src, filename) {
@@ -65,6 +65,15 @@ $("document").ready(() => {
             let file = input.files && input.files[0];
             if (file) {
                 on_file_load(file);
+            } else {
+                remove_image();
+            }
+        });
+
+        el_default_url.change(function() {
+            default_url = el_default_url.val();
+            if (!image_changed.val()) {
+                reset_image();
             }
         });
 

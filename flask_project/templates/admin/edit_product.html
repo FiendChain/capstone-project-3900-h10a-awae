@@ -24,7 +24,7 @@
 <!--Homepage-->
 <div class="container w-75">
 <h3>Edit Product</h3>
-<form id="edit-product" method="POST" action="{{ url_for("admin_bp.edit_product", id=id) }}" enctype="multipart/form-data">
+<form class="wtf-ajax-form" id="edit-product" method="POST" action="{{ url_for("admin_api_bp.edit_product", id=id) }}" enctype="multipart/form-data">
   {{ form.csrf_token }}
   {{ render_product_form(form) }}
   <!--Form controls-->
