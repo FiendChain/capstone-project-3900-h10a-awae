@@ -12,6 +12,15 @@
 
 {% from "admin/product_form.html" import render_product_form %}
 
+<!--Navigation breadcrumb-->
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('admin_bp.home') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('admin_bp.products')}}">Products</a></li>
+    <li class="breadcrumb-item active">Add Product</li>
+  </ol>
+</nav>
+
 <!--Homepage-->
 <div class="container w-75">
 <h3>Add Product</h3>
