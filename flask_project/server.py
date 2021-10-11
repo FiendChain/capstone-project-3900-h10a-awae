@@ -17,10 +17,11 @@ app = Flask(__name__, static_folder='static', static_url_path='/static')
 
 # setup path for saving uploaded files
 upload_folder = os.path.join(app.instance_path, '../static/uploads')
-print(f"Setting upload path: {upload_folder}")
-pathlib.Path(upload_folder).mkdir(exist_ok=True, parents=True)
-app.config["UPLOAD_FOLDER"] = upload_folder 
+image_folder = os.path.join(upload_folder, 'images')
+pathlib.Path(image_folder).mkdir(exist_ok=True, parents=True)
+print(f"Setting upload image path: {image_folder}")
 
+app.config['UPLOADED_IMAGES_DEST'] = image_folder
 
 app.secret_key = 'very-secret-123' # must include
 

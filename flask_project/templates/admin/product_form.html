@@ -1,0 +1,92 @@
+{% macro render_product_form(form) %}
+
+<script src="/static/js/dragndrop_image.js"></script>
+<link rel="stylesheet" href="/static/css/dragndrop_image.css">
+
+<div class="row my-2">
+  <div class="col-md-8">
+      <!--Name-->
+      <div class="form-group row">
+        <label for="{{ form.name.id }}" class="col-md-3 col-form-label">Name</label>
+        <div class="col">
+          <input 
+            type="text" class="form-control" placeholder="Name" required
+            id="{{ form.name.id }}" name="{{ form.name.id }}" value="{{ form.name.data or '' }}">
+        </div>
+      </div>
+      <!--Unit price-->
+      <div class="form-group row">
+        <label for="{{ form.unit_price.id }}" class="col-md-3 col-form-label">Unit Price</label>
+        <div class="col input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text">$</span>
+          </div>
+          <input 
+            type="number" step="0.01" class="form-control d-flex" placeholder="Unit Price" min="1" required
+            id="{{ form.unit_price.id }}" name="{{ form.unit_price.id }}" value="{{ form.unit_price.data or 1 }}">
+        </div>
+      </div>
+      <!--Category-->
+      <div class="form-group row">
+        <label for="{{ form.category.id }}" class="col-md-3 col-form-label">Category</label>
+        <div class="col input-group">
+          <select class="custom-select" id="{{ form.category.id }}" name="{{ form.category.id }}">
+            <option value="coffee"  {{'selected' if form.category.data=='coffee' }}>Coffee</option>
+            <option value="cofveve" {{'selected' if form.category.data=='cofveve' }}>Cofveve</option>
+            <option value="latte"   {{'selected' if form.category.data=='latte' }}>Latte</option>
+            <option value="brown"   {{'selected' if form.category.data=='brown' }}>Brown</option>
+          </select>
+        </div>
+      </div>
+      <!--Description-->
+      <div class="form-group row">
+        <label for="{{ form.description.id }}" class="col-md-3 col-form-label">Description</label>
+        <div class="col">
+          <textarea 
+            type="text" class="form-control" placeholder="No description given" rows="3" maxlength="250"
+            id="{{ form.description.id }}" name="{{ form.description.id }}">{{ form.description.data or '' }}</textarea>
+        </div>
+      </div>
+      <!--Estimated delivery-->
+      <div class="form-group row">
+        <label for="{{ form.est_delivery_amount.id }}" class="col-md-3 col-form-label">Est. delivery in</label>
+        <div class="col input-group">
+          <input 
+            type="number" class="form-control d-flex" placeholder="Unit Price" min="1" required
+            id="{{ form.est_delivery_amount.id }}" name="{{ form.est_delivery_amount.id }}" value="{{ form.est_delivery_amount.data or 1 }}">
+          <div class="input-group-append">
+            <select class="custom-select" id="{{ form.est_delivery_units.id }}" name="{{ form.est_delivery_units.id }}">
+              <option value="days"    {{ 'selected' if form.est_delivery_units.data == 'days' }}>Days</option>
+              <option value="weeks"   {{ 'selected' if form.est_delivery_units.data == 'weeks' }}>Weeks</option>
+              <option value="months"  {{ 'selected' if form.est_delivery_units.data == 'months' }}>Months</option>
+              <option value="years"   {{ 'selected' if form.est_delivery_units.data == 'years' }}>Years</option>
+            </select>
+          </div>
+        </div>
+      </div>
+  </div>
+
+  <div class="col">
+    <div class="dragndrop-image round">
+      <div class="preview d-none">
+        <div class="overlay">
+          <div class="row h-100 text-center justify-content-center">
+            <div class="col my-auto mx-auto">
+              <div class="btn btn-danger" id="delete">Delete</div>
+            </div>
+          </div>
+        </div>
+        <img class="img-fluid" src=""/>
+        <p class="filename text-center"></p>
+      </div>
+
+      <div class="dropzone w-100">
+        <div class="dropzone-description">
+          <p>Choose an image file or drag it here.</p>
+        </div>
+        <input type="file" id="{{ form.image.id }}" name="{{ form.image.id }}" accept="image/*" class="dropzone-input" form="add-product" required>
+      </div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
