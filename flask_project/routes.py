@@ -66,14 +66,14 @@ def cart():
     return render_template('cart.html', **data)
 
 # Purchasing
-@app.route('/transaction/add', methods=['POST'])
+@app.route('/api_v1/transaction/add', methods=['POST'])
 def product_add():
     form = request.form
     print(f'Adding: {form}')
 
     return jsonify(dict(success=True))
 
-@app.route('/transactions/update', methods=['POST'])
+@app.route('/api_v1/transactions/update', methods=['POST'])
 def product_update():
     form = request.form
     # discard repeats of same input field
@@ -86,7 +86,7 @@ def product_update():
 
     return jsonify(dict(quantity=quantity))
 
-@app.route('/transaction/buy', methods=['POST'])
+@app.route('/api_v1/transaction/buy', methods=['POST'])
 def product_buy():
     form = request.form
     print(f'Buying: {form}')
