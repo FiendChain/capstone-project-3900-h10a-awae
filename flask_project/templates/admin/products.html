@@ -9,6 +9,26 @@
 {% block content %}
 {% include 'admin/alt_navbar.html' %}
 
+<script>
+$('document').ready(function () {
+
+  $("[id='product-remove']").click(function() {
+    let btn = $(this);
+    let url = btn.attr("url");
+    let row_entry = btn.parents("tr").first();
+
+    $.ajax({
+      url, type: 'POST',
+      success: () => {
+        row_entry.remove();
+      },
+      error: () => location.reload(),
+    })
+
+  });
+});
+</script>
+
 <!--Homepage-->
 <div class="container w-75">
   <!--Table header-->
@@ -49,7 +69,9 @@
           <a href="{{ url_for("admin_bp.edit_product", id=p.id) }}">
             <div class="btn btn-sm btn-outline-primary">Edit</div>
           </a>
-          <div class="btn btn-sm btn-danger">Remove</div>
+          <div 
+            class="btn btn-sm btn-danger" id="product-remove" 
+            url="{{ url_for("admin_bp.delete_product", id=p.id) }}">Remove</div>
         </div>
       </td>
     </tr>

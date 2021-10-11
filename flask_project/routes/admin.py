@@ -2,6 +2,8 @@ from flask import redirect, request, render_template, url_for, abort
 from flask import g
 from flask import Blueprint
 
+from flask import jsonify
+
 from server import app
 import os
 import uuid
@@ -117,3 +119,12 @@ def edit_product(id):
 
     db_products[id] = product
     return redirect(url_for('admin_bp.products'))
+
+@admin_bp.route("/products/<string:id>/delete", methods=["POST"])
+def delete_product(id):
+    if id in db_products:
+        print(f"Deleting product: {id}")
+        del db_products[id]
+        return jsonify({'success': True})
+    
+    abort(403)
