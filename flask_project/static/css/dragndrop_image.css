@@ -9,6 +9,19 @@
   background: #ecf0f5;
 }
 
+.dragndrop-image .dropzone .overlay {
+  position: absolute;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.dragndrop-image .dropzone:hover .overlay {
+  opacity: 1;
+}
+
 .dragndrop-image .dropzone-input,
 .dragndrop-image .dropzone-input:focus {
   position: absolute;

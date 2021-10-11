@@ -5,6 +5,17 @@
 
 <div class="row my-2">
   <div class="col-md-8">
+      <!--Id if it exists-->
+      {% if form.id.data %}
+      <div class="form-group row">
+        <label for="{{ form.id.id }}" class="col-md-3 col-form-label">UUID</label>
+        <div class="col">
+          <input 
+            type="text" class="form-control" placeholder="Name" required readonly
+            id="{{ form.id.id }}" name="{{ form.id.id }}" value="{{ form.id.data or '' }}">
+        </div>
+      </div>
+      {% endif %}
       <!--Name-->
       <div class="form-group row">
         <label for="{{ form.name.id }}" class="col-md-3 col-form-label">Name</label>
@@ -47,6 +58,15 @@
             id="{{ form.description.id }}" name="{{ form.description.id }}">{{ form.description.data or '' }}</textarea>
         </div>
       </div>
+      <!--Total in stock-->
+      <div class="form-group row">
+        <label for="{{ form.in_stock.id }}" class="col-md-3 col-form-label">In stock</label>
+        <div class="col input-group">
+          <input 
+            type="number" class="form-control d-flex" placeholder="In stock" min="1" required
+            id="{{ form.in_stock.id }}" name="{{ form.in_stock.id }}" value="{{ form.in_stock.data or 0 }}">
+        </div>
+      </div>
       <!--Estimated delivery-->
       <div class="form-group row">
         <label for="{{ form.est_delivery_amount.id }}" class="col-md-3 col-form-label">Est. delivery in</label>
@@ -65,10 +85,12 @@
         </div>
       </div>
   </div>
-
+  <!--Image upload-->
   <div class="col">
     <div class="dragndrop-image round">
+      <!--Image preview-->
       <div class="preview d-none">
+        <!--Overlay to show edit buttons-->
         <div class="overlay">
           <div class="row h-100 text-center justify-content-center">
             <div class="col my-auto mx-auto">
@@ -80,11 +102,22 @@
         <p class="filename text-center"></p>
       </div>
 
+      <!--Image drop zone-->
       <div class="dropzone w-100">
+        <!--Reset control for dropzone if original src url was provided-->
+        <div class="overlay d-none">
+          <div class="justify-content-right text-right">
+            <div class="btn btn-secondary" id="reset">Reset</div>
+          </div>
+        </div>
         <div class="dropzone-description">
           <p>Choose an image file or drag it here.</p>
         </div>
-        <input type="file" id="{{ form.image.id }}" name="{{ form.image.id }}" accept="image/*" class="dropzone-input" form="add-product" required>
+        <!--If there was an original src image, store its url here-->
+        <input value="{{ form.image_url.data or '' }}" class="dropzone-src-url" hidden>
+        <input type="checkbox" checked=false name="{{ form.image_changed.id }}" class="dropzone-dirty" required hidden>
+        <!--Input that actually handles the drag and drop-->
+        <input type="file" id="{{ form.image.id }}" name="{{ form.image.id }}" accept="image/*" class="dropzone-input">
       </div>
     </div>
   </div>

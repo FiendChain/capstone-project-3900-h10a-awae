@@ -1,0 +1,29 @@
+{% import "bootstrap/wtf.html" as wtf %}
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/homepage.css">
+<title>Cafe AWAE Admin Product</title>
+{% endblock %}
+
+
+{% block content %}
+{% include 'admin/alt_navbar.html' %}
+
+{% from "admin/product_form.html" import render_product_form %}
+
+<!--Homepage-->
+<div class="container w-75">
+<h3>Edit Product</h3>
+<form id="edit-product" method="POST" action="{{ url_for("admin_bp.edit_product", id=id) }}" enctype="multipart/form-data">
+  {{ form.csrf_token }}
+  {{ render_product_form(form) }}
+  <!--Form controls-->
+  <div class="form-group row text-right">
+    <div class="col">
+      <button type="submit" class="btn btn-primary">Submit Changes</button>
+    </div>
+  </div>
+</form>
+</div>
+{% endblock %}

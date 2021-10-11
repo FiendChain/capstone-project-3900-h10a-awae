@@ -17,6 +17,7 @@ if __name__ == "__main__":
     # handle login
     login_manager.init_app(app)
     app.config['TEMPLATES_AUTO_RELOAD'] = True
+    app.debug = True
 
     server = Server(app.wsgi_app)
     server.serve(port=5002, debug=True, liveport=5003)

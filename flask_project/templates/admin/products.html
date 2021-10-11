@@ -40,13 +40,15 @@
     <tr>
       <th scope="row">{{ p.id }}</th>
       <td>{{ p.name }}</td>
-      <td>{{ p.cost }}</td>
-      <td>{{ p.est_delivery }}</td>
+      <td>{{ "$%.2f"|format(p.cost) }}</td>
+      <td>{{ "%d %s"|format(p.est_delivery_amount, p.est_delivery_units) }}</td>
       <td>{{ p.in_stock }}</td>
       <td>
         <div class="text-right">
           <div class="btn btn-sm btn-outline-primary">Details</div>
-          <div class="btn btn-sm btn-outline-primary">Edit</div>
+          <a href="{{ url_for("admin_bp.edit_product", id=p.id) }}">
+            <div class="btn btn-sm btn-outline-primary">Edit</div>
+          </a>
           <div class="btn btn-sm btn-danger">Remove</div>
         </div>
       </td>
