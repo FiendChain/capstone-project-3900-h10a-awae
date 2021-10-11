@@ -7,8 +7,37 @@
 
 
 {% block content %}
+{% include 'admin/navbar.html' %}
+
 <!--Homepage-->
-<div class="container-fluid">
-    Admin stuff
+<div class="container w-75">
+  <div class="row my-auto justify-content-center">
+    <div class="col-md-3 mx-auto border">
+      <div class="row">
+        <img src="/static/images/coffee_1.jpg" alt="#" class="product-img rounded img-fluid">
+      </div>
+      <div class="row justify-content-center my-1">
+        <div class="btn btn-primary text-center" href="#">Manage products</div>
+      </div>
+    </div>
+
+    <div class="col-md-3 mx-auto border">
+      <div class="row">
+        <img src="/static/images/coffee_2.jpg" alt="#" class="product-img rounded img-fluid">
+      </div>
+      <div class="row justify-content-center my-1">
+        <div class="btn btn-primary text-center" href="#">View orders</div>
+      </div>
+    </div>
+
+    <div class="col-md-3 mx-auto border">
+      <div class="row">
+        <img src="/static/images/coffee_3.jpg" alt="#" class="product-img rounded img-fluid">
+      </div>
+      <div class="row justify-content-center my-1">
+        <div class="btn btn-primary text-center" href="#">View past sales</div>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

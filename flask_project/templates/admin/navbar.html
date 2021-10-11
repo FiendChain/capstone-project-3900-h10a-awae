@@ -1,0 +1,18 @@
+<!--Header-->
+<header class="navbar navar-expand flex-column">
+  <div class="row w-100">
+    <div class="col align-self-start text-left">
+      <a href="{{ url_for("admin_bp.home") }}">
+        <h2>Welcome, Admin</h2>
+      </a>
+    </div>
+    <!--Controls-->
+    <div class="col align-self-end text-right">
+      <div>
+        <a href='{{ url_for('admin_bp.login') }}'>
+          <div class="btn btn-primary">Profile</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
