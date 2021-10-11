@@ -8,6 +8,7 @@ from werkzeug.utils import secure_filename
 
 from server import login_manager, app
 import os
+import uuid
 
 admin_bp = Blueprint('admin_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
 
@@ -58,12 +59,36 @@ def add_product():
     print(f"Adding product: {request.form}")
     print(request.files)
 
+    form = request.form.to_dict(flat=True)
+
     files = request.files.to_dict(flat=True)
-    if 'image' in files:
-        file = files['image']
-        if file.filename != '':
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    if 'image' not in files:
+        abort(403)
+
+    file = files['image']
+    if file.filename == '':
+        abort(403)
+    
+    if '.' not in file.filename:
+        abort(403)
+
+    ext = os.path.splitext(file.filename)[1]
+    rand_filename = f"{uuid.uuid4()}.{ext}"
+    uid = uuid.uuid4()
+    file.save(os.path.join(app.config['UPLOAD_FOLDER'], rand_filename))
+    
+    product = {
+        "name": form["name"],
+        "cost": form["price"],
+        "category": form["category"],
+        "description": form["description"],
+        "est_delivery": f"{form['est-delivery']} {form['est-delivery-units']}",
+        "in_stock": 10,
+        "image_url": rand_filename,
+        "id": uid,
+    }
+
+    db_products.append(product)
 
     return redirect(url_for('admin_bp.products'))
 

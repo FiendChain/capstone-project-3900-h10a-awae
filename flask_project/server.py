@@ -16,7 +16,7 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 
 # setup path for saving uploaded files
-upload_folder = os.path.join(app.instance_path, 'uploads')
+upload_folder = os.path.join(app.instance_path, '../static/uploads')
 print(f"Setting upload path: {upload_folder}")
 pathlib.Path(upload_folder).mkdir(exist_ok=True, parents=True)
 app.config["UPLOAD_FOLDER"] = upload_folder 
