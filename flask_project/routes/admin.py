@@ -13,7 +13,7 @@ admin_bp = Blueprint('admin_bp', __name__, static_folder='static', static_url_pa
 db_products = {
     "A232-109": {
         "name": "Lite Latte",
-        "cost": 10.20,
+        "unit_price": 10.20,
         "est_delivery_amount": 3,
         "est_delivery_units": "days",
         "in_stock": 10,
@@ -45,9 +45,6 @@ def add_product():
     form = ProductForm()
 
     if not form.validate_on_submit():
-        for fieldName, errorMessages in form.errors.items():
-            for err in errorMessages:
-                print(err)
         return render_template("admin/add_product.html", form=form)
 
     print(f"Adding product: {form}")
@@ -67,7 +64,7 @@ def add_product():
     
     product = {
         "name": form.name.data,
-        "cost": form.unit_price.data,
+        "unit_price": form.unit_price.data,
         "category": form.category.data,
         "description": form.description.data,
         "est_delivery_amount": form.est_delivery_amount.data,
@@ -90,9 +87,6 @@ def edit_product(id):
     form = ProductForm(data={'id':id, **product})
 
     if not form.validate_on_submit():
-        for fieldName, errorMessages in form.errors.items():
-            for err in errorMessages:
-                print(err)
         return render_template("admin/edit_product.html", form=form, id=id)
     
     print(f"Editing product: {form}")
@@ -112,7 +106,7 @@ def edit_product(id):
     
     product = {
         "name": form.name.data,
-        "cost": form.unit_price.data,
+        "unit_price": form.unit_price.data,
         "category": form.category.data,
         "description": form.description.data,
         "est_delivery_amount": form.est_delivery_amount.data,

@@ -34,7 +34,7 @@ class ProductForm(FlaskForm):
     image_changed = BooleanField(validators=[InputRequired()], default=False)
     image = FileField(validators=[Optional(), FileAllowed(valid_images, message="Images allowed only")])
 
-    name = StringField(validators=[Length(5, 40), InputRequired()])
+    name = StringField(validators=[Length(5, 40), InputRequired(message="Product name is required")])
     unit_price = FloatField(validators=[NumberRange(min=0, max=1000), InputRequired()])
     category = StringField(validators=[AnyOf(valid_categories), InputRequired()])
     description = StringField(validators=[Length(0, 250)])

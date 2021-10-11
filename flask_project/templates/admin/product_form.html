@@ -1,3 +1,18 @@
+{% macro get_input_error(field) %}
+{{ 'is-invalid' if field.errors else '' }}
+{% endmacro %}
+
+{% macro render_form_error(field) %}
+{% if field.errors %}
+{% for error in field.errors %}
+<div id="{{ field.id }}" class="invalid-feedback">
+  {{ error }}
+</div>
+{% endfor %}
+{% endif %}
+{% endmacro %}
+
+
 {% macro render_product_form(form) %}
 
 <script src="/static/js/dragndrop_image.js"></script>
@@ -21,8 +36,9 @@
         <label for="{{ form.name.id }}" class="col-md-3 col-form-label">Name</label>
         <div class="col">
           <input 
-            type="text" class="form-control" placeholder="Name" required
+            type="text" class="form-control {{ get_input_error(form.name) }}" placeholder="Name" required
             id="{{ form.name.id }}" name="{{ form.name.id }}" value="{{ form.name.data or '' }}">
+          {{ render_form_error(form.name) }}
         </div>
       </div>
       <!--Unit price-->
@@ -33,20 +49,22 @@
             <span class="input-group-text">$</span>
           </div>
           <input 
-            type="number" step="0.01" class="form-control d-flex" placeholder="Unit Price" min="1" required
+            type="number" step="0.01" class="form-control {{ get_input_error(form.unit_price) }}" placeholder="Unit Price" min="1" required
             id="{{ form.unit_price.id }}" name="{{ form.unit_price.id }}" value="{{ form.unit_price.data or 1 }}">
+          {{ render_form_error(form.unit_price) }}
         </div>
       </div>
       <!--Category-->
       <div class="form-group row">
         <label for="{{ form.category.id }}" class="col-md-3 col-form-label">Category</label>
         <div class="col input-group">
-          <select class="custom-select" id="{{ form.category.id }}" name="{{ form.category.id }}">
+          <select class="custom-select {{ get_input_error(form.category) }}" id="{{ form.category.id }}" name="{{ form.category.id }}">
             <option value="coffee"  {{'selected' if form.category.data=='coffee' }}>Coffee</option>
             <option value="cofveve" {{'selected' if form.category.data=='cofveve' }}>Cofveve</option>
             <option value="latte"   {{'selected' if form.category.data=='latte' }}>Latte</option>
             <option value="brown"   {{'selected' if form.category.data=='brown' }}>Brown</option>
           </select>
+          {{ render_form_error(form.category) }}
         </div>
       </div>
       <!--Description-->
@@ -54,8 +72,9 @@
         <label for="{{ form.description.id }}" class="col-md-3 col-form-label">Description</label>
         <div class="col">
           <textarea 
-            type="text" class="form-control" placeholder="No description given" rows="3" maxlength="250"
+            type="text" class="form-control {{ get_input_error(form.description) }}" placeholder="No description given" rows="3" maxlength="250"
             id="{{ form.description.id }}" name="{{ form.description.id }}">{{ form.description.data or '' }}</textarea>
+          {{ render_form_error(form.description) }}
         </div>
       </div>
       <!--Total in stock-->
@@ -63,8 +82,9 @@
         <label for="{{ form.in_stock.id }}" class="col-md-3 col-form-label">In stock</label>
         <div class="col input-group">
           <input 
-            type="number" class="form-control d-flex" placeholder="In stock" min="1" required
+            type="number" class="form-control d-flex {{ get_input_error(form.in_stock) }}" placeholder="In stock" min="0" required
             id="{{ form.in_stock.id }}" name="{{ form.in_stock.id }}" value="{{ form.in_stock.data or 0 }}">
+          {{ render_form_error(form.in_stock) }}
         </div>
       </div>
       <!--Estimated delivery-->
@@ -72,16 +92,18 @@
         <label for="{{ form.est_delivery_amount.id }}" class="col-md-3 col-form-label">Est. delivery in</label>
         <div class="col input-group">
           <input 
-            type="number" class="form-control d-flex" placeholder="Unit Price" min="1" required
+            type="number" class="form-control d-flex {{ get_input_error(form.est_delivery_amount) }}" placeholder="Unit Price" min="1" required
             id="{{ form.est_delivery_amount.id }}" name="{{ form.est_delivery_amount.id }}" value="{{ form.est_delivery_amount.data or 1 }}">
           <div class="input-group-append">
-            <select class="custom-select" id="{{ form.est_delivery_units.id }}" name="{{ form.est_delivery_units.id }}">
+            <select class="custom-select {{ get_input_error(form.est_delivery_units) }}" id="{{ form.est_delivery_units.id }}" name="{{ form.est_delivery_units.id }}">
               <option value="days"    {{ 'selected' if form.est_delivery_units.data == 'days' }}>Days</option>
               <option value="weeks"   {{ 'selected' if form.est_delivery_units.data == 'weeks' }}>Weeks</option>
               <option value="months"  {{ 'selected' if form.est_delivery_units.data == 'months' }}>Months</option>
               <option value="years"   {{ 'selected' if form.est_delivery_units.data == 'years' }}>Years</option>
             </select>
           </div>
+          {{ render_form_error(form.est_delivery_amount) }}
+          {{ render_form_error(form.est_delivery_units) }}
         </div>
       </div>
   </div>
@@ -117,7 +139,8 @@
         <input value="{{ form.image_url.data or '' }}" class="dropzone-src-url" hidden>
         <input type="checkbox" checked=false name="{{ form.image_changed.id }}" class="dropzone-dirty" required hidden>
         <!--Input that actually handles the drag and drop-->
-        <input type="file" id="{{ form.image.id }}" name="{{ form.image.id }}" accept="image/*" class="dropzone-input">
+        <input type="file" id="{{ form.image.id }}" name="{{ form.image.id }}" accept="image/*" class="dropzone-input {{ get_input_error(form.image) }}">
+        {{ render_form_error(form.image) }}
       </div>
     </div>
   </div>
