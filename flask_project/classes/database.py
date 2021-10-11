@@ -10,7 +10,7 @@ class Database(object):
         cur = conn.cursor()
         self.conn = conn
         self.cur = cur
-        print("db initialised, use db.conn and db.cur")
+        print("db connected, use db.conn and db.cur")
     
     def tables_create(self, f):
         self.cur.executescript(f.read()) # Read sql schema and create tables
@@ -48,7 +48,6 @@ class Database(object):
         print("Sample entries filled")
     
 
-
     def drop(self, table):
         try:
             self.cur.execute(f"DROP TABLE {table}")
@@ -77,7 +76,7 @@ class Database(object):
 
     def add(self, table_name, entry_no_id):
         # Assign a uid for the product
-        cols_no_id = dict((i, self.cols[i]) for i in self.cols if i != "id")   # Drop rowid from entry class
+        cols_no_id = dict((i, self.tables[table_name[i]]) for i in self.tables[table_name] if i != "id")   # Drop rowid from entry class
         subquery1 = ', '.join(f"{key}" for key in cols_no_id.keys())
         subquery2 = ', '.join(f"?" for i in enumerate(cols_no_id))
         query = f"INSERT INTO {table_name} ({subquery1}) VALUES ({subquery2})"
@@ -95,7 +94,7 @@ class Database(object):
         print(f"Entry {entry[0]} deleted")
 
     def update(self, table_name, entry_old, entry_new):
-        subquery1 = ', '.join(f"{col} = ?" for (i, col) in enumerate(self.cols))
+        subquery1 = ', '.join(f"{col} = ?" for (i, col) in enumerate(self.tables[table_name]))
         query = f"UPDATE {table_name} SET {subquery1} WHERE id = {entry_old[0]}"
         params = entry_new
         print(query)
@@ -103,3 +102,22 @@ class Database(object):
         self.cur.execute(query, params)
         self.conn.commit()
         print(f"Entry {entry_new[0]} updated")
+    
+    def get_random_entries(self, table_name, amount):
+        query = f"SELECT * from {table_name} ORDER BY RANDOM() LIMIT {amount}"
+        self.cur.execute(query)
+        entries = self.cur.fetchall()
+        entries = [self.make_dicts(self.cur, entry) for entry in entries]
+        return entries
+
+    def make_dicts(self, cursor, row):
+        return dict((cursor.description[idx][0], value) for idx, value in enumerate(row))
+
+
+
+# # To prevent SQL injection and for better database security, we must use wildcards instead of variable names in the query
+# wildcards = {
+#     "products": "?, ?, ?, ?, ?, ?, ?, ?",
+#     "accounts": "?, ?, ?, ?, ?, ?, ?"
+# }
+# %%

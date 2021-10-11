@@ -4,17 +4,21 @@ from flask import Flask, json, redirect, request, render_template, url_for, send
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from server import app, login_manager
 from flask import g
-
+from server import get_db
 import random
 
 # Product browsing
 @app.route('/', methods=["GET", "POST"])
 def home():
+    with app.app_context():
+        db = get_db()
+        products = db.get_random_entries("products", 4)
     data = {
         'products': [
             {
-                'image_url': f'/static/images/coffee_{i}.jpg',
-                'product_url': url_for('product_page', id=f'coffee_{i}')
+                'image_url': f'/static/images/product_{i}.jpg',
+                'product_url': url_for('product_page', id=f'product_{i}'),
+                'product_name': products[i]["name"]
             } for i in range(1,4)
         ]
     }
@@ -37,13 +41,13 @@ def product_page(id):
 def cart():
     def get_product(i):
         return {
-            'id': f'coffee_{i}',
-            'name': f'coffee_{i}',
+            'id': f'product_{i}',
+            'name': f'product_{i}',
             'cost': f'{10.25:.2f}',
             'description': 'The finest lattee on the planet',
-            'image_url': f'/static/images/coffee_{i}.jpg',
-            'product_url': url_for('product_page', id=f'coffee_{i}'),
-            'category': 'coffee',
+            'image_url': f'/static/images/product_{i}.jpg',
+            'product_url': url_for('product_page', id=f'product_{i}'),
+            'category': 'product',
             'status': 'In stock',
         }
     products = [get_product(i) for i in range(1,4)]

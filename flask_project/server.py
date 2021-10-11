@@ -44,8 +44,6 @@ def create_database():
         # print(db.tables)
 
         db.fill("products", "data/awae_products.xlsx")
-        x = db.search_product_by_name("tall coffee")
-        print(x)
         db.conn.close()
     print("System finished setting up")
     # table_products = Table("products", table_cols["products"], conn, cur)
