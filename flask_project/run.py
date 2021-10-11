@@ -1,6 +1,7 @@
 from livereload import Server
 from server import app, login_manager
 from routes import user_bp, admin_bp, api_bp
+import flask_db
 
 if __name__ == "__main__":
     app.jinja_env.auto_reload = True
