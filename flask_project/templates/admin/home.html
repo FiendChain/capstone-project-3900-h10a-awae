@@ -17,7 +17,9 @@
         <img src="/static/images/coffee_1.jpg" alt="#" class="product-img rounded img-fluid">
       </div>
       <div class="row justify-content-center my-1">
-        <div class="btn btn-primary text-center" href="#">Manage products</div>
+        <a href="{{ url_for("admin_bp.products") }}">
+          <div class="btn btn-primary text-center">Manage products</div>
+        </a>
       </div>
     </div>
 

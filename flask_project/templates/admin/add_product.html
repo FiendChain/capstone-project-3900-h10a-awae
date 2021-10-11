@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/homepage.css">
+<title>Cafe AWAE Admin Product</title>
+{% endblock %}
+
+
+{% block content %}
+{% include 'admin/alt_navbar.html' %}
+
+<script src="/static/js/dragndrop_image.js"></script>
+<link rel="stylesheet" href="/static/css/dragndrop_image.css">
+
+<!--Homepage-->
+<div class="container w-75">
+<h3>Add Product</h3>
+<form id="add-product" method="POST" action="{{ url_for("admin_bp.add_product") }}" enctype="multipart/form-data">
+  <div class="row my-2">
+    <div class="col-md-8">
+        <!--Name-->
+        <div class="form-group row">
+          <label for="name" class="col-md-3 col-form-label">Name</label>
+          <div class="col">
+            <input type="text" class="form-control" id="name" name="name" placeholder="Name" required>
+          </div>
+        </div>
+        <!--Unit price-->
+        <div class="form-group row">
+          <label for="price" class="col-md-3 col-form-label">Unit Price</label>
+          <div class="col input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text">$</span>
+            </div>
+            <input type="number" class="form-control d-flex" id="price" name="price" placeholder="Unit Price" min="1" value="1" required>
+          </div>
+        </div>
+        <!--Category-->
+        <div class="form-group row">
+          <label for="category" class="col-md-3 col-form-label">Category</label>
+          <div class="col input-group">
+            <select class="custom-select mr-sm-2" id="category" name="category">
+              <option value="Coffee" selected>Coffee</option>
+              <option value="Cofveve">Cofveve</option>
+              <option value="Latte">Latte</option>
+              <option value="Brown">Brown</option>
+            </select>
+          </div>
+        </div>
+        <!--Description-->
+        <div class="form-group row">
+          <label for="description" class="col-md-3 col-form-label">Description</label>
+          <div class="col">
+            <textarea 
+              type="text" class="form-control" id="description" name="description" 
+              placeholder="No description given" rows="3" maxlength="250" required></textarea>
+          </div>
+        </div>
+        <!--Estimated delivery-->
+        <div class="form-group row">
+          <label for="est-delivery" class="col-md-3 col-form-label">Est. delivery in</label>
+          <div class="col input-group">
+            <input 
+              type="number" class="form-control d-flex" id="est-delivery" name="est-delivery" 
+              placeholder="Unit Price" min="1" value="1" required>
+            <div class="input-group-append">
+              <select class="custom-select mr-sm-2" id="est-delivery-units" name="est-delivery-units">
+                <option value="days" selected>Days</option>
+                <option value="weeks">Weeks</option>
+                <option value="months">Months</option>
+                <option value="years">Years</option>
+              </select>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <div class="col">
+      <div class="dragndrop-image round">
+        <div class="preview d-none">
+          <div class="overlay">
+            <div class="row h-100 text-center justify-content-center">
+              <div class="col my-auto mx-auto">
+                <div class="btn btn-danger" id="delete">Delete</div>
+              </div>
+            </div>
+          </div>
+          <img class="img-fluid" src=""/>
+          <p class="filename text-center"></p>
+        </div>
+
+        <div class="dropzone w-100">
+          <div class="dropzone-description">
+            <p>Choose an image file or drag it here.</p>
+          </div>
+          <input type="file" id="image" name="image" accept="image/*" class="dropzone-input" form="add-product" required>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!--Form controls-->
+  <div class="form-group row text-right">
+    <div class="col">
+      <button type="submit" class="btn btn-primary">Add Product</button>
+    </div>
+  </div>
+</form>
+</div>
+{% endblock %}

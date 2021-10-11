@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<link rel="stylesheet" href="/static/css/homepage.css">
+<title>Cafe AWAE Admin Products</title>
+{% endblock %}
+
+
+{% block content %}
+{% include 'admin/alt_navbar.html' %}
+
+<!--Homepage-->
+<div class="container w-75">
+  <!--Table header-->
+  <div class="row mx-0 justify-content-center">
+    <div class="col text-left">
+      <h4>My Products</h4>
+    </div>
+    <div class="col text-right">
+      <a href="{{ url_for("admin_bp.add_product") }}">
+        <div class="btn btn-sm btn-primary">Add Product</div>
+      </a>
+    </div>
+  </div>
+
+  <!--Product list--> 
+  <table class="table table-hover">
+  <thead>
+    <tr>
+      <th scope="col">UID</th>
+      <th scope="col">Name</th>
+      <th scope="col">Price ($)</th>
+      <th scope="col">Est. Delivery</th>
+      <th scope="col">In Stock</th>
+      <th scope="col">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for p in products %}
+    <tr>
+      <th scope="row">{{ p.id }}</th>
+      <td>{{ p.name }}</td>
+      <td>{{ p.cost }}</td>
+      <td>{{ p.est_delivery }}</td>
+      <td>{{ p.in_stock }}</td>
+      <td>
+        <div class="text-right">
+          <div class="btn btn-sm btn-outline-primary">Details</div>
+          <div class="btn btn-sm btn-outline-primary">Edit</div>
+          <div class="btn btn-sm btn-danger">Remove</div>
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}
