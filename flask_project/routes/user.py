@@ -16,14 +16,12 @@ def home():
     products = db.products.values()
     return render_template("homepage.html", products=products)
 
-
 @user_bp.route('/products/<string:id>', methods=['GET', 'POST'])
 def product_page(id):
     if id not in db.products:
         abort(404)
     
     product = db.products[id]
-
     return render_template('product.html', product=product)
 
 # Signin endpoints
@@ -33,7 +31,6 @@ def login():
     register_form = RegisterForm()
     return render_template("login.html", login_form=login_form, register_form=register_form)
     
-
 @user_bp.route('/register', methods=['GET', 'POST'])
 def register():
     return render_template('registration.html')
@@ -43,6 +40,7 @@ def logout():
     logout_user()
     return redirect(url_for("user_bp.login"))
 
+# Perform login validation
 @api_bp.route("/login", methods=["POST"])
 def login():
     form = LoginForm()
@@ -66,8 +64,8 @@ def login():
     print(f"User logged in: {serialize_form(form)}")
     login_user(user, remember=form.remember_me.data)
     return jsonify(dict(redirect=url_for("user_bp.home")))
-    
 
+# Perform registration validation
 @api_bp.route("/register", methods=["POST"])
 def register():
     form = RegisterForm()
@@ -77,9 +75,16 @@ def register():
     
     return jsonify(serialize_form(form)), 403
 
+# User account
+@user_bp.route('/profile', methods=["GET"])
+def profile():
+    return render_template("profile.html")
+
+# Cart and purchasing
 def validate_product_id(id):
     return id in db.products
 
+# Depending on whether a user is logged in, we can store cart in flask-session or mock db
 def get_user_cart():
     if not current_user.is_authenticated:
         cart = SessionCart(session)
@@ -89,7 +94,7 @@ def get_user_cart():
     cart.purge(validate_product_id)
     return cart
 
-# User account
+# Render the cart page
 @user_bp.route('/cart', methods=['GET'])
 def cart():
     cart = get_user_cart()
@@ -116,11 +121,8 @@ def cart():
 
     return render_template('cart.html', **data)
 
-@user_bp.route('/profile', methods=["GET"])
-def profile():
-    return render_template("profile.html")
 
-# Purchasing
+# Add product to cart
 @api_bp.route('/transaction/add', methods=['POST'])
 def product_add():
     form = UserPurchaseForm(meta=dict(csrf=False))
@@ -131,13 +133,12 @@ def product_add():
         form.id.errors.append("Invalid product id")
         return jsonify(serialize_form(form)), 403
 
-    print(f"Adding item to cart {form.id.data} {form.quantity.data}")
-
     cart = get_user_cart()
     cart.add_product(form.id.data, form.quantity.data)
 
     return jsonify(serialize_form(form))
 
+# Update the quantity of a product in the cart
 @api_bp.route('/transactions/update', methods=['POST'])
 def product_update():
     form = UserPurchaseForm(meta=dict(csrf=False))
@@ -148,13 +149,12 @@ def product_update():
         form.id.errors.append("Invalid product id")
         return jsonify(serialize_form(form)), 403
 
-    print(f'Changing quantity: {form.id.data} {form.quantity.data}')
-
     cart = get_user_cart()
     cart.update_product(form.id.data, form.quantity.data)
 
     return jsonify(dict(quantity=form.quantity.data))
 
+# TODO: Buy the product immediately
 @api_bp.route('/transaction/buy', methods=['POST'])
 def product_buy():
     form = request.form
