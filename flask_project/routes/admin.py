@@ -3,6 +3,7 @@ from flask import g
 from flask import Blueprint
 
 from flask import jsonify
+from wtforms.fields.simple import FileField
 
 from server import app
 import os
@@ -18,8 +19,10 @@ def serialize_form(form):
         value = field.data
         errors = field.errors
 
-        if isinstance(value, str):
-            data.append({"name": name, "value": value, "errors": errors})
+        if isinstance(field, FileField):
+            continue
+
+        data.append({"name": name, "value": value, "errors": errors})
 
     return data
 
@@ -48,6 +51,18 @@ def add_product():
     form = ProductForm()
     return render_template("admin/add_product.html", form=form)
 
+
+@admin_bp.route("/products/<string:id>/edit", methods=["GET"])
+def edit_product(id):
+    if id not in db.products:
+        abort(404)
+    
+    product = db.products[id]
+    form = ProductForm(data=product)
+    return render_template("admin/edit_product.html", form=form, id=id)
+
+# admin api endpoints
+# used primary for database editing, adding and deletion
 @admin_api_bp.route("/products/add", methods=['POST'])
 def add_product():
     form = ProductForm()
@@ -82,18 +97,7 @@ def add_product():
     }
 
     db.products[uid] = product
-    return redirect(url_for("admin_bp.products"))
-    # return jsonify(dict(success=True))
-
-
-@admin_bp.route("/products/<string:id>/edit", methods=["GET"])
-def edit_product(id):
-    if id not in db.products:
-        abort(404)
-    
-    product = db.products[id]
-    form = ProductForm(data=product)
-    return render_template("admin/edit_product.html", form=form, id=id)
+    return jsonify(dict(redirect=url_for("admin_bp.products")))
 
 @admin_api_bp.route("/products/<string:id>/edit", methods=["POST"]) 
 def edit_product(id):
@@ -134,7 +138,7 @@ def edit_product(id):
     }
 
     db.products[id] = product
-    return jsonify(dict(success=True))
+    return jsonify(dict(redirect=url_for("admin_bp.products")))
 
 @admin_api_bp.route("/products/<string:id>/delete", methods=["POST"])
 def delete_product(id):

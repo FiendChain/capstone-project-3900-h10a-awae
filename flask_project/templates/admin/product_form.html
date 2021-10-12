@@ -4,57 +4,9 @@
 
 {% macro render_product_form(form) %}
 
+<script src="/static/js/wtf_ajax_form.js"></script>
 <script src="/static/js/dragndrop_image.js"></script>
 <link rel="stylesheet" href="/static/css/dragndrop_image.css">
-
-<script>
-$("document").ready(function() {
-  $("form.wtf-ajax-form").submit(function(ev) {
-    ev.preventDefault();
-
-    let data = new FormData(this);
-    let url = $(this).attr("action");
-    let method = $(this).attr("method") || "POST";
-    let enctype = $(this).attr("enctype") || "multipart/form";
-
-    let form = $(this);
-
-    console.log({data, url, method});
-
-    function update_from_ajax(data) {
-      console.log({data});
-
-      for (let field of data) {
-        let name = field.name;
-        let value = field.value;
-        let errors = field.errors;
-
-        let el_sel = `[name='${name}']`;
-        let el_input = form.find(el_sel);
-        let el_error = form.find(`div.invalid-feedback[id='${name}']`);
-
-        if (errors && errors.length && errors.length > 0) {
-          el_input.addClass("is-invalid");
-          el_error.html(errors[0]);
-          el_error.removeClass("d-none");
-        } else {
-          el_input.removeClass("is-invalid");
-          el_error.html("");
-          el_error.addClass("d-none");
-        }
-      }
-    }
-
-    $.ajax({
-      url, data, type: method, enctype,
-      cache: false,
-      processData: false,
-      contentType: false,
-      error: (xhr) => update_from_ajax(xhr.responseJSON),
-    });
-  });
-});
-</script>
 
 <div class="row my-2">
   <div class="col-md-8">
