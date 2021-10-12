@@ -50,7 +50,6 @@ $("document").ready(function() {
       cache: false,
       processData: false,
       contentType: false,
-      success: e => console.log(e),
       error: (xhr) => update_from_ajax(xhr.responseJSON),
     });
   });
@@ -167,9 +166,7 @@ $("document").ready(function() {
       <div class="dropzone w-100">
         <!--Reset control for dropzone if original src url was provided-->
         <div class="overlay d-none">
-          <div class="justify-content-right text-right">
-            <div class="btn btn-secondary" id="reset">Reset</div>
-          </div>
+          <div class="btn btn-secondary" id="reset">Reset</div>
         </div>
         <div class="dropzone-description">
           <p>Choose an image file or drag it here.</p>

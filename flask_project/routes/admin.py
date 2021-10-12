@@ -9,6 +9,7 @@ import os
 import uuid
 
 from .forms import ProductForm
+from .temp_db import db
 
 def serialize_form(form):
     data = [] 
@@ -25,19 +26,6 @@ def serialize_form(form):
 admin_bp = Blueprint('admin_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
 admin_api_bp = Blueprint('admin_api_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
 
-db_products = {
-    "A232-109": {
-        "name": "Lite Latte",
-        "unit_price": 10.20,
-        "est_delivery_amount": 3,
-        "est_delivery_units": "days",
-        "in_stock": 10,
-        "category": "coffee",
-        "image_url": "/static/images/coffee_1.jpg",
-        "description": "A deliciously light latte that makes you moist"
-    }
-}
-
 @admin_bp.route('/', methods=['GET'])
 def home():
     return render_template("admin/home.html")
@@ -51,7 +39,7 @@ def login():
 
 @admin_bp.route("/products", methods=['GET'])
 def products():
-    flat_products = [{"id":uid, **v} for uid, v in db_products.items()]
+    flat_products = list(db.products.values())
     return render_template("admin/products.html", products=flat_products)
 
 
@@ -68,8 +56,7 @@ def add_product():
         return jsonify(serialize_form(form)), 403
 
     print(f"Adding product: {form}")
-    while (uid := str(uuid.uuid4())[:7]) in db_products:
-        pass
+    uid = db.gen_uuid()
 
     image_file = form.image.data
     file_exists = image_file and image_file.filename != '' and '.' in image_file.filename
@@ -83,6 +70,7 @@ def add_product():
         image_url = None
     
     product = {
+        "id": uid,
         "name": form.name.data,
         "unit_price": form.unit_price.data,
         "category": form.category.data,
@@ -93,23 +81,23 @@ def add_product():
         "image_url": image_url,
     }
 
-    db_products[uid] = product
+    db.products[uid] = product
     return redirect(url_for("admin_bp.products"))
     # return jsonify(dict(success=True))
 
 
 @admin_bp.route("/products/<string:id>/edit", methods=["GET"])
 def edit_product(id):
-    if id not in db_products:
+    if id not in db.products:
         abort(404)
     
-    product = db_products[id]
-    form = ProductForm(data={'id':id, **product})
+    product = db.products[id]
+    form = ProductForm(data=product)
     return render_template("admin/edit_product.html", form=form, id=id)
 
 @admin_api_bp.route("/products/<string:id>/edit", methods=["POST"]) 
 def edit_product(id):
-    if id not in db_products:
+    if id not in db.products:
         abort(404)
 
     form = ProductForm()
@@ -118,7 +106,7 @@ def edit_product(id):
         return jsonify(serialize_form(form)), 403
 
     print(f"Editing product: {form}")
-    product = db_products[id]
+    product = db.products[id]
 
     image_file = form.image.data
     file_exists = image_file and image_file.filename != '' and '.' in image_file.filename
@@ -134,6 +122,7 @@ def edit_product(id):
         image_url = None
     
     product = {
+        "id": id,
         "name": form.name.data,
         "unit_price": form.unit_price.data,
         "category": form.category.data,
@@ -144,14 +133,14 @@ def edit_product(id):
         "image_url": image_url,
     }
 
-    db_products[id] = product
+    db.products[id] = product
     return jsonify(dict(success=True))
 
 @admin_api_bp.route("/products/<string:id>/delete", methods=["POST"])
 def delete_product(id):
-    if id in db_products:
+    if id in db.products:
         print(f"Deleting product: {id}")
-        del db_products[id]
+        del db.products[id]
         return jsonify({'success': True})
     
     abort(403)

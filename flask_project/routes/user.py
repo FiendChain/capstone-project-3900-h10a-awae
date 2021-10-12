@@ -1,11 +1,13 @@
 # Store all routes here
 
-from flask import Flask, json, redirect, request, render_template, url_for, send_from_directory, jsonify
+from flask import Flask, json, redirect, request, render_template, url_for, send_from_directory, jsonify, abort
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from flask import g
 from flask import Blueprint
 
 from server import login_manager
+
+from .temp_db import db
 
 
 user_bp  = Blueprint('user_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
@@ -14,43 +16,23 @@ api_bp = Blueprint('api_bp', __name__)
 # Product browsing
 @user_bp.route('/', methods=["GET", "POST"])
 def home():
-    data = {
-        'products': [
-            {
-                'image_url': f'/static/images/coffee_{i}.jpg',
-                'product_url': url_for('user_bp.product_page', id=f'coffee_{i}')
-            } for i in range(1,4)
-        ]
-    }
-    return render_template("homepage.html", **data)
+    products = db.products.values()
+    return render_template("homepage.html", products=products)
 
 
 @user_bp.route('/products/<string:id>', methods=['GET', 'POST'])
 def product_page(id):
-    product = {
-        'id': id,
-        'name': id,
-        'image_url': f'/static/images/{id}.jpg',
-        'cost': f'{10.25:.2f}',
-        'description': 'The finest lattee on the planet '*5
-    }
+    if id not in db.products:
+        abort(404)
+    
+    product = db.products[id]
+
     return render_template('product.html', product=product)
 
 # User account
 @user_bp.route('/cart', methods=['GET'])
 def cart():
-    def get_product(i):
-        return {
-            'id': f'coffee_{i}',
-            'name': f'coffee_{i}',
-            'cost': f'{10.25:.2f}',
-            'description': 'The finest lattee on the planet',
-            'image_url': f'/static/images/coffee_{i}.jpg',
-            'product_url': url_for('user_bp.product_page', id=f'coffee_{i}'),
-            'category': 'coffee',
-            'status': 'In stock',
-        }
-    products = [get_product(i) for i in range(1,4)]
+    products = db.products.values()
 
     summary = {
         'total_cost': f'{10:.2f}',
