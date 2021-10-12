@@ -4,7 +4,13 @@ from routes import user_bp, admin_bp, api_bp, admin_api_bp
 import flask_db
 from flask_bootstrap import Bootstrap
 
+import argparse 
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--no-livereload", action="store_true")
+    args = parser.parse_args()
+
     app.jinja_env.auto_reload = True
 
     # add blueprint for handling user and admin endpoints
@@ -20,5 +26,8 @@ if __name__ == "__main__":
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.debug = True
 
-    server = Server(app.wsgi_app)
-    server.serve(port=5002, debug=True, liveport=5003)
+    if args.no_livereload:
+        app.run(port=5002, debug=True)
+    else:
+        server = Server(app.wsgi_app)
+        server.serve(port=5002, debug=True, liveport=5003)

@@ -1,11 +1,11 @@
-from flask import redirect, request, render_template, url_for, jsonify, abort
+from flask import json, redirect, request, render_template, url_for, jsonify, abort, session
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from flask import g
 from flask import Blueprint
 
 from server import login_manager
-from .temp_db import db
-from .forms import LoginForm, RegisterForm, serialize_form
+from .temp_db import db, SessionCart
+from .forms import LoginForm, RegisterForm, UserPurchaseForm, serialize_form
 
 user_bp  = Blueprint('user_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
 api_bp = Blueprint('api_bp', __name__)
@@ -46,11 +46,27 @@ def logout():
 @api_bp.route("/login", methods=["POST"])
 def login():
     form = LoginForm()
+
+    if not form.validate_on_submit():
+        return jsonify(serialize_form(form)), 403
+
     if form.validate_on_submit():
-        print(f"User logged in: {serialize_form(form)}")
-        return jsonify(dict(redirect=url_for("user_bp.home")))
+        key = lambda u: u.username == form.name.data and u.password == form.password.data
+        users =  [u for u in db.users.values() if key(u)]
+
+        # invalid credentials
+        if not users:
+            form.name.errors.append("Invalid credentials")
+            form.password.errors.append("Invalid credentials")
+            return jsonify(serialize_form(form)), 403
+
+    assert(len(users) == 1)
+    user = users[0]
+
+    print(f"User logged in: {serialize_form(form)}")
+    login_user(user, remember=form.remember_me.data)
+    return jsonify(dict(redirect=url_for("user_bp.home")))
     
-    return jsonify(serialize_form(form)), 403
 
 @api_bp.route("/register", methods=["POST"])
 def register():
@@ -61,10 +77,27 @@ def register():
     
     return jsonify(serialize_form(form)), 403
 
+def validate_product_id(id):
+    return id in db.products
+
+def get_user_cart():
+    if not current_user.is_authenticated:
+        cart = SessionCart(session)
+    else:
+        cart = current_user.cart
+
+    cart.purge(validate_product_id)
+    return cart
+
 # User account
 @user_bp.route('/cart', methods=['GET'])
 def cart():
-    products = db.products.values()
+    cart = get_user_cart()
+    products = []
+    for id, quantity in cart.to_list():
+        product = db.products[id]
+        data = {**product, 'quantity': quantity}
+        products.append(data)
 
     summary = {
         'total_cost': f'{10:.2f}',
@@ -83,26 +116,44 @@ def cart():
 
     return render_template('cart.html', **data)
 
+@user_bp.route('/profile', methods=["GET"])
+def profile():
+    return render_template("profile.html")
+
 # Purchasing
 @api_bp.route('/transaction/add', methods=['POST'])
 def product_add():
-    form = request.form
-    print(f'Adding: {form}')
+    form = UserPurchaseForm(meta=dict(csrf=False))
+    if not form.validate_on_submit():
+        return jsonify(serialize_form(form)), 403
 
-    return jsonify(dict(success=True))
+    if not validate_product_id(form.id.data):
+        form.id.errors.append("Invalid product id")
+        return jsonify(serialize_form(form)), 403
+
+    print(f"Adding item to cart {form.id.data} {form.quantity.data}")
+
+    cart = get_user_cart()
+    cart.add_product(form.id.data, form.quantity.data)
+
+    return jsonify(serialize_form(form))
 
 @api_bp.route('/transactions/update', methods=['POST'])
 def product_update():
-    form = request.form
-    # discard repeats of same input field
-    data = form.to_dict(flat=True)
-    print(f'Changing quantity: {data}')
+    form = UserPurchaseForm(meta=dict(csrf=False))
+    if not form.validate_on_submit():
+        return jsonify(serialize_form(form)), 403
+    
+    if not validate_product_id(form.id.data):
+        form.id.errors.append("Invalid product id")
+        return jsonify(serialize_form(form)), 403
 
-    quantity = int(data['quantity'])
-    if quantity > 10 or quantity < 0:
-        return jsonify(**dict(quantity=2), error='Invalid quantity'), 403
+    print(f'Changing quantity: {form.id.data} {form.quantity.data}')
 
-    return jsonify(dict(quantity=quantity))
+    cart = get_user_cart()
+    cart.update_product(form.id.data, form.quantity.data)
+
+    return jsonify(dict(quantity=form.quantity.data))
 
 @api_bp.route('/transaction/buy', methods=['POST'])
 def product_buy():
@@ -110,8 +161,7 @@ def product_buy():
     print(f'Buying: {form}')
     return jsonify(dict(success=True))
 
-
 # Reloads and returns the User object for current session
 @login_manager.user_loader
-def load_user(name):
-    pass
+def load_user(id):
+    return db.users.get(id, None)

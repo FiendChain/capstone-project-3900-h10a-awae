@@ -26,6 +26,7 @@ app.config['UPLOADED_IMAGES_DEST'] = image_folder
 app.secret_key = 'very-secret-123' # must include
 
 login_manager = LoginManager()
+login_manager.login_view = "user_bp.login"
 
 # generate database
 def get_db():

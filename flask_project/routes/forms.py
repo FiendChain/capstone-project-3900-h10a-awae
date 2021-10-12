@@ -59,6 +59,10 @@ class RegisterForm(FlaskForm):
     email = EmailField(validators=[Email(), InputRequired(message="Email is required")])
     remember_me = BooleanField(validators=[Optional()], default=True)
 
+class UserPurchaseForm(FlaskForm):
+    id = StringField(Length(2,100), validators=[InputRequired(message="Product id required")])
+    quantity = IntegerField(validators=[NumberRange(min=0, max=1000), InputRequired()])
+
 def serialize_form(form):
     data = [] 
     for field in form:
