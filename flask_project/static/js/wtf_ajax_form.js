@@ -2,6 +2,19 @@
 // For a form marked as wtf-ajax-form, we dynamically add in bootstrap validation 
 // For an input to display an error, it must have an associated div.invalid-feedback with id='input.name'
 
+// The expected wtform error response looks like
+// responseJSON = {
+//    'bad_field' : {name:'field.name', value: 'field.value', 'errors': ['An error', 'Another error']},
+//    'good_field': {name:'field.name', value: 'field.value', 'errors': []},
+// }
+// status_code = 403 (Must be this to show errors on the form)
+// If the status code is not 403, then we refresh the page
+
+// On a successful form submission, wtform expects the following to redirect
+// If the responseJSON doesn't have a redirect field, then we just reload the page
+// status_code = 200
+// responseJSON = {'redirect': 'url to redirect to'}
+
 $("document").ready(function() {
   $("form.wtf-ajax-form").submit(function(ev) {
     ev.preventDefault();
