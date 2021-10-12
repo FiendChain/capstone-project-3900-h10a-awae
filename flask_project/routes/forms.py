@@ -6,7 +6,9 @@ from flask_uploads import UploadSet, IMAGES, configure_uploads
 from wtforms import StringField, IntegerField, FloatField, SubmitField
 from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import HiddenField
-from wtforms.validators import InputRequired, Length, NumberRange, AnyOf, Optional
+from wtforms.fields.html5 import EmailField
+from wtforms.validators import Email, EqualTo, InputRequired, Length, NumberRange, AnyOf, Optional
+from wtforms.widgets.core import Input
 
 from server import app
 
@@ -48,6 +50,13 @@ class ProductForm(FlaskForm):
 class LoginForm(FlaskForm):
     name = StringField(validators=[Length(5, 40), InputRequired(message="Username is required")])
     password = StringField(validators=[Length(5, 40), InputRequired(message="Password is required")])
+    remember_me = BooleanField(validators=[Optional()], default=True)
+
+class RegisterForm(FlaskForm):
+    username = StringField(validators=[Length(5,40), InputRequired(message="Username is required")])
+    password = StringField("password", validators=[Length(5, 40), InputRequired(message="Password is required")])
+    confirm_password = StringField(validators=[Length(5, 40), InputRequired(message="You must confirm your password"), EqualTo("password")])
+    email = EmailField(validators=[Email(), InputRequired(message="Email is required")])
     remember_me = BooleanField(validators=[Optional()], default=True)
 
 def serialize_form(form):
