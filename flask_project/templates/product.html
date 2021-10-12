@@ -10,13 +10,13 @@
 <!--Script for adding product to cart, or immediate purchase-->
 <script>
 $("document").ready(function() {
-  $('.product_form').submit(e => {
-    e.preventDefault();
-    let form = $(e.currentTarget);
-    
-    let btn = $(e.originalEvent.submitter)
+  $('.product_form').submit(function(ev) {
+    ev.preventDefault();
+
+    let form = $(this);
+    let btn = $(ev.originalEvent.submitter)
     let action = btn.attr('id');
-    let url = btn.attr('href');
+    let url = btn.attr('v-link');
     let data = form.serializeArray();
 
     switch (action) 
@@ -24,20 +24,20 @@ $("document").ready(function() {
     case 'cart_add':
       $.ajax({
         url, data, type: 'POST',
-        success: location.reload(),
-        failure: location.reload(),
+        success: () => location.reload(),
+        error: () => location.reload(),
       })
       break;
 
     case 'buy_now':
       $.ajax({
         url, data, type: 'POST',
-        success: location.reload(),
-        failure: location.reload(),
+        success: () => location.reload(),
+        error: () => location.reload(),
       })
       break;
     }
-  })
+  });
 })
 </script>
 
@@ -78,7 +78,7 @@ $("document").ready(function() {
       </div>
       <!--Purchasing form-->
       <form class='product_form' id="product_form" method='POST'>
-        <input type="hidden" id="product_id" name="product_id" value="{{ product.id }}">
+        <input type="hidden" id="product_id" name="id" value="{{ product.id }}">
         <div class="row justify-content-between">
           <div class="col-md-5 pl-0">
             <div class="form-group row">
@@ -88,8 +88,8 @@ $("document").ready(function() {
           </div>
           <div class="col pr-0 text-right">
             <div class="btn-group">
-              <button type="submit" id='cart_add' href="{{ url_for('api_bp.product_add') }}" class="btn btn-outline-primary mb-2">Add to Cart</button>
-              <button type="submit" id='buy_now' href="{{ url_for('api_bp.product_buy') }}" class="btn btn-primary mb-2">Buy Now</button>
+              <button type="submit" id='cart_add' v-link="{{ url_for('api_bp.product_add') }}" class="btn btn-outline-primary mb-2">Add to Cart</button>
+              <button type="submit" id='buy_now' v-link="{{ url_for('api_bp.product_buy') }}" class="btn btn-primary mb-2">Buy Now</button>
             </div>
           </div>
         </div>

@@ -35,10 +35,10 @@
       <!--Quantity editing form-->
       <div class="row">
         <form class='quantity_form' id="{{ p.id }}" method='POST' action="{{ url_for('api_bp.product_update') }}">
-          <input type="hidden" id="product_id" name="product_id" value="{{ p.id }}">
+          <input type="hidden" id="product_id" name="id" value="{{ p.id }}">
           <div class="form-group row">
             <label class="col text-center" for="quantity">Quantity</label>
-            <input class="col form-control" type="number" min="0" max="99" id="quantity" name="quantity" value=1> 
+            <input class="col form-control" type="number" min="0" max="99" id="quantity" name="quantity" value={{ p.quantity }}> 
           </div>
         </form>
       </div>
