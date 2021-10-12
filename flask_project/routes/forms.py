@@ -44,3 +44,22 @@ class ProductForm(FlaskForm):
 
 
     submit_button = SubmitField('Submit Form')
+
+class LoginForm(FlaskForm):
+    name = StringField(validators=[Length(5, 40), InputRequired(message="Username is required")])
+    password = StringField(validators=[Length(5, 40), InputRequired(message="Password is required")])
+    remember_me = BooleanField(validators=[Optional()], default=True)
+
+def serialize_form(form):
+    data = [] 
+    for field in form:
+        name = field.id
+        value = field.data
+        errors = field.errors
+
+        if isinstance(field, FileField):
+            continue
+
+        data.append({"name": name, "value": value, "errors": errors})
+
+    return data

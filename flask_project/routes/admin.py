@@ -3,28 +3,13 @@ from flask import g
 from flask import Blueprint
 
 from flask import jsonify
-from wtforms.fields.simple import FileField
 
 from server import app
 import os
 import uuid
 
-from .forms import ProductForm
+from .forms import ProductForm, LoginForm, serialize_form
 from .temp_db import db
-
-def serialize_form(form):
-    data = [] 
-    for field in form:
-        name = field.id
-        value = field.data
-        errors = field.errors
-
-        if isinstance(field, FileField):
-            continue
-
-        data.append({"name": name, "value": value, "errors": errors})
-
-    return data
 
 admin_bp = Blueprint('admin_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
 admin_api_bp = Blueprint('admin_api_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
@@ -35,10 +20,16 @@ def home():
 
 @admin_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    form = LoginForm()
+
     if request.method == "GET":
-        return render_template("admin/login.html")
+        return render_template("admin/login.html", form=form)
     
-    return redirect(url_for("admin_bp.home"))
+    if form.validate_on_submit():
+        print(f"Logging in user: {serialize_form(form)}")
+        return jsonify(dict(redirect=url_for("admin_bp.home"))) 
+    
+    return jsonify(serialize_form(form)), 403
 
 @admin_bp.route("/products", methods=['GET'])
 def products():
