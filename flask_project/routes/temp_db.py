@@ -148,10 +148,10 @@ class TempDB:
 
 
     def gen_uuid(self):
-        pass
-        # while (uid := str(uuid.uuid4())[:7]) in self.all_ids:
-        #     pass
-        # self.all_ids.add(uid)
-        # return uid 
+        while True:
+            uid = str(uuid.uuid4())[:7]
+            if uid not in self.all_ids:
+                break
+        return uid 
 
 db = TempDB()
