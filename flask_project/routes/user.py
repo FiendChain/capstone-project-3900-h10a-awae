@@ -5,7 +5,7 @@ from flask_login.utils import login_required
 
 from server import login_manager, app, get_db
 from .temp_db import db, SessionCart
-from .forms import LoginForm, RegisterForm, UserPurchaseForm, UserProfileLoginSecurityForm, serialize_form
+from .forms import LoginForm, RegisterForm, UserPurchaseForm, UserProfileLoginSecurityForm, ProductSearchParams, serialize_form
 from classes.flaskuser import FlaskUser
 
 user_bp  = Blueprint('user_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
@@ -17,10 +17,19 @@ def home():
     with app.app_context():
         db = get_db()
         products = db.get_random_entries("products", 5)
-        print("Rendering homepage")
     return render_template("homepage.html", products=products)
 
-@user_bp.route('/products/<string:id>', methods=['GET', 'POST'])
+# Product search 
+@user_bp.route("/products", methods=['GET', 'POST'])
+def products():
+    form = ProductSearchParams()
+    print(serialize_form(form))
+    with app.app_context():
+        db = get_db()
+        products = db.get_random_entries("products", 10)
+    return render_template("products.html", products=products, form=form)
+
+@user_bp.route('/products/<string:id>', methods=['GET'])
 def product_page(id):
     with app.app_context():
         db = get_db()

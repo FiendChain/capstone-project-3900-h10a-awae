@@ -4,6 +4,7 @@ from flask_wtf.file import FileAllowed, FileField, FileRequired
 from flask_uploads import UploadSet, IMAGES, configure_uploads
 
 from wtforms import StringField, IntegerField, FloatField, SubmitField
+from wtforms import validators
 from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import HiddenField
 from wtforms.fields.html5 import EmailField
@@ -17,7 +18,8 @@ from server import app
 
 # TODO: Find a better place to put this
 
-valid_categories = ["coffee", "cofveve", "latte", "brown"]
+valid_categories = ["All", "Coffee", "Alt Milk", "Meal Kit", "Tools", "Dessert"]
+valid_product_sort = ["price_low_to_high", "price_high_to_low"]
 valid_delivery_units = ["days", "weeks", "months", "years"]
 valid_images = UploadSet('images', IMAGES)
 
@@ -92,6 +94,12 @@ class UserProfileLoginSecurityForm(FlaskForm):
     confirm_password = StringField(validators=[Length(5, 40), InputRequired(message="You must confirm your new password"), EqualTo("new_password")])
     email = EmailField(validators=[Email(), InputRequired(message="Email is required")])
     phone = StringField(validators=[PhoneValidator(), InputRequired()])
+
+# form for product search
+class ProductSearchParams(FlaskForm):
+    name = StringField(Optional(), validators=[Length(0,100)])
+    categories = StringField(Optional(), validators=[AnyOf(valid_categories)])
+    sort_type = StringField(Optional(), validators=[AnyOf(valid_product_sort)])
 
 def serialize_form(form):
     data = [] 

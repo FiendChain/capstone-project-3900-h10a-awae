@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Cafe AWAE Products</title>
+{% endblock %}
+
+
+{% block content %}
+{% include 'user_navbar.html' %}
+
+<!--Homepage-->
+<div class="container-fluid">
+  <!--Navigation-->
+  <div class="row">
+    <div class="col align-self-center text-center">
+      <div class="btn-group">
+        <a class="btn btn-primary" href="{{ url_for('user_bp.products') }}">Products</a>
+        <div class="btn btn-outline-primary">Reviews</div>
+        <div class="btn btn-outline-primary">Curators</div>
+      </div>
+    </div>
+  </div>
+  <!--Products-->
+  <div class="container-fluid w-75">
+    <form action="{{ url_for("user_bp.products") }}" method='POST' id="product-search-form">
+      {{ form.csrf_token }}
+      <div class="row">
+        <button class="btn btn-primary" type="submit">Submit</button>
+      </div>
+      <!--Sort controls-->
+      <div class="row my-2 justify-content-between">
+        <div class="col text-left">
+          <p class="my-1">Showing results for </p>
+        </div>
+        <div class="col-md-auto text-right">
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="">Sort by</span>
+            </div>
+            <select class="custom-select" id="{{ form.sort_type.id }}" name="{{ form.sort_type.id }}">
+              <option value="price_low_to_high" {{ 'selected' if form.sort_type.data == 'price_low_to_high' }}>Price (Low to High)</option>
+              <option value="price_high_to_low" {{ 'selected' if form.sort_type.data == 'price_high_to_low' }}>Price (High to Low)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <!--Product search results-->
+      <div class="row w-100">
+        <!--Filter controls-->
+        <div class="col-md-2">
+          <div class="row"><strong>Filter by</strong></div>
+          <div class="row">Category</div>
+          <div class="row">
+            <div class="col">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="{{ form.categories.id }}" id="filter_category_coffee" value="Coffee" checked>
+                <label class="form-check-label" for="filter_category_coffee">Coffee</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="{{ form.categories.id }}" id="filter_category_alt_milk" value="Alt milk" checked>
+                <label class="form-check-label" for="filter_category_alt_milk">Alt Milk</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--Show products-->
+        <div class="col">
+          <div class="row">
+            {% for p in products %}
+            <div class="col-sm-2 px-0 mx-1 rounded border">
+              <div class="thumbnail">
+                <a href="{{ url_for("user_bp.product_page", id=p.id) }}" class="text-decoration-none">
+                  <img src="{{ p.image_url }}" class="product-img rounded img-fluid">
+                  <div class="text-center">
+                    <h6>{{ p.name }}</h6>
+                    <p class="text-muted my-0">{{ "$%.2f"|format(p.unit_price) }}</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

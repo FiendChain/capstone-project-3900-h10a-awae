@@ -1,11 +1,41 @@
+<!--Search bar functionality changes depending on context-->
+<script>
+$("document").ready(function () {
+  $("#search-bar-nav").keypress(function (ev) {
+    // TODO: Get this working from homepage
+    // check if the enter key pressed
+    var keycode = (ev.keyCode ? ev.keyCode : ev.which);
+    if(keycode != 13){
+      return;
+    }
+
+    let search = $(this);
+    let linked_form = search.attr("form");
+    let form = $(`form#${linked_form}`);
+
+    // if form doesn't exist, then we go to the product page
+    if (form.length === 0) {
+      let url = "{{ url_for("user_bp.products") }}";
+      let qstring = new URLSearchParams({"name": search.val()}).toString();
+      //window.location.href = `${url}?${qstring}`;
+    } else {
+      ev.preventDefault();
+    }
+  });
+});
+</script>
+
 <!--Header-->
 <header class="navbar navar-expand flex-column">
   <div class="row w-100">
     <!--Search bar-->
     <div class="col align-self-start text-left">
-      <form class="w-75 d-flex align-items-center">
-        <input type="search" class="form-control" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off" spellcheck="false">
-      </form>
+      <!--This links to the product search form-->
+      <div class="w-75 d-flex align-items-center">
+        <input 
+          type="search" class="form-control" id="search-bar-nav" placeholder="Search..." aria-label="Search for..." autocomplete="off" spellcheck="false" 
+          form="product-search-form" name="name">
+      </div>
     </div>
     <div class="col align-self-center text-center">
       <a href="{{ url_for("user_bp.home") }}">
