@@ -7,7 +7,7 @@
 
 
 {% block content %}
-{% include 'admin/alt_navbar.html' %}
+{% include 'admin/navbar.html' %}
 
 <script>
 $('document').ready(function () {
@@ -29,7 +29,15 @@ $('document').ready(function () {
 });
 </script>
 
-<!--Homepage-->
+<!--Navigation breadcrumb-->
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('admin_bp.home') }}">Home</a></li>
+    <li class="breadcrumb-item active">Products</li>
+  </ol>
+</nav>
+
+<!--Product page-->
 <div class="container w-75">
   <!--Table header-->
   <div class="row mx-0 justify-content-center">
