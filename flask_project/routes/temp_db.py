@@ -114,7 +114,7 @@ class TempDB:
                 "in_stock": 10,
                 "brand": f"Adele {i}",
                 "category": "coffee",
-                "image_url": f"/static/images/coffee_{i}.jpg",
+                "image_url": f"/static/uploads/images/coffee_{i}.jpg",
                 "description": "A deliciously light latte that gives you the runs"
             }
 
