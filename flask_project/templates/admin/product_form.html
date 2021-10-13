@@ -2,7 +2,7 @@
 <div id="{{ field.id }}" class="invalid-feedback d-none"></div>
 {% endmacro %}
 
-{% macro render_product_form(form) %}
+{% macro render_product_form(form, categories=[]) %}
 
 <script src="/static/js/wtf_ajax_form.js"></script>
 <script src="/static/js/dragndrop_image.js"></script>
@@ -59,10 +59,9 @@
       <label for="{{ form.category.id }}" class="col-md-3 col-form-label">Category</label>
       <div class="col input-group">
         <select class="custom-select" id="{{ form.category.id }}" name="{{ form.category.id }}">
-          <option value="coffee"  {{'selected' if form.category.data=='coffee' }}>Coffee</option>
-          <option value="cofveve" {{'selected' if form.category.data=='cofveve' }}>Cofveve</option>
-          <option value="latte"   {{'selected' if form.category.data=='latte' }}>Latte</option>
-          <option value="brown"   {{'selected' if form.category.data=='brown' }}>Brown</option>
+          {% for category in categories %}
+          <option value="{{ category }}"  {{'selected' if form.category.data==category }}>{{ category }}</option>
+          {% endfor %}
         </select>
         {{ render_form_error(form.category) }}
       </div>

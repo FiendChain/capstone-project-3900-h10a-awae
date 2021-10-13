@@ -27,7 +27,10 @@ def products():
 @admin_required
 def add_product():
     form = ProductForm()
-    return render_template("admin/add_product.html", form=form)
+    with app.app_context():
+        db = get_db()
+        valid_categories = db.get_unique_values("products", "category")
+    return render_template("admin/add_product.html", form=form, categories=valid_categories)
 
 # admin api endpoints
 # used primary for database editing, adding and deletion
@@ -82,8 +85,10 @@ def edit_product(id):
     with app.app_context():
         db = get_db()
         product = db.get_entry_by_id("products", id)
+        valid_categories = db.get_unique_values("products", "category")
+
     form = ProductForm(data=product)
-    return render_template("admin/edit_product.html", form=form, id=id)
+    return render_template("admin/edit_product.html", form=form, id=id, categories=valid_categories)
 
 @admin_api_bp.route("/products/<string:id>/edit", methods=["POST"]) 
 @admin_required
