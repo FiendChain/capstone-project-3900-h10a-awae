@@ -27,6 +27,14 @@ def product_page(id):
         product = db.get_entry_by_id("products", id)
     return render_template('product.html', product=product)
 
+@user_bp.route('/search', methods=['GET', 'POST'])
+def search_page(filter):
+    with app.app_context():
+        db = get_db
+        #db.search_product_by_name()
+    pass
+
+
 # Signin endpoints
 @user_bp.route('/login', methods=['GET'])
 def login():
