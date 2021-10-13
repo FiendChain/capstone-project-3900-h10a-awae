@@ -74,13 +74,23 @@ $("document").ready(function() {
         <div class="col text-right px-0"><p>{{ "$%.2f"|format(product.unit_price) }}</p></div>
       </div>
       <div class="row">
+        {% if product.stock > 0 %}
+        <p class="text-left my-0 text-success">In stock</p>
+        {% else %}
+        <p class="text-left my-0 text-danger">Out of stock</p>
+        {% endif %}
+      </div>
+      <div class="row">
         <p>{{ product.description }}</p>
       </div>
       <div class="row">
-        <p>Brand:{{ product.brand }} Warranty days:{{ product.warranty_days}} Delivery days:{{ product.delivery_days }}</p>
+        <div class="row w-100"><span class="col"><strong>Brand: </strong>{{ product.brand }}</span></div>
+        <div class="row w-100"><span class="col"><strong>Warranty days: </strong>{{ product.warranty_days }}</span></div>
+        <div class="row w-100"><span class="col"><strong>Delivery days: </strong>{{ product.delivery_days }}</span></div>
+        <div class="row w-100"><span class="col"><strong>In stock: </strong>{{ product.stock }}</span></div>
       </div>
       <!--Purchasing form-->
-      <form class='product_form' id="product_form" method='POST'>
+      <form class='product_form my-2' id="product_form" method='POST'>
         <input type="hidden" id="product_id" name="id" value="{{ product.id }}">
         <div class="row justify-content-between">
           <div class="col-md-5 pl-0">

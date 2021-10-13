@@ -73,7 +73,7 @@ $('document').ready(function () {
       <td>{{ p.stock }}</td>
       <td>
         <div class="text-right">
-          <div class="btn btn-sm btn-outline-primary">Details</div>
+          <a class="btn btn-sm btn-outline-primary" href="{{ url_for("user_bp.product_page", id=p.id) }}">Details</a>
           <a href="{{ url_for("admin_bp.edit_product", id=p.id) }}">
             <div class="btn btn-sm btn-outline-primary">Edit</div>
           </a>
