@@ -90,11 +90,15 @@ class Database(object):
         self.conn.commit()
         print(f"Entry {entry[0]} deleted")
 
+
     def update(self, table_name, entry_old, entry_new):
         cols = self.get_table_headings(table_name)
-        cols_no_id = [col for col in cols if col != "id"]   # Drop rowid from entry class
-        subquery1 = ', '.join(f"{col} = ?" for col in cols_no_id)
-        query = f"UPDATE {table_name} SET {subquery1} WHERE id = {entry_old[0]}"
+        #cols_no_id = [col for col in cols if col != "id"]   # Drop rowid from entry class
+
+        
+        subquery1 = ', '.join(f"{col} = ?" for col in cols)
+        query = f"UPDATE or IGNORE {table_name} SET {subquery1} WHERE id = {entry_old[0]}"
+        #query = f"REPLACE into {table_name} VALUES ({subquery1}) WHERE id = {entry_old[0]}"
         params = entry_new
         self.cur.execute(query, params)
         self.conn.commit()
