@@ -1,12 +1,13 @@
-from flask import json, redirect, request, render_template, url_for, jsonify, abort, session
-from flask_login import LoginManager, login_user, current_user, login_required, logout_user
-from flask import g
+from flask import redirect, request, render_template, url_for, jsonify, abort, session
+from flask_login import login_user, current_user, logout_user
 from flask import Blueprint
+from flask_login.utils import login_required
 
 from server import login_manager, app, get_db
 from .temp_db import db, SessionCart
 from .forms import LoginForm, RegisterForm, UserPurchaseForm, serialize_form
 from classes.flaskuser import FlaskUser
+from .roles import roles_required
 
 user_bp  = Blueprint('user_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
 api_bp = Blueprint('api_bp', __name__)
@@ -30,15 +31,16 @@ def product_page(id):
 # Signin endpoints
 @user_bp.route('/login', methods=['GET'])
 def login():
-    login_form = LoginForm()
-    register_form = RegisterForm()
-    return render_template("login.html", login_form=login_form, register_form=register_form)
+    form = LoginForm()
+    return render_template("login.html", form=form)
     
 @user_bp.route('/register', methods=['GET', 'POST'])
 def register():
-    return render_template('registration.html')
+    form = RegisterForm()
+    return render_template('registration.html', form=form)
 
 @user_bp.route('/logout')
+@login_required
 def logout():
     logout_user()
     return redirect(url_for("user_bp.login"))
@@ -88,6 +90,7 @@ def register():
 
 # User account
 @user_bp.route('/profile', methods=["GET"])
+@roles_required("user")
 def profile():
     return render_template("profile.html")
 
