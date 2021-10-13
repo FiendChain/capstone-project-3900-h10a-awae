@@ -71,6 +71,7 @@ class PhoneValidator:
             if not phonenumbers.is_valid_number(input_number):
                 raise ValidationError(self.message)
 
+# form for registering the user
 class RegisterForm(FlaskForm):
     username = StringField(validators=[Length(5,40), InputRequired(message="Username is required")])
     password = StringField("password", validators=[Length(5, 40), InputRequired(message="Password is required")])
@@ -79,9 +80,18 @@ class RegisterForm(FlaskForm):
     phone = StringField(validators=[PhoneValidator(), InputRequired()])
     remember_me = BooleanField(validators=[Optional()], default=True)
 
+# form for adding or removing products from the cart
 class UserPurchaseForm(FlaskForm):
     id = StringField(Length(2,100), validators=[InputRequired(message="Product id required")])
     quantity = IntegerField(validators=[NumberRange(min=0, max=1000), InputRequired()])
+
+# form for editing the user's details
+class UserProfileLoginSecurityForm(FlaskForm):
+    password = StringField(validators=[Length(5, 40), InputRequired(message="Original password is required")])
+    new_password = StringField("new_password", validators=[Length(5, 40), InputRequired(message="Password is required")])
+    confirm_password = StringField(validators=[Length(5, 40), InputRequired(message="You must confirm your new password"), EqualTo("new_password")])
+    email = EmailField(validators=[Email(), InputRequired(message="Email is required")])
+    phone = StringField(validators=[PhoneValidator(), InputRequired()])
 
 def serialize_form(form):
     data = [] 

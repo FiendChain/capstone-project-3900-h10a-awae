@@ -30,4 +30,4 @@ if __name__ == "__main__":
         app.run(port=5002, debug=True)
     else:
         server = Server(app.wsgi_app)
-        server.serve(port=5002, debug=True, liveport=5003)
+        server.serve(port=5002, debug=True, liveport=5002)

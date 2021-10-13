@@ -5,7 +5,7 @@ from flask_login.utils import login_required
 
 from server import login_manager, app, get_db
 from .temp_db import db, SessionCart
-from .forms import LoginForm, RegisterForm, UserPurchaseForm, serialize_form
+from .forms import LoginForm, RegisterForm, UserPurchaseForm, UserProfileLoginSecurityForm, serialize_form
 from classes.flaskuser import FlaskUser
 
 user_bp  = Blueprint('user_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
@@ -104,6 +104,23 @@ def register():
 @login_required
 def profile():
     return render_template("profile.html")
+
+@user_bp.route('/profile/login_security', methods=["GET"])
+@login_required
+def profile_edit_login_security():
+    form = UserProfileLoginSecurityForm()
+    return render_template("profile/edit_login_security.html", form=form)
+
+@api_bp.route('/profile/login_security', methods=['POST'])
+@login_required
+def profile_edit_login_security():
+    form = UserProfileLoginSecurityForm()
+    if form.validate_on_submit():
+        # TODO: actually check to see that the form values can be applied to the database
+
+        return jsonify(dict(redirect=url_for("user_bp.profile")))
+    
+    return jsonify(serialize_form(form)), 403
 
 # Cart and purchasing
 def validate_product_id(id):
