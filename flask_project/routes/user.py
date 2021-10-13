@@ -158,10 +158,13 @@ def validate_product_id(id):
 
 # Depending on whether a user is logged in, we can store cart in flask-session or mock db
 def get_user_cart():
-    if not current_user.is_authenticated:
-        cart = SessionCart(session)
-    else:
-        cart = current_user.cart
+    cart = SessionCart(session)
+
+    # TODO: Replace this with the cart in sql database when done
+    # if not current_user.is_authenticated:
+    #     cart = SessionCart(session)
+    # else:
+    #     cart = current_user.cart
 
     cart.purge(validate_product_id)
     return cart
