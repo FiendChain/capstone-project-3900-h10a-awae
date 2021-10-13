@@ -64,7 +64,7 @@ class Database(object):
     # sort_order: asc, desc
 
     def search_product_by_name(self, name="", category = "", order_by="id ASC"):
-        query = f"SELECT * FROM products WHERE name LIKE ? AND category = {category}ORDER BY {order_by}"
+        query = f"SELECT * FROM products WHERE name LIKE ? AND category = {category} ORDER BY {order_by}"
         params = f"%{name}%",   # comma is intentional
         self.cur.execute(query, params)
         entries = self.cur.fetchall()

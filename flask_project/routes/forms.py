@@ -97,9 +97,9 @@ class UserProfileLoginSecurityForm(FlaskForm):
 
 # form for product search
 class ProductSearchParams(FlaskForm):
-    name = StringField(Optional(), validators=[Length(0,100)])
-    categories = StringField(Optional(), validators=[AnyOf(valid_categories)])
-    sort_type = StringField(Optional(), validators=[AnyOf(valid_product_sort)])
+    name = StringField(Optional(), validators=[Length(0,100)], default="")
+    categories = StringField(Optional(), validators=[AnyOf(valid_categories)], default="All")
+    sort_type = StringField(Optional(), validators=[AnyOf(valid_product_sort)], default="price_low_to_high")
 
 def serialize_form(form):
     data = [] 

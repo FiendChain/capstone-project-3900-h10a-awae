@@ -15,11 +15,11 @@ $("document").ready(function () {
 
     // if form doesn't exist, then we go to the product page
     if (form.length === 0) {
-      let url = "{{ url_for("user_bp.products") }}";
+      let url = "{{ url_for("user_bp.search") }}";
       let qstring = new URLSearchParams({"name": search.val()}).toString();
       //window.location.href = `${url}?${qstring}`;
     } else {
-      ev.preventDefault();
+
     }
   });
 });

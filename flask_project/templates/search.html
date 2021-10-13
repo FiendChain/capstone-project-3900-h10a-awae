@@ -8,13 +8,23 @@
 {% block content %}
 {% include 'user_navbar.html' %}
 
+<script>
+$("document").ready(function () {
+  $("form#product-search-form").change(function (ev) {
+    $(this).submit();
+  })
+
+  $("#search-bar-nav").val("{{ form.name.data }}");
+})
+</script>
+
 <!--Homepage-->
 <div class="container-fluid">
   <!--Navigation-->
   <div class="row">
     <div class="col align-self-center text-center">
       <div class="btn-group">
-        <a class="btn btn-primary" href="{{ url_for('user_bp.products') }}">Products</a>
+        <a class="btn btn-primary" href="{{ url_for('user_bp.search') }}">Products</a>
         <div class="btn btn-outline-primary">Reviews</div>
         <div class="btn btn-outline-primary">Curators</div>
       </div>
@@ -22,11 +32,8 @@
   </div>
   <!--Products-->
   <div class="container-fluid w-75">
-    <form action="{{ url_for("user_bp.products") }}" method='POST' id="product-search-form">
+    <form action="{{ url_for("user_bp.search") }}" method='POST' id="product-search-form">
       {{ form.csrf_token }}
-      <div class="row">
-        <button class="btn btn-primary" type="submit">Submit</button>
-      </div>
       <!--Sort controls-->
       <div class="row my-2 justify-content-between">
         <div class="col text-left">
@@ -52,14 +59,14 @@
           <div class="row">Category</div>
           <div class="row">
             <div class="col">
+              {% for category in categories %}
               <div class="form-check">
-                <input class="form-check-input" type="radio" name="{{ form.categories.id }}" id="filter_category_coffee" value="Coffee" checked>
-                <label class="form-check-label" for="filter_category_coffee">Coffee</label>
+                <input 
+                  class="form-check-input" type="radio"
+                  name="{{ form.categories.id }}" id="filter_category_{{category}}" value="{{ category }}" {{ 'checked' if form.categories.data == category }}>
+                <label class="form-check-label" for="filter_category_{{ category }}">{{ category }}</label>
               </div>
-              <div class="form-check">
-                <input class="form-check-input" type="radio" name="{{ form.categories.id }}" id="filter_category_alt_milk" value="Alt milk" checked>
-                <label class="form-check-label" for="filter_category_alt_milk">Alt Milk</label>
-              </div>
+              {% endfor %}
             </div>
           </div>
         </div>

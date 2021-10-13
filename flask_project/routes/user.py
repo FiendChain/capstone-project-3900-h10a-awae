@@ -5,7 +5,7 @@ from flask_login.utils import login_required
 
 from server import login_manager, app, get_db
 from .temp_db import db, SessionCart
-from .forms import LoginForm, RegisterForm, UserPurchaseForm, UserProfileLoginSecurityForm, ProductSearchParams, serialize_form
+from .forms import LoginForm, RegisterForm, UserPurchaseForm, UserProfileLoginSecurityForm, ProductSearchParams, serialize_form, valid_categories
 from classes.flaskuser import FlaskUser
 
 user_bp  = Blueprint('user_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
@@ -19,16 +19,6 @@ def home():
         products = db.get_random_entries("products", 5)
     return render_template("homepage.html", products=products)
 
-# Product search 
-@user_bp.route("/products", methods=['GET', 'POST'])
-def products():
-    form = ProductSearchParams()
-    print(serialize_form(form))
-    with app.app_context():
-        db = get_db()
-        products = db.get_random_entries("products", 10)
-    return render_template("products.html", products=products, form=form)
-
 @user_bp.route('/products/<string:id>', methods=['GET'])
 def product_page(id):
     with app.app_context():
@@ -36,33 +26,26 @@ def product_page(id):
         product = db.get_entry_by_id("products", id)
     return render_template('product.html', product=product)
 
-@user_bp.route('/search', methods=['GET'])
-def search_page():
-    dict_sort_by = {
-        "Price (low to high)": "unit_price ASC",
-        "Price (high to low)": "unit_price DESC"
-    }
-    with app.app_context():
-        db = get_db
-        products = db.search_product_by_name()  # no arguments = get all products as list of dicts
-        categories = db.get_unique_values("products", "category")   # Get all categories as list
-    print(products[0])
-    print(categories)
-    return render_template('search.html', products = products, dict_sort_by = dict_sort_by, categories = categories)
+@user_bp.route('/search', methods=['GET', 'POST'])
+def search():
+    form = ProductSearchParams()
+    print(serialize_form(form))
 
-
-@user_bp.route('/search', methods=['POST'])
-def search_page(product_name, category, order_by):
+    # NOTE: valid keys are stored in valid_categories for form validation object definition
     dict_sort_by = {
-        "Price (low to high)": "unit_price ASC",
-        "Price (high to low)": "unit_price DESC"
+        "price_low_to_high": "unit_price ASC",
+        "price_high_to_low": "unit_price DESC"
     }
-    order_by = dict_sort_by[order_by]
+
     with app.app_context():
-        db = get_db
-        products = db.search_product_by_name(product_name, category, order_by)
-        categories = db.get_unique_values("products", "category")
-    return render_template('search.html', products = products, dict_sort_by = dict_sort_by, categories = categories)
+        sort_cmd = dict_sort_by[form.sort_type.data]
+        # db = get_db()
+        # products = db.search_product_by_name()  # no arguments = get all products as list of dicts
+        # categories = db.get_unique_values("products", "category")   # Get all categories as list
+        db = get_db()
+        products = db.get_random_entries("products", 20)
+
+    return render_template('search.html', products=products, categories=valid_categories, form=form)
 
 # Signin endpoints
 @user_bp.route('/login', methods=['GET'])
@@ -255,9 +238,7 @@ def product_buy():
 def load_user(id):
     with app.app_context():
         db = get_db()
-        print("Load user id ", ord(id))
         user = db.get_entry_by_id("users", ord(id)) # convert unicode id back to int
-        print(user)
         if user is None:
             return None
         flask_user = FlaskUser(user["username"], True, True, False, chr(user["id"]), user["is_admin"])

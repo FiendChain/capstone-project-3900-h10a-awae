@@ -44,8 +44,8 @@ $("document").ready(function() {
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{ url_for('user_bp.products') }}">Products</a></li>
-    <li class="breadcrumb-item"><a href="#">Coffee</a></li>
+    <li class="breadcrumb-item"><a href="{{ url_for('user_bp.search') }}">Products</a></li>
+    <li class="breadcrumb-item"><a href="#">{{ product.category }}</a></li>
   </ol>
 </nav>
 
