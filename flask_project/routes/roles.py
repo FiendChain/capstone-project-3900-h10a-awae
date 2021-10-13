@@ -6,7 +6,7 @@ from flask_login import current_user
 def admin_required(func):
     @wraps(func)
     def decorated_view(*args, **kwargs):
-        if not current_user.is_admin():
+        if not current_user.admin:
             flash("Administrative permissions required")
             return current_app.login_manager.unauthorized()
         return func(*args, **kwargs)

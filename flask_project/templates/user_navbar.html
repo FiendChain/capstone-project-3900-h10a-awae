@@ -44,7 +44,7 @@ $("document").ready(function () {
     <!--Controls-->
     <div class="col align-self-end text-right">
       <div class="btn-group">
-        {% if current_user.is_admin() %}
+        {% if current_user.admin %}
         <a href='{{ url_for('admin_bp.home') }}' class="btn btn-success">Admin</a>
         {% endif %}
         <a href='{{ url_for('user_bp.cart') }}' class="btn btn-outline-secondary">Cart</a>
