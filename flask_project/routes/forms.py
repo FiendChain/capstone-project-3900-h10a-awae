@@ -18,8 +18,7 @@ from server import app
 
 # TODO: Find a better place to put this
 
-valid_categories = ["Coffee", "Alt Milk", "Meal Kit", "Tools", "Dessert"]
-valid_product_sort = ["price_low_to_high", "price_high_to_low"]
+# valid_product_sort = ["price_low_to_high", "price_high_to_low"]
 valid_delivery_units = ["days", "weeks", "months", "years"]
 valid_images = UploadSet('images', IMAGES)
 
@@ -42,7 +41,7 @@ class ProductForm(FlaskForm):
 
     name = StringField(validators=[Length(5, 40), InputRequired(message="Product name is required")])
     unit_price = FloatField(validators=[NumberRange(min=0, max=1000), InputRequired()])
-    category = StringField(validators=[AnyOf(valid_categories), InputRequired()])
+    category = StringField(validators=[InputRequired()])
     description = StringField(validators=[Length(0, 250)])
     est_delivery_amount = IntegerField(validators=[NumberRange(min=1, max=1000), InputRequired()])
     est_delivery_units = StringField(validators=[AnyOf(valid_delivery_units), InputRequired()])
@@ -101,8 +100,8 @@ class UserProfileLoginSecurityForm(FlaskForm):
 # form for product search
 class ProductSearchParams(FlaskForm):
     name = StringField(Optional(), validators=[Length(0,100)], default="")
-    categories = StringField(Optional(), validators=[AnyOf(valid_categories)], default="")
-    sort_type = StringField(Optional(), validators=[AnyOf(valid_product_sort)], default="price_low_to_high")
+    categories = StringField(Optional(), default="")
+    sort_type = StringField(Optional(), default="price_low_to_high")
 
 def serialize_form(form):
     data = [] 

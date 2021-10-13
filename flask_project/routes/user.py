@@ -5,7 +5,7 @@ from flask_login.utils import login_required
 
 from server import login_manager, app, get_db
 from .temp_db import db, SessionCart
-from .forms import LoginForm, RegisterForm, UserPurchaseForm, UserProfileLoginSecurityForm, ProductSearchParams, serialize_form, valid_categories
+from .forms import LoginForm, RegisterForm, UserPurchaseForm, UserProfileLoginSecurityForm, ProductSearchParams, serialize_form
 from classes.flaskuser import FlaskUser
 
 user_bp  = Blueprint('user_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
@@ -28,23 +28,18 @@ def product_page(id):
 
 @user_bp.route('/search', methods=['GET', 'POST'])
 def search():
-    form = ProductSearchParams()
-    print(serialize_form(form))
-
-    # NOTE: valid keys are stored in valid_categories for form validation object definition
-    dict_sort_by = {
-        "price_low_to_high": "unit_price ASC",
-        "price_high_to_low": "unit_price DESC"
-    }
 
     with app.app_context():
-        sort_cmd = dict_sort_by[form.sort_type.data]
-        # db = get_db()
-        # products = db.search_product_by_name()  # no arguments = get all products as list of dicts
-        # categories = db.get_unique_values("products", "category")   # Get all categories as list
         db = get_db()
-        products = db.get_random_entries("products", 20)
-
+        valid_categories = db.get_unique_values("products", "category")
+        form = ProductSearchParams()
+        print(serialize_form(form))
+        dict_sort_by = {
+            "price_low_to_high": "unit_price ASC",
+            "price_high_to_low": "unit_price DESC"
+        }
+        sort_by = dict_sort_by[form.sort_type.data]
+        products = db.search_product_by_name(form.name.data, form.categories.data, sort_by)
     return render_template('search.html', products=products, categories=valid_categories, form=form)
 
 # Signin endpoints
@@ -107,7 +102,12 @@ def register():
                 return jsonify(serialize_form(form)), 403
 
             print(f"User registered: {serialize_form(form)}")
-            return jsonify(dict(redirect=url_for("user_bp.register")))
+
+            user = db.get_entries_by_heading("users", "username", user_data[0])[0]
+            flask_user = FlaskUser(user["username"], True, True, False, chr(user["id"]), user["is_admin"])    # user id must be unicode
+            print(f"User {flask_user.get_username()} registered and logged in")
+            login_user(flask_user, remember=form.remember_me.data)
+            return jsonify(dict(redirect=url_for("user_bp.home")))
     
     return jsonify(serialize_form(form)), 403
 

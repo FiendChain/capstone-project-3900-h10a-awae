@@ -64,8 +64,15 @@ class Database(object):
     # sort_order: asc, desc
 
     def search_product_by_name(self, name="", category = "", order_by="id ASC"):
-        query = f"SELECT * FROM products WHERE name LIKE ? AND category = {category} ORDER BY {order_by}"
-        params = f"%{name}%",   # comma is intentional
+        if category == "":
+
+            query = f"SELECT * FROM products WHERE name LIKE ? ORDER BY {order_by}"
+            
+        else:
+            category = f"'{category}'"
+            query = f"SELECT * FROM products WHERE name LIKE ? AND category={category} ORDER BY {order_by}"
+        params = (f"%{name}%",)   # comma is intentional
+        print(query)
         self.cur.execute(query, params)
         entries = self.cur.fetchall()
         entries = [self.make_dict(self.cur, entry) for entry in entries]
