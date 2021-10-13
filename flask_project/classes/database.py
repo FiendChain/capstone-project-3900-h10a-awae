@@ -106,6 +106,14 @@ class Database(object):
         self.conn.commit()
         print(f"Entry {entry[0]} deleted")
         return entry[0]
+    
+    def delete_by_id(self, table_name, id):
+        query = f"DELETE FROM {table_name} WHERE rowid = ?"
+        params = int(id), # comma is intentional
+        self.cur.execute(query, params)
+        self.conn.commit()
+        print(f"Entry {id} deleted")
+        return id
 
 
     def update(self, table_name, entry_old, entry_new):
@@ -116,7 +124,9 @@ class Database(object):
         subquery1 = ', '.join(f"{col} = ?" for col in cols)
         query = f"UPDATE or IGNORE {table_name} SET {subquery1} WHERE id = {entry_old[0]}"
         #query = f"REPLACE into {table_name} VALUES ({subquery1}) WHERE id = {entry_old[0]}"
+        
         params = entry_new
+        print(query, params)
         self.cur.execute(query, params)
         self.conn.commit()
         print(f"Entry {entry_new[0]} updated")
