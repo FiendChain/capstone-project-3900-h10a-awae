@@ -1,6 +1,7 @@
 $('document').ready(() => {
     let el_total_cost = $("#cart-summary-total-cost");
     let el_total_items = $("#cart-summary-total-items");
+    let el_cart_count = $("#navbar-cart-count");
 
     // on quantity change, submit changes
     $('.quantity_form').find('input[id="quantity"]').change(ev => {
@@ -30,6 +31,7 @@ $('document').ready(() => {
 
                 el_total_cost.html(`${total_cost.toFixed(2)}`);
                 el_total_items.html(`${total_items}`);
+                el_cart_count.html(`${total_items}`);
             }
 
             let quantity = Number(res.quantity);

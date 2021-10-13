@@ -10,7 +10,7 @@
     <div class="col align-self-end text-right">
       <div class="btn-group">
         <a href='{{ url_for('user_bp.home') }}' class="btn btn-success">User</a>
-        <a href='{{ url_for('user_bp.cart') }}' class="btn btn-outline-secondary">Cart</a>
+        <a href='{{ url_for('user_bp.cart') }}' class="btn btn-outline-secondary">Cart (<span id="navbar-cart-count">{{ current_cart.total_items }}</span>)</a>
         {% if current_user.is_authenticated %}
         <a href='{{ url_for('user_bp.profile') }}' class="btn btn-primary">Profile ({{ current_user.username[0] }})</a>
         <a href='{{ url_for('user_bp.logout') }}' class="btn btn-danger">Logout</a>

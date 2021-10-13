@@ -256,6 +256,12 @@ def cart_checkout():
     cart.empty()
     return redirect(url_for("user_bp.cart"))
 
+# Keep cart total count public
+@app.context_processor
+def cart_total_injector():
+    cart = get_user_cart()
+    summary = get_cart_summary(cart)
+    return dict(current_cart=summary)
 
 # Reloads and returns the User object for current session
 @login_manager.user_loader
