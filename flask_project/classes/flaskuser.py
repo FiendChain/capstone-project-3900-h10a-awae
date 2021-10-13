@@ -13,12 +13,15 @@ class FlaskUser(object):
     def get_username(self):
         return self.username
     
+    @property
     def is_authenticated(self):
         return self.authenticated
     
+    @property
     def is_active(self):
         return self.active
-    
+
+    @property
     def is_anonymous(self):
         return self.anonymous
     
