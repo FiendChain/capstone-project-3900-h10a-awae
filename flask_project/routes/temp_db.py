@@ -109,9 +109,10 @@ class TempDB:
                 "id": id,
                 "name": "Lite Latte",
                 "unit_price": 10.20,
-                "est_delivery_amount": 3,
-                "est_delivery_units": "days",
+                "delivery_days": 3,
+                "warranty_days": 5,
                 "in_stock": 10,
+                "brand": f"Adele {i}",
                 "category": "coffee",
                 "image_url": f"/static/images/coffee_{i}.jpg",
                 "description": "A deliciously light latte that gives you the runs"
@@ -147,10 +148,9 @@ class TempDB:
 
 
     def gen_uuid(self):
-        pass
-        # while (uid := str(uuid.uuid4())[:7]) in self.all_ids:
-        #     pass
-        # self.all_ids.add(uid)
-        # return uid 
+        while (uid := str(uuid.uuid4())[:7]) in self.all_ids:
+            pass
+        self.all_ids.add(uid)
+        return uid 
 
 db = TempDB()
