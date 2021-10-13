@@ -26,7 +26,7 @@
 <h3>Add Product</h3>
 <form class="wtf-ajax-form" id="add-product" method="POST" action="{{ url_for("admin_api_bp.add_product") }}" enctype="multipart/form-data">
   {{ form.csrf_token }}
-  {{ render_product_form(form) }}
+  {{ render_product_form(form, categories) }}
   <!--Form controls-->
   <div class="form-group row text-right">
     <div class="col">
