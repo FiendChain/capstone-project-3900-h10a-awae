@@ -40,8 +40,6 @@ class Database(object):
         subquery_1 = ', '.join(f"{key}" for key in cols_no_id)
         subquery_2 = ', '.join(f"?" for (i, col) in enumerate(cols_no_id))
         query = f"INSERT INTO {table_name} ({subquery_1}) VALUES ({subquery_2})"
-        print(query)
-        print(entries)
         params = entries
         self.cur.executemany(query, params)
         self.conn.commit()
@@ -62,8 +60,11 @@ class Database(object):
     #     print(f"table {self.name} created")
 
     # Case insensitive, substring search
-    def search_product_by_name(self, name):
-        query = "SELECT * FROM products WHERE name LIKE ?"
+        # sort_filter: price    
+    # sort_order: asc, desc
+
+    def search_product_by_name(self, name="", category = "", order_by="id ASC"):
+        query = f"SELECT * FROM products WHERE name LIKE ? AND category = {category}ORDER BY {order_by}"
         params = f"%{name}%",   # comma is intentional
         self.cur.execute(query, params)
         entries = self.cur.fetchall()
@@ -143,4 +144,11 @@ class Database(object):
             return True
         return False
     
+    # Get unique values for a chosen table heading, eg: product categories
+    def get_unique_values(self, table_name, heading):
+        query = f"SELECT DISTINCT {heading} from {table_name}"
+        self.cur.execute(query)
+        entries = self.cur.fetchall()
+        entries = [entry[0] for entry in entries]
+        return entries
 # %%

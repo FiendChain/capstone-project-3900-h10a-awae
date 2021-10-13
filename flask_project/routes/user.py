@@ -27,13 +27,33 @@ def product_page(id):
         product = db.get_entry_by_id("products", id)
     return render_template('product.html', product=product)
 
-@user_bp.route('/search', methods=['GET', 'POST'])
-def search_page(filter):
+@user_bp.route('/search', methods=['GET'])
+def search_page():
+    dict_sort_by = {
+        "Price (low to high)": "unit_price ASC",
+        "Price (high to low)": "unit_price DESC"
+    }
     with app.app_context():
         db = get_db
-        #db.search_product_by_name()
-    pass
+        products = db.search_product_by_name()  # no arguments = get all products as list of dicts
+        categories = db.get_unique_values("products", "category")   # Get all categories as list
+    print(products[0])
+    print(categories)
+    return render_template('search.html', products = products, dict_sort_by = dict_sort_by, categories = categories)
 
+
+@user_bp.route('/search', methods=['POST'])
+def search_page(product_name, category, order_by):
+    dict_sort_by = {
+        "Price (low to high)": "unit_price ASC",
+        "Price (high to low)": "unit_price DESC"
+    }
+    order_by = dict_sort_by[order_by]
+    with app.app_context():
+        db = get_db
+        products = db.search_product_by_name(product_name, category, order_by)
+        categories = db.get_unique_values("products", "category")
+    return render_template('search.html', products = products, dict_sort_by = dict_sort_by, categories = categories)
 
 # Signin endpoints
 @user_bp.route('/login', methods=['GET'])
