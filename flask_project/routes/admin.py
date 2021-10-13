@@ -4,6 +4,7 @@ from flask import Blueprint
 from .forms import ProductForm, serialize_form
 from .temp_db import db, InvalidFileExtension
 from .roles import admin_required
+from server import app, get_db
 
 admin_bp = Blueprint('admin_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
 admin_api_bp = Blueprint('admin_api_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
@@ -16,8 +17,10 @@ def home():
 @admin_bp.route("/products", methods=['GET'])
 @admin_required
 def products():
-    flat_products = list(db.products.values())
-    return render_template("admin/products.html", products=flat_products)
+    with app.app_context():
+        db = get_db()
+        products = db.search_product_by_name()
+    return render_template("admin/products.html", products=products)
 
 
 @admin_bp.route("/products/add", methods=['GET'])
@@ -48,33 +51,40 @@ def add_product():
         return jsonify(serialize_form(form)), 403
 
     print(f"Adding product: {form}")
-    uid = db.gen_uuid()
 
-    image_file = form.image.data
+    with app.app_context():
+        db = get_db()
+        image_url = db.gen_image_url(form.image.data, app)
+        product = (
+            form.name.data, form.unit_price.data, form.brand.data, form.category.data, form.description.data, form.delivery_days.data, form.warranty_days.data, "", form.stock.data, image_url
+        )
+        id = db.add("products", product)
+        
 
-    if image_file:
-        try:
-            image_url = db.add_image(image_file)
-        except InvalidFileExtension as ex:
-            form.image.errors.append("Invalid file extension")
-            return jsonify(serialize_form(form)), 403
-    else:
-        image_url = None
+
+    # if image_file:
+    #     try:
+    #         image_url = db.add_image(image_file)
+    #     except InvalidFileExtension as ex:
+    #         form.image.errors.append("Invalid file extension")
+    #         return jsonify(serialize_form(form)), 403
+    # else:
+    #     image_url = None
     
-    product = {
-        "id": uid,
-        "name": form.name.data,
-        "unit_price": form.unit_price.data,
-        "brand": form.brand.data,
-        "category": form.category.data,
-        "description": form.description.data,
-        "delivery_days": form.delivery_days.data,
-        "warranty_days": form.warranty_days.data,
-        "in_stock": form.in_stock.data,
-        "image_url": image_url,
-    }
+    # product = {
+    #     "id": uid,
+    #     "name": form.name.data,
+    #     "unit_price": form.unit_price.data,
+    #     "brand": form.brand.data,
+    #     "category": form.category.data,
+    #     "description": form.description.data,
+    #     "delivery_days": form.delivery_days.data,
+    #     "warranty_days": form.warranty_days.data,
+    #     "in_stock": form.in_stock.data,
+    #     "image_url": image_url,
+    # }
 
-    db.products[uid] = product
+    # db.products[uid] = product
     return jsonify(dict(redirect=url_for("admin_bp.products")))
 
 @admin_api_bp.route("/products/<string:id>/edit", methods=["POST"]) 

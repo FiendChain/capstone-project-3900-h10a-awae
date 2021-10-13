@@ -2,6 +2,15 @@
 # DB parameters
 import sqlite3
 import pandas as pd
+import uuid
+import os
+
+
+class InvalidFileExtension(Exception):
+    def __init__(self, filename, message=None):
+        super().__init__(message)
+        self.filename = filename
+
 class Database(object):
     def __init__(self, path):
         self.path = path
@@ -88,6 +97,7 @@ class Database(object):
         self.cur.execute(query, params)
         self.conn.commit()
         print(f"Entry {entry_no_id[0]} added")
+        return entry_no_id[0]
         
     def delete(self, table_name, entry):
         query = f"DELETE FROM {table_name} WHERE rowid = ?"
@@ -95,6 +105,7 @@ class Database(object):
         self.cur.execute(query, params)
         self.conn.commit()
         print(f"Entry {entry[0]} deleted")
+        return entry[0]
 
 
     def update(self, table_name, entry_old, entry_new):
@@ -109,6 +120,7 @@ class Database(object):
         self.cur.execute(query, params)
         self.conn.commit()
         print(f"Entry {entry_new[0]} updated")
+        return entry_new[0]
     
     def get_random_entries(self, table_name, amount):
         query = f"SELECT * from {table_name} ORDER BY RANDOM() LIMIT {amount}"
@@ -156,4 +168,23 @@ class Database(object):
         entries = self.cur.fetchall()
         entries = [entry[0] for entry in entries]
         return entries
+
+    def gen_uuid(self):
+        while True:
+            uid = str(uuid.uuid4())[:7]
+            if uid not in self.get_unique_values("products", "id"):
+                break
+        return uid 
+    
+    def gen_image_url(self, file, app):
+        valid_filename = file.filename != '' and '.' in file.filename
+        if not valid_filename:
+            raise InvalidFileExtension(valid_filename)
+        ext = os.path.splitext(file.filename)[1]
+        id = uuid.uuid4()
+        print(id, " + ", ext)
+        rand_filename = f"{id}{ext}"
+        file.save(os.path.join(app.config['UPLOADED_IMAGES_DEST'], rand_filename))
+        image_url = f"/static/uploads/images/{rand_filename}"
+        return image_url
 # %%

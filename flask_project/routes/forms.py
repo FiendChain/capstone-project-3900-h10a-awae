@@ -44,7 +44,7 @@ class ProductForm(FlaskForm):
     category = StringField(validators=[InputRequired()])
     brand = StringField(validators=[Length(0, 250)])
     description = StringField(validators=[Length(0, 250)])
-    in_stock = IntegerField(validators=[NumberRange(min=0, max=10000), InputRequired()])
+    stock = IntegerField(validators=[NumberRange(min=0, max=10000), InputRequired()])
     delivery_days = IntegerField(validators=[NumberRange(min=1, max=1000), InputRequired()])
     warranty_days = IntegerField(validators=[NumberRange(min=1, max=1000), InputRequired()])
 

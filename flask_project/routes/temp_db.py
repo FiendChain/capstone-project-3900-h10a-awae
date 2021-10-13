@@ -137,7 +137,7 @@ class TempDB:
         ext = os.path.splitext(file.filename)[1]
 
         id = uuid.uuid4()
-        rand_filename = f"{id}.{ext}"
+        rand_filename = f"{id}{ext}"
 
         # TODO: Decide on how you want to store images
         file.save(os.path.join(app.config['UPLOADED_IMAGES_DEST'], rand_filename))

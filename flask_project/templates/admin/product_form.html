@@ -79,12 +79,12 @@
     </div>
     <!--Total in stock-->
     <div class="form-group row">
-      <label for="{{ form.in_stock.id }}" class="col-md-3 col-form-label">In stock</label>
+      <label for="{{ form.stock.id }}" class="col-md-3 col-form-label">In stock</label>
       <div class="col input-group">
         <input 
           type="number" class="form-control d-flex" placeholder="In stock" min="0" required
-          id="{{ form.in_stock.id }}" name="{{ form.in_stock.id }}" value="{{ form.in_stock.data or 0 }}">
-        {{ render_form_error(form.in_stock) }}
+          id="{{ form.stock.id }}" name="{{ form.stock.id }}" value="{{ form.stock.data or 0 }}">
+        {{ render_form_error(form.stock) }}
       </div>
     </div>
     <!--Estimated delivery-->
