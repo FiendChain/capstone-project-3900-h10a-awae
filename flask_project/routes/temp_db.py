@@ -2,10 +2,33 @@ import uuid
 import os
 
 from server import app
-        
+
+from abc import ABC, abstractmethod
 # rough outline of how cart data is stored
-class UserCart:
+class Cart(ABC):
+    @abstractmethod
+    def to_list(self):
+        pass
+
+    @abstractmethod
+    def purge(self, validator):
+        pass
+
+    @abstractmethod
+    def add_product(self, id, quantity):
+        pass
+
+    @abstractmethod
+    def update_product(self, id, quantity):
+        pass
+
+    @abstractmethod
+    def empty(self):
+        pass
+
+class DictCart(Cart):
     def __init__(self):
+        super().__init__()
         self.items = {} 
     
     def to_list(self):
@@ -35,9 +58,12 @@ class UserCart:
             self.items[id] = quantity
         else:
             del self.items[id]
+    
+    def empty(self):
+        self.items = {}
 
 # convert flask session object to store a cart 
-class SessionCart(UserCart):
+class SessionCart(DictCart):
     def __init__(self, session):
         self.session = session
     
@@ -47,15 +73,20 @@ class SessionCart(UserCart):
     
     def add_product(self, id, quantity):
         rv = super().add_product(id, quantity)
-        self.session.changed = True
-        print(self.session)
+        self.session.modified = True
+        print(f'Added: {self.session}')
         return rv
     
     def update_product(self, id, quantity):
         rv = super().update_product(id, quantity)
-        self.session.changed = True
-        print(self.session)
+        self.session.modified = True
+        print(f'Updated: {self.session}')
         return rv
+    
+    def empty(self):
+        self.session['cart'] = {}
+        self.session.modified = True
+
 
 # temporary user login code for flask
 class TempUser:
@@ -64,7 +95,7 @@ class TempUser:
         self.username = username
         self.password = password
 
-        self.cart = UserCart() 
+        self.cart = DictCart() 
         self.roles = set(["user"]) 
 
     def has_roles(self, *roles):
@@ -114,7 +145,7 @@ class TempDB:
                 "in_stock": 10,
                 "brand": f"Adele {i}",
                 "category": "coffee",
-                "image_url": f"/static/images/coffee_{i}.jpg",
+                "image_url": f"/static/uploads/images/coffee_{i}.jpg",
                 "description": "A deliciously light latte that gives you the runs"
             }
 

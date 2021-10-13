@@ -1,4 +1,7 @@
 $('document').ready(() => {
+    let el_total_cost = $("#cart-summary-total-cost");
+    let el_total_items = $("#cart-summary-total-items");
+
     // on quantity change, submit changes
     $('.quantity_form').find('input[id="quantity"]').change(ev => {
         let input = $(ev.currentTarget);
@@ -19,10 +22,21 @@ $('document').ready(() => {
             if (res.quantity === undefined) {
                 return;
             } 
+
+            // update the summary from the response
+            if (res.summary !== undefined) {
+                let total_cost = res.summary.total_cost;
+                let total_items = res.summary.total_items;
+
+                el_total_cost.html(`${total_cost.toFixed(2)}`);
+                el_total_items.html(`${total_items}`);
+            }
+
             let quantity = Number(res.quantity);
             if (!isFinite(quantity)) {
                 return;
             }
+
 
             // if item was deleted, then remove entry
             if (quantity == 0) {
