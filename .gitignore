@@ -6,7 +6,7 @@ ecommerce.db
 testing_stuff/
 flask_project/db/ecommerce.db
 
-flask_project/static/uploads
+# flask_project/static/uploads
 
 
 # Byte-compiled / optimized / DLL files
