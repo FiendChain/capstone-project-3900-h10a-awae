@@ -62,7 +62,7 @@ def create_database():
         #     "Arnold", "Schwar", "arnold@gmail.com", "0404123456", 0
         # ))
         # print(db.get_unique_values("products", "category"))
-        print(db.search_product_by_name("", category = "Meal Kit", order_by = "unit_price ASC"))
+        # print(db.search_product_by_name("", category = "Meal Kit", order_by = "unit_price ASC"))
         db.conn.close()
     print("System finished setting up")
     # table_products = Table("products", table_cols["products"], conn, cur)
