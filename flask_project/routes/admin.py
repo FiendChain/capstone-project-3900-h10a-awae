@@ -3,7 +3,7 @@ from flask import Blueprint
 
 from .forms import ProductForm, serialize_form
 from .temp_db import db, InvalidFileExtension
-from .roles import roles_required, admin_required
+from .roles import admin_required
 
 admin_bp = Blueprint('admin_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
 admin_api_bp = Blueprint('admin_api_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
