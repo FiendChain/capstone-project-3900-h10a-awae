@@ -36,9 +36,15 @@ $("document").ready(function () {
       {{ form.csrf_token }}
       <!--Sort controls-->
       <div class="row my-2 justify-content-between">
+        <!--Search description-->
         <div class="col text-left">
-          <p class="my-1">Showing results for </p>
+          {% if form.name.data %}
+          <p class="my-1"><strong>Showing results for </strong>{{ form.name.data or "" }}</p>
+          {% else %}
+          <p class="my-1"><strong>Showing results for {{ products.__len__() }} matches</strong></p>
+          {% endif %}
         </div>
+        <!--Sort by price-->
         <div class="col-md-auto text-right">
           <div class="input-group">
             <div class="input-group-prepend">
@@ -53,12 +59,19 @@ $("document").ready(function () {
       </div>
       <!--Product search results-->
       <div class="row w-100">
-        <!--Filter controls-->
+        <!--Filter by category-->
         <div class="col-md-2">
           <div class="row"><strong>Filter by</strong></div>
           <div class="row">Category</div>
           <div class="row">
             <div class="col">
+              <!--Default all categories-->
+              <div class="form-check">
+                <input 
+                  class="form-check-input" type="radio"
+                  name="{{ form.categories.id }}" id="filter_category_all" value="" {{ 'checked' if form.categories.data == "" }}>
+                <label class="form-check-label" for="filter_category_all">All</label>
+              </div>
               {% for category in categories %}
               <div class="form-check">
                 <input 

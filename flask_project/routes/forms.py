@@ -18,7 +18,7 @@ from server import app
 
 # TODO: Find a better place to put this
 
-valid_categories = ["All", "Coffee", "Alt Milk", "Meal Kit", "Tools", "Dessert"]
+valid_categories = ["Coffee", "Alt Milk", "Meal Kit", "Tools", "Dessert"]
 valid_product_sort = ["price_low_to_high", "price_high_to_low"]
 valid_delivery_units = ["days", "weeks", "months", "years"]
 valid_images = UploadSet('images', IMAGES)
@@ -98,7 +98,7 @@ class UserProfileLoginSecurityForm(FlaskForm):
 # form for product search
 class ProductSearchParams(FlaskForm):
     name = StringField(Optional(), validators=[Length(0,100)], default="")
-    categories = StringField(Optional(), validators=[AnyOf(valid_categories)], default="All")
+    categories = StringField(Optional(), validators=[AnyOf(valid_categories)], default="")
     sort_type = StringField(Optional(), validators=[AnyOf(valid_product_sort)], default="price_low_to_high")
 
 def serialize_form(form):
