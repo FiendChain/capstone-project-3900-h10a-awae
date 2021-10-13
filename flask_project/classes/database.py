@@ -65,9 +65,7 @@ class Database(object):
 
     def search_product_by_name(self, name="", category = "", order_by="id ASC"):
         if category == "":
-
             query = f"SELECT * FROM products WHERE name LIKE ? ORDER BY {order_by}"
-            
         else:
             category = f"'{category}'"
             query = f"SELECT * FROM products WHERE name LIKE ? AND category={category} ORDER BY {order_by}"
@@ -122,11 +120,11 @@ class Database(object):
     def get_entry_by_id(self, table_name, id):
         query = f"SELECT * from {table_name} WHERE id = {id}"
         self.cur.execute(query)
-        entry = self.cur.fetchone()
-        if not entry:
+        entries = self.cur.fetchall()
+        if not entries:
             return None
-        entry = self.make_dict(self.cur, entry)
-        return entry
+        entry = [self.make_dict(self.cur, entry) for entry in entries]
+        return entry[0]
 
     # Returns a dictionary object, with table headings as keys and entry (tuple) values as value
     def make_dict(self, cursor, row):

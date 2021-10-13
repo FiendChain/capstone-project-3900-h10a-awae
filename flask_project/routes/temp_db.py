@@ -148,9 +148,10 @@ class TempDB:
 
 
     def gen_uuid(self):
-        while (uid := str(uuid.uuid4())[:7]) in self.all_ids:
-            pass
-        self.all_ids.add(uid)
-        return uid 
+        pass
+        # while (uid := str(uuid.uuid4())[:7]) in self.all_ids:
+        #     pass
+        # self.all_ids.add(uid)
+        # return uid 
 
 db = TempDB()

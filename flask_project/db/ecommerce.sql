@@ -18,8 +18,9 @@ CREATE TABLE IF NOT EXISTS "products" (
   "description" text,
   "delivery_days" int,
   "warranty_days" int,
-  "image_url" text,
-  "stock" int
+  "original_link" text,
+  "stock" int,
+  "image_url" text
 );
 
 CREATE TABLE IF NOT EXISTS "cart_item" (
