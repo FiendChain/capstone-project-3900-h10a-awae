@@ -7,8 +7,10 @@ from wtforms import StringField, IntegerField, FloatField, SubmitField
 from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import HiddenField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import Email, EqualTo, InputRequired, Length, NumberRange, AnyOf, Optional
+from wtforms.validators import Email, EqualTo, InputRequired, Length, NumberRange, AnyOf, Optional, ValidationError
 from wtforms.widgets.core import Input
+
+import phonenumbers
 
 from server import app
 
@@ -52,11 +54,29 @@ class LoginForm(FlaskForm):
     password = StringField(validators=[Length(5, 40), InputRequired(message="Password is required")])
     remember_me = BooleanField(validators=[Optional()], default=True)
 
+class PhoneValidator:
+    def __init__(self, length=10, message="Invalid phone number"):
+        self.length = length
+        self.message = message
+
+    def __call__(self, form, field):
+        if len(field.data) < self.length:
+            raise ValidationError(f'Phone number must have at least {self.length} digits')
+        try:
+            input_number = phonenumbers.parse(field.data)
+            if not phonenumbers.is_valid_number(input_number):
+                raise ValidationError(self.message)
+        except:
+            input_number = phonenumbers.parse("+61"+field.data)
+            if not phonenumbers.is_valid_number(input_number):
+                raise ValidationError(self.message)
+
 class RegisterForm(FlaskForm):
     username = StringField(validators=[Length(5,40), InputRequired(message="Username is required")])
     password = StringField("password", validators=[Length(5, 40), InputRequired(message="Password is required")])
     confirm_password = StringField(validators=[Length(5, 40), InputRequired(message="You must confirm your password"), EqualTo("password")])
     email = EmailField(validators=[Email(), InputRequired(message="Email is required")])
+    phone = StringField(validators=[PhoneValidator(), InputRequired()])
     remember_me = BooleanField(validators=[Optional()], default=True)
 
 class UserPurchaseForm(FlaskForm):
