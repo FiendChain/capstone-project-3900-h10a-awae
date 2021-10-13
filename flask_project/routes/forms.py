@@ -57,7 +57,7 @@ class LoginForm(FlaskForm):
     remember_me = BooleanField(validators=[Optional()], default=True)
 
 class PhoneValidator:
-    def __init__(self, length=10, message="Invalid phone number"):
+    def __init__(self, length=8, message="Invalid phone number"):
         self.length = length
         self.message = message
 
