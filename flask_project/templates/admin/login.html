@@ -1,0 +1,52 @@
+<!doctype html>
+{% extends 'base.html' %}
+{% block head %}
+<title>Cafe AWAE Admin Login Portal</title>
+{% endblock %}
+
+{% block content %}
+<script src="/static/js/wtf_ajax_form.js"></script>
+
+<div class="container-fluid h-100 justify-content-center">
+  <div class="row">
+    <div class="col text-center">
+      <h1>Cafe AWAE Admin Login</h1>
+    </div>
+  </div>
+  <div class="row my-auto justify-content-center">
+    <!--Sign in panel-->
+    <div class="col-md-5">
+      <div class="card">
+        <div class="card-header">
+          <h6>Admin Login</h6>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('admin_bp.login') }}" class="wtf-ajax-form">
+          {{ form.csrf_token }}
+          <div class="form-group">
+            <label for="{{ form.name.id }}">Username</label>
+            <input type="text" class="form-control" id="{{ form.name.id }}" name="{{ form.name.id }}" placeholder="Enter username" minlength="5" maxlength="25" required>
+            <div class="invalid-feedback d-none" id="{{ form.name.id }}"></div>
+          </div>
+          <div class="form-group">
+            <label for="{{ form.password.id }}">Password</label>
+            <input type="password" class="form-control" id="{{ form.password.id }}" name="{{ form.password.id }}" placeholder="Password" minlength="5" maxlength="25" required>
+            <div class="invalid-feedback d-none" id="{{ form.password.id }}"></div>
+          </div>
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="{{ form.remember_me.id }}" name="{{ form.remember_me.id }}" checked="{{ form.remember_me.data }}">
+            <div class="invalid-feedback d-none" id="{{ form.remember_me.id }}"></div>
+            <label class="form-check-label" for="{{ form.remember_me.id }}">Remember me</label>
+          </div>
+          <div class="form-row">
+            <div class="col text-right">
+              <button type="submit" class="btn btn-primary">Login</button>
+            </div>
+          </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,114 @@
+import uuid
+
+# rough outline of how cart data is stored
+class UserCart:
+    def __init__(self):
+        self.items = {} 
+    
+    def to_list(self):
+        for id, quantity in self.items.items():
+            yield (id, quantity)
+    
+    def purge(self, validator):
+        bad_ids = [id for id in self.items if not validator(id)]
+        for id in bad_ids:
+            del self.items[id]
+    
+    def add_product(self, id, quantity):
+        if id not in self.items:
+            self.items[id] = quantity
+            return
+        self.items[id] += quantity
+    
+    def update_product(self, id, quantity):
+        if id not in self.items and quantity > 0:
+            self.items[id] = quantity
+            return
+        
+        if id not in self.items:
+            return
+        
+        if quantity > 0:
+            self.items[id] = quantity
+        else:
+            del self.items[id]
+
+# convert flask session object to store a cart 
+class SessionCart(UserCart):
+    def __init__(self, session):
+        self.session = session
+    
+    @property
+    def items(self):
+        return self.session.setdefault('cart', {})
+    
+    def add_product(self, id, quantity):
+        rv = super().add_product(id, quantity)
+        self.session.changed = True
+        print(self.session)
+        return rv
+    
+    def update_product(self, id, quantity):
+        rv = super().update_product(id, quantity)
+        self.session.changed = True
+        print(self.session)
+        return rv
+
+# temporary user login code for flask
+class TempUser:
+    def __init__(self, id, username, password):
+        self.id = id
+        self.username = username
+        self.password = password
+
+        self.cart = UserCart() 
+
+    @property
+    def is_authenticated(self):
+        return True
+    
+    @property
+    def is_active(self):
+        return True
+    
+    @property
+    def is_anonymous(self):
+        return False
+    
+    def get_id(self):
+        return self.id
+
+# temporary db for storing products and users
+# basic uuid generation
+class TempDB:
+    def __init__(self):
+        self.all_ids = set()
+
+        self.products = {}
+        self.users = {}
+
+        for i in range(1,4):
+            id = self.gen_uuid()
+            self.products[id] = {
+                "id": id,
+                "name": "Lite Latte",
+                "unit_price": 10.20,
+                "est_delivery_amount": 3,
+                "est_delivery_units": "days",
+                "in_stock": 10,
+                "category": "coffee",
+                "image_url": f"/static/images/coffee_{i}.jpg",
+                "description": "A deliciously light latte that gives you the runs"
+            }
+
+        for i in range(1,4):
+            id = self.gen_uuid() 
+            self.users[id] = TempUser(id, f"user{i:02d}", f"pass{i:02d}")
+
+    def gen_uuid(self):
+        while (uid := str(uuid.uuid4())[:7]) in self.all_ids:
+            pass
+        self.all_ids.add(uid)
+        return uid 
+
+db = TempDB()

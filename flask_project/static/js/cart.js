@@ -40,7 +40,7 @@ $('document').ready(() => {
         $.ajax({
             url, data, type: 'POST',
             success: data => update_quantity_from_res(data),
-            error: xhr => update_quantity_from_res(xhr.responseJSON),
+            error: xhr => location.reload(),
         });
     })
 })

@@ -1,0 +1,10 @@
+.product-img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+}
+
+.profile-tile:hover {
+    cursor: pointer;
+    background-color: #f7f7f7;
+}

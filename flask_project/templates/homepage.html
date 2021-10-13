@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 
 {% block head %}
-<link rel="stylesheet" href="/static/css/homepage.css">
-<title>Cafe AWAE Login Portal</title>
+<title>Cafe AWAE Homepage</title>
 {% endblock %}
 
 
@@ -25,14 +24,14 @@
   <div class="container">
     <p class="my-1"><em>Recommended for you</em></p>
     <div class="row" style="border-width: 2rem; border: solid #f7f7f9; padding: 1rem;">
-      {% for product in products %}
+      {% for p in products %}
       <div class="col-sm-2 px-0 mx-1 rounded" style="border: solid #f7f7f7">
         <div class="thumbnail">
-          <a href="{{ product.product_url }}" class="text-decoration-none">
-            <img src="{{ product.image_url }}" class="product-img rounded img-fluid">
+          <a href="{{ url_for("user_bp.product_page", id=p.id) }}" class="text-decoration-none">
+            <img src="{{ p.image_url }}" class="product-img rounded img-fluid">
             <div class="text-center">
-              <h6>{{ product.product_name }}</h6>
-              <p class="text-muted my-0">$10.00</p>
+              <h6>{{ p.name }}</h6>
+              <p class="text-muted my-0">{{ "$%.2f"|format(p.unit_price) }}</p>
             </div>
           </a>
         </div>
