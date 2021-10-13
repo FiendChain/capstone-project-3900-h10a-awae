@@ -101,10 +101,16 @@ def edit_product(id):
     print(f"Editing product: {form}")
     with app.app_context():
         db = get_db()
-        if form.image.data is None: # if admin does not change the image, use old url
+        if form.image.data is None and not form.image_changed.data: # Image was not changed
+            print("IMAGE UNCHANGED")
             image_url = form.image_url.data
-        else:
+        elif form.image.data is None and form.image_changed.data: # Image was deleted
+            print("IMAGE DELETED")
+            image_url = ""
+        else:   # Image was changed to a new image
+            print("IMAGE CHANGED")
             image_url = db.gen_image_url(form.image.data, app)
+            
         product = (
             id, form.name.data, form.unit_price.data, form.brand.data, form.category.data, form.description.data, form.delivery_days.data, form.warranty_days.data, form.stock.data, image_url
         )
