@@ -1,7 +1,7 @@
 from flask import json, redirect, request, render_template, url_for, abort, jsonify
 from flask import Blueprint
 
-from .forms import ProductForm, LoginForm, serialize_form
+from .forms import ProductForm, serialize_form
 from .temp_db import db, InvalidFileExtension
 from .roles import roles_required, admin_required
 
@@ -12,19 +12,6 @@ admin_api_bp = Blueprint('admin_api_bp', __name__, static_folder='static', stati
 @admin_required
 def home():
     return render_template("admin/home.html")
-
-@admin_bp.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-
-    if request.method == "GET":
-        return render_template("admin/login.html", form=form)
-    
-    if form.validate_on_submit():
-        print(f"Logging in user: {serialize_form(form)}")
-        return jsonify(dict(redirect=url_for("admin_bp.home"))) 
-    
-    return jsonify(serialize_form(form)), 403
 
 @admin_bp.route("/products", methods=['GET'])
 @admin_required

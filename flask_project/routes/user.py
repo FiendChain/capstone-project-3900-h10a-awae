@@ -28,14 +28,13 @@ def product_page(id):
 # Signin endpoints
 @user_bp.route('/login', methods=['GET'])
 def login():
-    login_form = LoginForm()
-    register_form = RegisterForm()
-    return render_template("login.html", login_form=login_form, register_form=register_form)
+    form = LoginForm()
+    return render_template("login.html", form=form)
     
 @user_bp.route('/register', methods=['GET', 'POST'])
-@roles_required("user")
 def register():
-    return render_template('registration.html')
+    form = RegisterForm()
+    return render_template('registration.html', form=form)
 
 @user_bp.route('/logout')
 @login_required
@@ -70,12 +69,11 @@ def login():
 
 # Perform registration validation
 @api_bp.route("/register", methods=["POST"])
-@roles_required("user")
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
         print(f"User registered: {serialize_form(form)}")
-        return jsonify(dict(redirect=url_for("user_bp.register")))
+        return jsonify(dict(redirect=url_for("user_bp.home")))
     
     return jsonify(serialize_form(form)), 403
 

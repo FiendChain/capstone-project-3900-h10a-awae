@@ -1,136 +1,71 @@
 {% extends 'base.html' %}
-
 {% block head %}
 <title>Cafe AWAE Registration</title>
 {% endblock %}
 
 {% block content %}
-<script src="/static/js/registration.js"></script>
+<script src="/static/js/wtf_ajax_form.js"></script>
 
-<div class="jumbotron">
-  <div class="container h-100">
-    <div class="row">
-      <div class="col text-center">
-        <a href="{{ url_for('user_bp.home') }}">
-          <h1>Cafe AWAE</h1>
-        </a>
-      </div>
+<div class="container h-100">
+  <div class="row">
+    <div class="col text-center">
+      <a href="{{ url_for('user_bp.home') }}">
+        <h1>Cafe AWAE</h1>
+      </a>
     </div>
-    <div class="row my-auto">
-      <!--Email confirmation panel-->
-      <div class="col-md my-auto">
-        <div class="card">
-          <div class="card-header">
-            <h6>Step 1: Confirm Email</h6>
-          </div>
-          <div class="card-body">
-            <form>
+  </div>
+  <div class="row my-auto justify-content-center">
+    <!--Registration panel--> 
+    <div class="col-md-5 my-auto">
+      <div class="card">
+        <div class="card-header">
+          <h6>Customer Registration</h6>
+        </div>
+        <div class="card-body">
+          <form method="POST" action="{{ url_for('api_bp.register') }}" id="user-register-form" class="wtf-ajax-form">
+            {{ form.csrf_token }}
             <div class="form-group">
-              <label for="email">Email</label>
-              <input type="email" class="form-control" id="email" aria-describedby="emailHelp" placeholder="Enter email">
+              <label for="{{ form.username.id }}">Username</label>
+              <input type="text" class="form-control" id="{{ form.username.id }}" name="{{ form.username.id }}" placeholder="Enter username" required>
+              <div class="invalid-feedback d-none" id="{{ form.username.id }}"></div>
             </div>
             <div class="form-group">
-              <label for="emailCode">Enter confirmation code</label>
-              <input type="text" class="form-control" id="emailCode" placeholder="Enter confirmation code">
+              <label for="{{ form.password.id }}">Password</label>
+              <input type="password" class="form-control" id="{{ form.password.id }}" name="{{ form.password.id }}" placeholder="Password" required>
+              <div class="invalid-feedback d-none" id="{{ form.password.id }}"></div>
             </div>
-            <div class="form-row">
-              <div class="col text-right">
-                <button type="submit" class="btn btn-primary">Resend Code</button>
+            <div class="form-group">
+              <label for="{{ form.confirm_password.id }}">Re-enter Password</label>
+              <input type="password" class="form-control" id="{{ form.confirm_password.id }}" name="{{ form.confirm_password.id }}" placeholder="Re-enter password" required>
+              <div class="invalid-feedback d-none" id="{{ form.confirm_password.id }}"></div>
+            </div>
+            <div class="form-group">
+              <label for="{{ form.email.id }}">Email</label>
+              <input type="email" class="form-control" id="{{ form.email.id }}" name="{{ form.email.id }}" placeholder="Enter email" required>
+              <div class="invalid-feedback d-none" id="{{ form.email.id }}"></div>
+            </div>
+            <div class="form-group">
+              <label for="{{ form.phone.id }}">Phone</label>
+              <input type="phone" class="form-control" id="{{ form.phone.id }}" name="{{ form.phone.id }}" placeholder="Enter phone number" required>
+              <div class="invalid-feedback d-none" id="{{ form.phone.id }}"></div>
+            </div>
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="{{ form.remember_me.id }}" name="{{ form.remember_me.id }}" checked="{{ form.remember_me.data }}">
+              <div class="invalid-feedback d-none" id="{{ form.remember_me.id }}"></div>
+              <label class="form-check-label" for="{{ form.remember_me.id }}">Remember me</label>
+            </div>
+            <div class="form-row my-2">
+              <div class="col">
+                <button type="submit" class="btn btn-primary w-100">Register</button>
               </div>
             </div>
-            </form>
+          </form>
+          <div class="row justify-content-center text-center">
+            <div class="col">Already signed up? <a href="{{ url_for("user_bp.login") }}">Login here</a></div>
           </div>
         </div>
-      </div>
-      <!--Enter phone number-->
-      <div class="col-md my-auto">
-        <div class="card">
-          <div class="card-header">
-            <h6>Step 2: Add phone number</h6>
-          </div>
-          <div class="card-body">
-            <form>
-            <div class="form-group">
-              <label for="phone">Enter phone number</label>
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <div class="input-group-text">AU +61</div>
-                </div>
-                <input type="tel" class="form-control" id="phone" aria-describedby="phoneHelp" placeholder="Enter phone number">
-              </div>
-            </div>
-            <div class="form-group">
-              <label for="phoneCode">Enter confirmation code</label>
-              <input type="text" class="form-control" id="phoneCode" placeholder="Enter confirmation code">
-            </div>
-            <div class="form-row">
-              <div class="col text-right">
-                <button type="submit" class="btn btn-primary">Resend Code</button>
-              </div>
-            </div>
-            </form>
-          </div>
-        </div>
-      </div>
-      <!--Enter payment details-->
-      <div class="col-md my-auto">
-        <div class="card">
-          <div class="card-header">
-            <div class="row">
-              <h6 class="col">Step 3: Payment Details</h6>
-              <div class="col text-right" style="margin-top: -5px;"> 
-                <img src="https://img.icons8.com/color/36/000000/visa.png"> 
-                <img src="https://img.icons8.com/color/36/000000/mastercard.png"> 
-                <img src="https://img.icons8.com/color/36/000000/amex.png"> 
-              </div>
-            </div>
-          </div>
-          <div class="card-body">
-            <form class="payment-form">
-              <div class="form-group">
-                <select class="custom-select custom-select-md">
-                  <option value="1" selected>Paypal</option>
-                  <option value="2">Credit Card</option>
-                  <option value="3">Square</option>
-                </select>
-              </div>
-              <div class="form-group">
-                <label for="cc-number">Card Number</label>
-                <input type="tel" class="form-control cc-number" id="cc-number" autocomplete="cc-number" placeholder="•••• •••• •••• ••••" required>
-              </div>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group"> 
-                    <label for="cc-exp" class="control-label">Card Expiry</label> 
-                    <input id="cc-exp" type="tel" class="input-lg form-control cc-exp" autocomplete="cc-exp" placeholder="•• / ••" required> 
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-group"> 
-                    <label for="cc-cvc" class="control-label">CVC</label> 
-                    <input id="cc-cvc" type="tel" class="input-lg form-control cc-cvc" autocomplete="off" placeholder="••••" required> 
-                  </div>
-                </div>
-              </div>
-              <div class="form-group"> 
-                <label for="numeric" class="control-label">Card Holder Name</label> 
-                <input type="text" class="input-lg form-control"> 
-              </div>
-            </form>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- Submit form button -->
-    <div class="row my-2">
-      <div class="col text-right">
-        <a href="{{ url_for('user_bp.home') }}">
-          <div class="btn btn-primary">Confirm All</div>
-        </a>
       </div>
     </div>
   </div>
-</div>
+  </div>
 {% endblock %}
