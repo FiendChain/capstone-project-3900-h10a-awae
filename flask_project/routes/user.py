@@ -3,9 +3,10 @@ from flask_login import LoginManager, login_user, current_user, login_required, 
 from flask import g
 from flask import Blueprint
 
-from server import login_manager
+from server import login_manager, app, get_db
 from .temp_db import db, SessionCart
 from .forms import LoginForm, RegisterForm, UserPurchaseForm, serialize_form
+from classes.flaskuser import FlaskUser
 
 user_bp  = Blueprint('user_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
 api_bp = Blueprint('api_bp', __name__)
@@ -13,15 +14,17 @@ api_bp = Blueprint('api_bp', __name__)
 # Product browsing
 @user_bp.route('/', methods=["GET", "POST"])
 def home():
-    products = db.products.values()
+    with app.app_context():
+        db = get_db()
+        products = db.get_random_entries("products", 5)
+        print("Rendering homepage")
     return render_template("homepage.html", products=products)
 
 @user_bp.route('/products/<string:id>', methods=['GET', 'POST'])
 def product_page(id):
-    if id not in db.products:
-        abort(404)
-    
-    product = db.products[id]
+    with app.app_context():
+        db = get_db()
+        product = db.get_entry_by_id("products", id)
     return render_template('product.html', product=product)
 
 # Signin endpoints
@@ -49,29 +52,37 @@ def login():
         return jsonify(serialize_form(form)), 403
 
     if form.validate_on_submit():
-        key = lambda u: u.username == form.name.data and u.password == form.password.data
-        users =  [u for u in db.users.values() if key(u)]
+        username = form.name.data
+        password = form.password.data
+        with app.app_context():
+            db = get_db()
+            valid = db.validate_user(username, password)
 
-        # invalid credentials
-        if not users:
-            form.name.errors.append("Invalid credentials")
-            form.password.errors.append("Invalid credentials")
-            return jsonify(serialize_form(form)), 403
-
-    assert(len(users) == 1)
-    user = users[0]
-
-    print(f"User logged in: {serialize_form(form)}")
-    login_user(user, remember=form.remember_me.data)
-    return jsonify(dict(redirect=url_for("user_bp.home")))
+            # invalid credentials
+            if valid == True:
+                user = db.get_entries_by_heading("users", "username", username)[0]
+                flask_user = FlaskUser(user["username"], True, True, False, chr(user["id"]))    # user id must be unicode
+                print(f"User {flask_user.get_username()}logged in: {serialize_form(form)}")
+                login_user(flask_user, remember=form.remember_me.data)
+                return jsonify(dict(redirect=url_for("user_bp.home")))
+            else:
+                form.name.errors.append("Invalid credentials")
+                form.password.errors.append("Invalid credentials")
+                return jsonify(serialize_form(form)), 403
 
 # Perform registration validation
 @api_bp.route("/register", methods=["POST"])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        print(f"User registered: {serialize_form(form)}")
-        return jsonify(dict(redirect=url_for("user_bp.register")))
+        with app.app_context():
+            db = get_db()
+            user_data = (form.username.data, form.password.data, form.email.data, form.phone.data, form.phone.data, 0)
+            db.add("users", user_data)
+            print("Found user: ")
+            print(db.get_entries_by_heading("users", "username", form.username.data))
+            print(f"User registered: {serialize_form(form)}")
+            return jsonify(dict(redirect=url_for("user_bp.register")))
     
     return jsonify(serialize_form(form)), 403
 

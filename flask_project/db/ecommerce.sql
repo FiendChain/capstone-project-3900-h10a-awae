@@ -2,25 +2,24 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS "users" (
   "id" integer PRIMARY KEY NOT NULL,
-  "username" text,
+  "username" text UNIQUE NOT NULL,
   "password" text,
   "email" text,
-  "first_name" text,
-  "last_name" text,
-  "dob" text,
+  "phone" int,
   "is_admin" int
 );
 
 CREATE TABLE IF NOT EXISTS "products" (
   "id" integer PRIMARY KEY NOT NULL,
   "name" text,
-  "price" real,
+  "unit_price" real,
   "brand" text,
   "category" text,
   "description" text,
-  "delivery" int,
-  "warranty" int,
-  "image_link" text
+  "delivery_days" int,
+  "warranty_days" int,
+  "image_url" text,
+  "stock" int
 );
 
 CREATE TABLE IF NOT EXISTS "cart_item" (

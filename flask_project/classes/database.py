@@ -33,19 +33,19 @@ class Database(object):
         table_headings = [description[0] for description in self.cur.description]
         return table_headings
 
-    def fill(self, table_name, path_products):
-        df = pd.read_excel(path_products, engine = 'openpyxl')
+    def fill(self, table_name, path_excel):
+        df = pd.read_excel(path_excel, engine = 'openpyxl')
         entries = df.to_numpy().tolist()
         cols_no_id = [x for x in self.tables[table_name] if x != "id"]
         subquery_1 = ', '.join(f"{key}" for key in cols_no_id)
         subquery_2 = ', '.join(f"?" for (i, col) in enumerate(cols_no_id))
         query = f"INSERT INTO {table_name} ({subquery_1}) VALUES ({subquery_2})"
-        # print(query)
-        # print(entries)
+        print(query)
+        print(entries)
         params = entries
         self.cur.executemany(query, params)
         self.conn.commit()
-        print("Sample entries filled")
+        print(f"Sample {table_name} filled")
     
 
     def drop(self, table):
@@ -61,18 +61,14 @@ class Database(object):
     #     self.cur.execute(query)
     #     print(f"table {self.name} created")
 
-
-    # Fill table initially with some products from a xlsx file
-
-
-
-
     # Case insensitive, substring search
     def search_product_by_name(self, name):
         query = "SELECT * FROM products WHERE name LIKE ?"
         params = f"%{name}%",   # comma is intentional
         self.cur.execute(query, params)
-        return [row for row in self.cur]
+        entries = self.cur.fetchall()
+        entries = [self.make_dict(self.cur, entry) for entry in entries]
+        return entries
 
     def add(self, table_name, entry_no_id):
         # Assign a uid for the product
@@ -97,8 +93,6 @@ class Database(object):
         subquery1 = ', '.join(f"{col} = ?" for (i, col) in enumerate(self.tables[table_name]))
         query = f"UPDATE {table_name} SET {subquery1} WHERE id = {entry_old[0]}"
         params = entry_new
-        print(query)
-        print(params)
         self.cur.execute(query, params)
         self.conn.commit()
         print(f"Entry {entry_new[0]} updated")
@@ -107,17 +101,37 @@ class Database(object):
         query = f"SELECT * from {table_name} ORDER BY RANDOM() LIMIT {amount}"
         self.cur.execute(query)
         entries = self.cur.fetchall()
-        entries = [self.make_dicts(self.cur, entry) for entry in entries]
+        entries = [self.make_dict(self.cur, entry) for entry in entries]
         return entries
 
-    def make_dicts(self, cursor, row):
+    def get_entry_by_id(self, table_name, id):
+        query = f"SELECT * from {table_name} WHERE id = {id}"
+        self.cur.execute(query)
+        entry = self.cur.fetchone()
+        entry = self.make_dict(self.cur, entry)
+        return entry
+
+    # Returns a dictionary object, with table headings as keys and entry (tuple) values as value
+    def make_dict(self, cursor, row):
         return dict((cursor.description[idx][0], value) for idx, value in enumerate(row))
 
 
+    def get_entries_by_heading(self, table_name, heading, value):
+        query = f"SELECT * from {table_name} where {heading} = ?"
+        params = value,
+        self.cur.execute(query, params)
+        entries = self.cur.fetchall()
+        entries = [self.make_dict(self.cur, entry) for entry in entries]
+        return entries
 
-# # To prevent SQL injection and for better database security, we must use wildcards instead of variable names in the query
-# wildcards = {
-#     "products": "?, ?, ?, ?, ?, ?, ?, ?",
-#     "accounts": "?, ?, ?, ?, ?, ?, ?"
-# }
+    def validate_user(self, username, password):
+        query = f"SELECT * from users WHERE username = ? AND password = ?"
+        params = (username, password)
+        self.cur.execute(query, params)
+        entries = self.cur.fetchall()
+        entries = [self.make_dict(self.cur, entry) for entry in entries]
+        if len(entries) == 1:
+            return True
+        return False
+    
 # %%

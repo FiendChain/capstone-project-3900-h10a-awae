@@ -106,9 +106,10 @@ class TempDB:
             self.users[id] = TempUser(id, f"user{i:02d}", f"pass{i:02d}")
 
     def gen_uuid(self):
-        while (uid := str(uuid.uuid4())[:7]) in self.all_ids:
-            pass
-        self.all_ids.add(uid)
-        return uid 
+        pass
+        # while (uid := str(uuid.uuid4())[:7]) in self.all_ids:
+        #     pass
+        # self.all_ids.add(uid)
+        # return uid 
 
 db = TempDB()

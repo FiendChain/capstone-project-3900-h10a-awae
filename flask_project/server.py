@@ -57,6 +57,7 @@ def create_database():
         # print(db.tables)
 
         db.fill("products", "data/awae_products.xlsx")
+        db.fill("users", "data/awae_accounts.xlsx")
         db.conn.close()
     print("System finished setting up")
     # table_products = Table("products", table_cols["products"], conn, cur)
