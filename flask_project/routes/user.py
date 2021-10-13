@@ -63,7 +63,7 @@ def login():
             # invalid credentials
             if valid == True:
                 user = db.get_entries_by_heading("users", "username", username)[0]
-                flask_user = FlaskUser(user["username"], True, True, False, chr(user["id"]))    # user id must be unicode
+                flask_user = FlaskUser(user["username"], True, True, False, chr(user["id"]), user["is_admin"])    # user id must be unicode
                 print(f"User {flask_user.get_username()}logged in: {serialize_form(form)}")
                 login_user(flask_user, remember=form.remember_me.data)
                 return jsonify(dict(redirect=url_for("user_bp.home")))
