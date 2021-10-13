@@ -64,14 +64,17 @@ class PhoneValidator:
     def __call__(self, form, field):
         if len(field.data) < self.length:
             raise ValidationError(f'Phone number must have at least {self.length} digits')
+
         try:
-            input_number = phonenumbers.parse(field.data)
-            if not phonenumbers.is_valid_number(input_number):
-                raise ValidationError(self.message)
+            try:
+                input_number = phonenumbers.parse(field.data)
+            except:
+                input_number = phonenumbers.parse("+612"+field.data)
         except:
-            input_number = phonenumbers.parse("+61"+field.data)
-            if not phonenumbers.is_valid_number(input_number):
-                raise ValidationError(self.message)
+            raise ValidationError("Phone number is not a valid format")
+
+        if not phonenumbers.is_valid_number(input_number):
+            raise ValidationError(self.message)
 
 # form for registering the user
 class RegisterForm(FlaskForm):
