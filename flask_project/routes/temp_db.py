@@ -66,13 +66,13 @@ class SessionCart(DictCart):
     
     def add_product(self, id, quantity):
         rv = super().add_product(id, quantity)
-        self.session.changed = True
+        self.session.modified = True
         print(f'Added: {self.session}')
         return rv
     
     def update_product(self, id, quantity):
         rv = super().update_product(id, quantity)
-        self.session.changed = True
+        self.session.modified = True
         print(f'Updated: {self.session}')
         return rv
 
