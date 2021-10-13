@@ -2,7 +2,7 @@ database_venv/
 test.py
 test2.py
 __pycache__/
-db_sqlite/ecommerce.db
+ecommerce.db
 testing_stuff/
 flask_project/db/ecommerce.db
 

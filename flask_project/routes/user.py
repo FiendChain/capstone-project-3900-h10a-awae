@@ -79,9 +79,13 @@ def register():
         with app.app_context():
             db = get_db()
             user_data = (form.username.data, form.password.data, form.email.data, form.phone.data, 0)   # 0 = user, 1 = admin
-            db.add("users", user_data)
-            print("Found user: ")
-            print(db.get_entries_by_heading("users", "username", form.username.data))
+            try:
+                db.add("users", user_data)
+            except Exception as e:
+                #print(serialize_form(form))
+                form.username.errors.append("Username already taken")
+                return jsonify(serialize_form(form)), 403
+
             print(f"User registered: {serialize_form(form)}")
             return jsonify(dict(redirect=url_for("user_bp.register")))
     

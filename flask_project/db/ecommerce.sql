@@ -2,7 +2,7 @@ PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS "users" (
   "id" integer PRIMARY KEY NOT NULL,
-  "username" text UNIQUE NOT NULL,
+  "username" text UNIQUE COLLATE NOCASE NOT NULL,
   "password" text,
   "email" text,
   "phone" int,
