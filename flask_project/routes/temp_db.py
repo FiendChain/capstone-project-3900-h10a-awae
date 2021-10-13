@@ -22,6 +22,10 @@ class Cart(ABC):
     def update_product(self, id, quantity):
         pass
 
+    @abstractmethod
+    def empty(self):
+        pass
+
 class DictCart(Cart):
     def __init__(self):
         super().__init__()
@@ -54,6 +58,9 @@ class DictCart(Cart):
             self.items[id] = quantity
         else:
             del self.items[id]
+    
+    def empty(self):
+        self.items = {}
 
 # convert flask session object to store a cart 
 class SessionCart(DictCart):
@@ -75,6 +82,11 @@ class SessionCart(DictCart):
         self.session.modified = True
         print(f'Updated: {self.session}')
         return rv
+    
+    def empty(self):
+        self.session['cart'] = {}
+        self.session.modified = True
+
 
 # temporary user login code for flask
 class TempUser:

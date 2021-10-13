@@ -1,4 +1,4 @@
-from flask import redirect, request, render_template, url_for, jsonify, abort, session
+from flask import json, redirect, request, render_template, url_for, jsonify, abort, session
 from flask_login import login_user, current_user, logout_user
 from flask import Blueprint
 from flask_login.utils import login_required
@@ -162,6 +162,17 @@ def validate_product_id(id):
         return True
     return False
 
+def get_cart_summary(cart):
+    total_items = 0
+    total_cost = 0
+    with app.app_context():
+        db = get_db()
+        for id, quantity in cart.to_list():
+            product = db.get_entry_by_id("products", id)
+            total_items += quantity
+            total_cost += quantity*product['unit_price']
+    return {"total_items": total_items, "total_cost": total_cost}
+
 # Depending on whether a user is logged in, we can store cart in flask-session or mock db
 def get_user_cart():
     cart = SessionCart(session)
@@ -188,20 +199,9 @@ def cart():
             data = {**product, 'quantity': quantity}
             products.append(data)
 
-    summary = {
-        'total_cost': f'{10:.2f}',
-        'shipping_cost': f'{6:.2f}'
-    }
-
-    payment_details = {
-        'card_number_last_four': "0421",
-        'method': 'PayPal'
-    }
-
     data = dict(
         products=products, 
-        summary=summary, 
-        payment_details=payment_details)
+        summary=get_cart_summary(cart))
 
     return render_template('cart.html', **data)
 
@@ -235,8 +235,9 @@ def product_update():
 
     cart = get_user_cart()
     cart.update_product(form.id.data, form.quantity.data)
+    summary = get_cart_summary(cart)
 
-    return jsonify(dict(quantity=form.quantity.data))
+    return jsonify(dict(quantity=form.quantity.data, summary=summary))
 
 # TODO: Buy the product immediately
 @api_bp.route('/transaction/buy', methods=['POST'])
@@ -244,6 +245,15 @@ def product_buy():
     form = request.form
     print(f'Buying: {form}')
     return jsonify(dict(success=True))
+
+# TODO: handle cart checkout
+@user_bp.route('/checkout', methods=['GET'])
+def cart_checkout():
+    print("Buying everything inside the cart")
+    cart = get_user_cart()
+    cart.empty()
+    return redirect(url_for("user_bp.cart"))
+
 
 # Reloads and returns the User object for current session
 @login_manager.user_loader
