@@ -19,7 +19,7 @@
         <p class="text-left my-0"><strong>{{ p.name }}</strong> in {{ p.category }}</p>
       </a>
       <!--Stock status-->
-      {% if p.in_stock > 0 %}
+      {% if p.stock > 0 %}
       <p class="text-left my-0 text-success">In stock</p>
       {% else %}
       <p class="text-left my-0 text-danger">Out of stock</p>

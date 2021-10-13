@@ -154,7 +154,13 @@ def profile_edit_login_security():
 
 # Cart and purchasing
 def validate_product_id(id):
-    return id in db.products
+    with app.app_context():
+        db = get_db()
+        product = db.get_entry_by_id("products", id)
+    
+    if product:
+        return True
+    return False
 
 # Depending on whether a user is logged in, we can store cart in flask-session or mock db
 def get_user_cart():
@@ -174,10 +180,13 @@ def get_user_cart():
 def cart():
     cart = get_user_cart()
     products = []
-    for id, quantity in cart.to_list():
-        product = db.products[id]
-        data = {**product, 'quantity': quantity}
-        products.append(data)
+
+    with app.app_context():
+        db = get_db()
+        for id, quantity in cart.to_list():
+            product = db.get_entry_by_id("products", id)
+            data = {**product, 'quantity': quantity}
+            products.append(data)
 
     summary = {
         'total_cost': f'{10:.2f}',
