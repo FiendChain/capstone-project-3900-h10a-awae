@@ -177,4 +177,12 @@ def product_buy():
 # Reloads and returns the User object for current session
 @login_manager.user_loader
 def load_user(id):
-    return db.users.get(id, None)
+    with app.app_context():
+        db = get_db()
+        print("Load user id ", ord(id))
+        user = db.get_entry_by_id("users", ord(id)) # convert unicode id back to int
+        print(user)
+        if user is None:
+            return None
+        flask_user = FlaskUser(user["username"], True, True, False, chr(user["id"]), user["is_admin"])
+        return flask_user
