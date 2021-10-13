@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Product page</title>
+{% endblock %}
+
+{% block content %}
+{% include 'user_navbar.html' %}
+
+<!--Script for adding product to cart, or immediate purchase-->
+<script>
+$("document").ready(function() {
+  $('.product_form').submit(function(ev) {
+    ev.preventDefault();
+
+    let form = $(this);
+    let btn = $(ev.originalEvent.submitter)
+    let action = btn.attr('id');
+    let url = btn.attr('v-link');
+    let data = form.serializeArray();
+
+    switch (action) 
+    {
+    case 'cart_add':
+      $.ajax({
+        url, data, type: 'POST',
+        success: () => location.reload(),
+        error: () => location.reload(),
+      })
+      break;
+
+    case 'buy_now':
+      $.ajax({
+        url, data, type: 'POST',
+        success: () => location.reload(),
+        error: () => location.reload(),
+      })
+      break;
+    }
+  });
+})
+</script>
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
+    <li class="breadcrumb-item"><a href="#">Products</a></li>
+    <li class="breadcrumb-item"><a href="#">Coffee</a></li>
+  </ol>
+</nav>
+
+<div class="container w-75">
+  <div class="row justify-content-between">
+    <!--Image panel-->
+    <div class="col-md-4 text-center">
+      <div class="d-block">
+        <!--Primary image-->
+        <div class="row my-1">
+          <div class="col thumbnail"><img src="{{ product.image_url }}" class="product-img rounded img-fluid"></div>
+        </div>
+        <!--Mini images-->
+        <div class="row">
+          <div class="col"><div class="thumbnail"><img src="{{ product.image_url }}" class="product-img rounded img-fluid"></div></div>
+          <div class="col"><div class="thumbnail"><img src="{{ product.image_url }}" class="product-img rounded img-fluid"></div></div>
+          <div class="col"><div class="thumbnail"><img src="{{ product.image_url }}" class="product-img rounded img-fluid"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!--Product description-->
+    <div class="col-md-5">
+      <div class="row justify-content-between">
+        <div class="col text-left px-0"><h3>{{ product.name }}</h3></div>
+        <div class="col text-right px-0"><p>{{ "$%.2f"|format(product.unit_price) }}</p></div>
+      </div>
+      <div class="row">
+        <p>{{ product.description }}</p>
+      </div>
+      <!--Purchasing form-->
+      <form class='product_form' id="product_form" method='POST'>
+        <input type="hidden" id="product_id" name="id" value="{{ product.id }}">
+        <div class="row justify-content-between">
+          <div class="col-md-5 pl-0">
+            <div class="form-group row">
+              <label class="col text-center" for="quantity">Quantity</label>
+              <input class="col form-control" type="number" min="1" max="99" id="quantity" name="quantity" value=1> 
+            </div>
+          </div>
+          <div class="col pr-0 text-right">
+            <div class="btn-group">
+              <button type="submit" id='cart_add' v-link="{{ url_for('api_bp.product_add') }}" class="btn btn-outline-primary mb-2">Add to Cart</button>
+              <button type="submit" id='buy_now' v-link="{{ url_for('api_bp.product_buy') }}" class="btn btn-primary mb-2">Buy Now</button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

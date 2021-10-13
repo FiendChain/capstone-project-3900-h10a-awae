@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Profile</title>
+{% endblock %}
+
+{% block content %}
+{% include 'user_navbar.html' %}
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
+    <li class="breadcrumb-item active">Profile</li>
+  </ol>
+</nav>
+
+<script>
+$("document").ready(function() {
+  $(".profile-tile").click(function() {
+    let href = $(this).attr("href");
+    window.location = href;
+  });
+})
+</script>
+
+<!--Render a profile link tile-->
+{% macro render_tile(heading, description, url) %}
+<div class="col-md-4 mx-2 my-2 border profile-tile" href="{{ url }}">
+  <div class="row my-3 mx-2">
+    <div class="col-sm-1"></div>
+    <div class="col text-left">
+      <div class="row"><h6>{{ heading }}</h6></div>
+      <div class="row"><p>{{ description }}</p></div>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+<!--TODO: Add iconography-->
+<div class="container w-50">
+  <div class="row justify-content-center">
+    {{ render_tile("Your Orders", "Track, return, or buy things again", url_for("user_bp.home")) }}
+    {{ render_tile("Login & Security", "Edit login, name, and phone number", url_for("user_bp.home")) }}
+    {{ render_tile("Your Addresses", "Edit addresses for orders", url_for("user_bp.home")) }}
+    {{ render_tile("Your Payments", "Manage payment methods and settings", url_for("user_bp.home")) }}
+    {{ render_tile("Reviews", "View and manage your product reviews", url_for("user_bp.home")) }}
+    {{ render_tile("Memberships", "View your membership benefits and status", url_for("user_bp.home")) }}
+  </div>
+</div>
+
+{% endblock %}

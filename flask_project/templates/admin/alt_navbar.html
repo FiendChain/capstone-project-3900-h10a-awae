@@ -1,0 +1,25 @@
+<!--Navbar for non admin homepages-->
+<header class="navbar navar-expand flex-column">
+  <div class="row w-100">
+    <div class="col text-left">
+      <a href="{{ url_for("admin_bp.home") }}">
+        <h2>Welcome, Admin</h2>
+      </a>
+    </div>
+    <!--Controls-->
+    <div class="col-md-3 text-right">
+      <div class="btn-group">
+        <div class="btn btn-outline-primary">Orders</div>
+        <div class="btn btn-outline-primary">Past Sales</div>
+        <div class="btn btn-outline-primary">Customer View</div>
+      </div>
+    </div>
+    <div class="col-md-1 text-right">
+      <div>
+        <a href='{{ url_for('user_bp.login') }}'>
+          <div class="btn btn-primary">Profile</div>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Cafe AWAE Homepage</title>
+{% endblock %}
+
+
+{% block content %}
+{% include 'user_navbar.html' %}
+
+<!--Homepage-->
+<div class="container-fluid">
+  <!--Navigation-->
+  <div class="row">
+    <div class="col align-self-center text-center">
+      <div class="btn-group">
+        <div class="btn btn-primary">Products</div>
+        <div class="btn btn-outline-primary">Reviews</div>
+        <div class="btn btn-outline-primary">Curators</div>
+      </div>
+    </div>
+  </div>
+  <!--Products-->
+  <div class="container">
+    <p class="my-1"><em>Recommended for you</em></p>
+    <div class="row" style="border-width: 2rem; border: solid #f7f7f9; padding: 1rem;">
+      {% for p in products %}
+      <div class="col-sm-2 px-0 mx-1 rounded" style="border: solid #f7f7f7">
+        <div class="thumbnail">
+          <a href="{{ url_for("user_bp.product_page", id=p.id) }}" class="text-decoration-none">
+            <img src="{{ p.image_url }}" class="product-img rounded img-fluid">
+            <div class="text-center">
+              <h6>{{ p.name }}</h6>
+              <p class="text-muted my-0">{{ "$%.2f"|format(p.unit_price) }}</p>
+            </div>
+          </a>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

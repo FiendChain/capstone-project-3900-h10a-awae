@@ -1,10 +1,12 @@
 database_venv/
-db/
 test.py
 test2.py
 __pycache__/
 db_sqlite/ecommerce.db
 testing_stuff/
+flask_project/db/ecommerce.db
+
+flask_project/static/uploads
 
 
 # Byte-compiled / optimized / DLL files

@@ -1,0 +1,32 @@
+<!--Header-->
+<header class="navbar navar-expand flex-column">
+  <div class="row w-100">
+    <!--Search bar-->
+    <div class="col align-self-start text-left">
+      <form class="w-75 d-flex align-items-center">
+        <input type="search" class="form-control" id="search-input" placeholder="Search..." aria-label="Search for..." autocomplete="off" spellcheck="false">
+      </form>
+    </div>
+    <div class="col align-self-center text-center">
+      <a href="{{ url_for("user_bp.home") }}">
+        <h2>Cafe AWAE</h2>
+      </a>
+    </div>
+    <!--Controls-->
+    <div class="col align-self-end text-right">
+      <div>
+        <a href='{{ url_for('user_bp.cart') }}'>
+          <div class="btn btn-primary">Cart</div>
+        </a>
+        <a href='{{ url_for('user_bp.login') if not current_user.is_authenticated else url_for('user_bp.profile') }}'>
+          <div class="btn btn-primary">Profile</div>
+        </a>
+        {% if current_user.is_authenticated %}
+        <a href='{{ url_for('user_bp.logout') }}'>
+          <div class="btn btn-primary">Logout</div>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</header>
