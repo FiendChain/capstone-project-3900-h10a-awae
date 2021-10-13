@@ -58,9 +58,11 @@ def create_database():
 
         db.fill("products", "data/awae_products.xlsx")
         db.fill("users", "data/awae_accounts.xlsx")
-        db.add("users", (
-            "Arnold", "Schwar", "arnold@gmail.com", "0404123456", 0
-        ))
+        # db.add("users", (
+        #     "Arnold", "Schwar", "arnold@gmail.com", "0404123456", 0
+        # ))
+        # print(db.get_unique_values("products", "category"))
+        print(db.search_product_by_name("", category = "Meal Kit", order_by = "unit_price ASC"))
         db.conn.close()
     print("System finished setting up")
     # table_products = Table("products", table_cols["products"], conn, cur)
@@ -70,3 +72,4 @@ def create_database():
     # table_products.create()
 
 create_database()
+

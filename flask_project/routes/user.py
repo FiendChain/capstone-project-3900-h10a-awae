@@ -36,6 +36,34 @@ def product_page(id):
         product = db.get_entry_by_id("products", id)
     return render_template('product.html', product=product)
 
+@user_bp.route('/search', methods=['GET'])
+def search_page():
+    dict_sort_by = {
+        "Price (low to high)": "unit_price ASC",
+        "Price (high to low)": "unit_price DESC"
+    }
+    with app.app_context():
+        db = get_db
+        products = db.search_product_by_name()  # no arguments = get all products as list of dicts
+        categories = db.get_unique_values("products", "category")   # Get all categories as list
+    print(products[0])
+    print(categories)
+    return render_template('search.html', products = products, dict_sort_by = dict_sort_by, categories = categories)
+
+
+@user_bp.route('/search', methods=['POST'])
+def search_page(product_name, category, order_by):
+    dict_sort_by = {
+        "Price (low to high)": "unit_price ASC",
+        "Price (high to low)": "unit_price DESC"
+    }
+    order_by = dict_sort_by[order_by]
+    with app.app_context():
+        db = get_db
+        products = db.search_product_by_name(product_name, category, order_by)
+        categories = db.get_unique_values("products", "category")
+    return render_template('search.html', products = products, dict_sort_by = dict_sort_by, categories = categories)
+
 # Signin endpoints
 @user_bp.route('/login', methods=['GET'])
 def login():
@@ -110,6 +138,12 @@ def profile():
 @login_required
 def profile_edit_login_security():
     form = UserProfileLoginSecurityForm()
+    id = ord(current_user.get_id()) # unicode to int
+    with app.app_context():
+        db = get_db()
+        user = db.get_entry_by_id("users", id)
+        form.email.data = user["email"]
+        form.phone.data = user["phone"]
     return render_template("profile/edit_login_security.html", form=form)
 
 @api_bp.route('/profile/login_security', methods=['POST'])
@@ -117,10 +151,22 @@ def profile_edit_login_security():
 def profile_edit_login_security():
     form = UserProfileLoginSecurityForm()
     if form.validate_on_submit():
-        # TODO: actually check to see that the form values can be applied to the database
+        id = ord(current_user.get_id()) # unicode to int
+        with app.app_context():
+            db = get_db()
+            user = db.get_entry_by_id("users", id)
+            if not db.validate_user(user["username"], form.password.data): # If entered password does not match password in database, return error
+                form.password.errors.append("Incorrect password")
+                return jsonify(serialize_form(form)), 403
 
+            # Create new user tuple and update old entry in db
+            print("new password: ", form.new_password.data)
+            user_old = ()
+            for value in user:
+                user_old += (value, )
+            user_new = (user["id"], user["username"], form.new_password.data, form.email.data, form.phone.data, user["is_admin"])
+            db.update("users", user_old, user_new)
         return jsonify(dict(redirect=url_for("user_bp.profile")))
-    
     return jsonify(serialize_form(form)), 403
 
 # Cart and purchasing
