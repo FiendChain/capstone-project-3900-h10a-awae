@@ -78,7 +78,7 @@ def register():
     if form.validate_on_submit():
         with app.app_context():
             db = get_db()
-            user_data = (form.username.data, form.password.data, form.email.data, form.phone.data, form.phone.data, 0)
+            user_data = (form.username.data, form.password.data, form.email.data, form.phone.data, 0)   # 0 = user, 1 = admin
             db.add("users", user_data)
             print("Found user: ")
             print(db.get_entries_by_heading("users", "username", form.username.data))

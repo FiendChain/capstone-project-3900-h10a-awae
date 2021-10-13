@@ -72,12 +72,15 @@ class Database(object):
 
     def add(self, table_name, entry_no_id):
         # Assign a uid for the product
-        cols_no_id = dict((i, self.tables[table_name[i]]) for i in self.tables[table_name] if i != "id")   # Drop rowid from entry class
-        subquery1 = ', '.join(f"{key}" for key in cols_no_id.keys())
+        cols = self.get_table_headings(table_name)
+        cols_no_id = [col for col in cols if col != "id"]   # Drop rowid from entry class
+        
+        subquery1 = ', '.join(f"{col}" for col in cols_no_id)
         subquery2 = ', '.join(f"?" for i in enumerate(cols_no_id))
         query = f"INSERT INTO {table_name} ({subquery1}) VALUES ({subquery2})"
+
         params = entry_no_id
-        print(query, params)
+        #print(query, params)
         self.cur.execute(query, params)
         self.conn.commit()
         print(f"Entry {entry_no_id[0]} added")
