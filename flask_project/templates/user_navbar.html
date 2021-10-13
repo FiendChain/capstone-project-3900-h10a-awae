@@ -1,8 +1,9 @@
 <!--Search bar functionality changes depending on context-->
+<!--If the form is present, then we let that handle the submission-->
+<!--If the form is not present, then we send it via ajax and redirect-->
 <script>
 $("document").ready(function () {
   $("#search-bar-nav").keypress(function (ev) {
-    // TODO: Get this working from homepage
     // check if the enter key pressed
     var keycode = (ev.keyCode ? ev.keyCode : ev.which);
     if(keycode != 13){
@@ -16,11 +17,9 @@ $("document").ready(function () {
     // if form doesn't exist, then we go to the product page
     if (form.length === 0) {
       let url = "{{ url_for("user_bp.search") }}";
-      let qstring = new URLSearchParams({"name": search.val()}).toString();
-      //window.location.href = `${url}?${qstring}`;
-    } else {
-
-    }
+      let data = {"name": search.val()};
+      $.redirect(url, data, "POST")
+    } 
   });
 });
 </script>

@@ -8,12 +8,12 @@
 {% block content %}
 {% include 'user_navbar.html' %}
 
+<!--On load, we set the search bar value to the form value-->
 <script>
 $("document").ready(function () {
   $("form#product-search-form").change(function (ev) {
     $(this).submit();
   })
-
   $("#search-bar-nav").val("{{ form.name.data }}");
 })
 </script>
