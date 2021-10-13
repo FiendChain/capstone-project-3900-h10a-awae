@@ -7,7 +7,6 @@ from server import login_manager, app, get_db
 from .temp_db import db, SessionCart
 from .forms import LoginForm, RegisterForm, UserPurchaseForm, serialize_form
 from classes.flaskuser import FlaskUser
-from .roles import roles_required
 
 user_bp  = Blueprint('user_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
 api_bp = Blueprint('api_bp', __name__)
@@ -90,7 +89,7 @@ def register():
 
 # User account
 @user_bp.route('/profile', methods=["GET"])
-@roles_required("user")
+@login_required
 def profile():
     return render_template("profile.html")
 
