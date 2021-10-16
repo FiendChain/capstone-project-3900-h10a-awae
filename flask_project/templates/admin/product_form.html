@@ -126,7 +126,7 @@
             </div>
           </div>
         </div>
-        <img class="img-fluid" src=""/>
+        <img class="img-fluid" src="" default-src="{{ form.image_url.data or '' }}"/>
         <p class="filename text-center"></p>
       </div>
 
@@ -140,7 +140,6 @@
           <p>Choose an image file or drag it here.</p>
         </div>
         <!--If there was an original src image, store its url here-->
-        <input value="{{ form.image_url.data or '' }}" name="{{ form.image_url.id }}" class="dropzone-src-url" hidden>
         <input type="checkbox" checked=false name="{{ form.image_changed.id }}" class="dropzone-dirty" required hidden>
         <!--Input that actually handles the drag and drop-->
         <input type="file" id="{{ form.image.id }}" name="{{ form.image.id }}" accept="image/*" class="dropzone-input">

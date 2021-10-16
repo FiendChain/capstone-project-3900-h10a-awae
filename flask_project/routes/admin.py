@@ -46,37 +46,18 @@ def add_product():
 
     with app.app_context():
         db = get_db()
-        image_url = db.gen_image_url(form.image.data, app)
+        if form.image.data and form.image_changed.data:
+            image_url = db.gen_image_url(form.image.data, app)
+        else:
+            image_url = None
+
         product = (
-            form.name.data, form.unit_price.data, form.brand.data, form.category.data, form.description.data, form.delivery_days.data, form.warranty_days.data, form.stock.data, image_url
+            form.name.data, form.unit_price.data, form.brand.data, form.category.data, 
+            form.description.data, form.delivery_days.data, form.warranty_days.data, form.stock.data, 
+            image_url
         )
         id = db.add("products", product)
-        
 
-
-    # if image_file:
-    #     try:
-    #         image_url = db.add_image(image_file)
-    #     except InvalidFileExtension as ex:
-    #         form.image.errors.append("Invalid file extension")
-    #         return jsonify(serialize_form(form)), 403
-    # else:
-    #     image_url = None
-    
-    # product = {
-    #     "id": uid,
-    #     "name": form.name.data,
-    #     "unit_price": form.unit_price.data,
-    #     "brand": form.brand.data,
-    #     "category": form.category.data,
-    #     "description": form.description.data,
-    #     "delivery_days": form.delivery_days.data,
-    #     "warranty_days": form.warranty_days.data,
-    #     "in_stock": form.in_stock.data,
-    #     "image_url": image_url,
-    # }
-
-    # db.products[uid] = product
     return jsonify(dict(redirect=url_for("admin_bp.products")))
 
 @admin_bp.route("/products/<string:id>/edit", methods=["GET"])
@@ -85,6 +66,8 @@ def edit_product(id):
     with app.app_context():
         db = get_db()
         product = db.get_entry_by_id("products", id)
+        if not product:
+            abort(404)
         valid_categories = db.get_unique_values("products", "category")
 
     form = ProductForm(data=product)
@@ -93,6 +76,11 @@ def edit_product(id):
 @admin_api_bp.route("/products/<string:id>/edit", methods=["POST"]) 
 @admin_required
 def edit_product(id):
+    with app.app_context():
+        db = get_db()
+        product = db.get_entry_by_id("products", id)
+        if product is None:
+            abort(404)
 
     form = ProductForm()
     if not form.validate_on_submit():
@@ -101,37 +89,21 @@ def edit_product(id):
     print(f"Editing product: {form}")
     with app.app_context():
         db = get_db()
-        if form.image.data is None and not form.image_changed.data: # Image was not changed
-            print("IMAGE UNCHANGED")
-            image_url = form.image_url.data
-        elif form.image.data is None and form.image_changed.data: # Image was deleted
-            print("IMAGE DELETED")
-            image_url = ""
-        else:   # Image was changed to a new image
-            print("IMAGE CHANGED")
+        if form.image_changed.data and form.image.data:
             image_url = db.gen_image_url(form.image.data, app)
+        elif form.image_changed.data and not form.image.data:
+            image_url = ""
+        else:
+            image_url = product["image_url"]
             
         product = (
-            id, form.name.data, form.unit_price.data, form.brand.data, form.category.data, form.description.data, form.delivery_days.data, form.warranty_days.data, form.stock.data, image_url
+            id, form.name.data, form.unit_price.data, form.brand.data, form.category.data, 
+            form.description.data, form.delivery_days.data, form.warranty_days.data, form.stock.data, 
+            image_url
         )
+
         db.update("products", product, product) # also pass in new product as old product, as we only need the id of the old product to update table
-    # product = db.products[id]
 
-    # image_file = form.image.data
-
-    # if image_file:
-    #     try:
-    #         image_url = db.add_image(image_file)
-    #     except InvalidFileExtension as ex:
-    #         form.image.errors.append("Invalid file extension")
-    #         return jsonify(serialize_form(form)), 403
-    # elif not form.image_changed.data:
-    #     image_url = product['image_url']
-    # else:
-    #     image_url = None
-
-
-    # db.products[id] = product
     return jsonify(dict(redirect=url_for("admin_bp.products")))
 
 @admin_api_bp.route("/products/<string:id>/delete", methods=["POST"])
@@ -141,7 +113,6 @@ def delete_product(id):
         db = get_db()
         if db.get_entry_by_id("products", id) is not []:
             db.delete_by_id("products", id)
-
             return jsonify({'success': True})
-    
-    abort(403)
+        else:
+            abort(404)

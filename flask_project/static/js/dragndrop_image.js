@@ -8,7 +8,7 @@
 //     <div class="overlay">
 //        <div id="delete">Delete</div>
 //     </div>
-//     <img class="img-fluid" src=""/>
+//     <img src="" default-src="{{ insert your default url }}"/>
 //     <p class="filename"></p>
 //   </div>
 //
@@ -20,7 +20,6 @@
 //     </div>
 //     <div class="dropzone-description"></div>
 //     <!--If there was an original src image, store its url here-->
-//     <input class="dropzone-src-url" hidden>
 //     <input type="checkbox" checked=false class="dropzone-dirty" required hidden>
 //     <!--Input that actually handles the drag and drop-->
 //     <input type="file" accept="image/*" class="dropzone-input">
@@ -45,12 +44,14 @@ $("document").ready(() => {
 
         // image data elements 
         // includes upload image file, url to default image
-        let el_default_url = dropzone.find("input.dropzone-src-url");
+        let el_default_url = preview.find("img");
         let image_changed = dropzone.find("input.dropzone-dirty");
 
         function get_default_url() {
-            return el_default_url.val();
+            return el_default_url.attr('default-src');
         }
+
+        console.log(el_default_url);
 
         // hide the drop zone and show the preview
         function show_image(src, filename) {
@@ -111,13 +112,6 @@ $("document").ready(() => {
                 on_file_load(file);
             } else {
                 remove_image();
-            }
-        });
-
-        // if the default url was changed, update the preview if needed
-        el_default_url.change(function() {
-            if (!image_changed.val()) {
-                reset_image();
             }
         });
 

@@ -12,6 +12,7 @@ from wtforms.validators import Email, EqualTo, InputRequired, Length, NumberRang
 from wtforms.widgets.core import Input
 
 import phonenumbers
+import os
 
 from server import app
 
@@ -24,18 +25,35 @@ valid_images = UploadSet('images', IMAGES)
 
 configure_uploads(app, (valid_images,))
 
+class ImageExtensionValidator:
+    def __init__(self, valid_exts=None):
+        self.valid_exts = valid_exts
+
+    def __call__(self, form, field):
+        file = field.data
+        if not file:
+            raise ValidationError("File not provided")
+        # if file provided, make sure that it has a valid filename
+        if file.filename == '':
+            raise ValidationError("File must have a name") 
+        if '.' not in file.filename:
+            raise ValidationError("File must have an extension")
+        
+        ext = os.path.splitext(file.filename)[-1]
+        if self.valid_exts and ext not in self.valid_exts:
+            valid_exts = ','.join(self.valid_exts)
+            raise ValidationError(f"File must have the following extensions ({valid_exts})") 
+        
 class ProductForm(FlaskForm):
     # optional id field to form 
     id = HiddenField()
+    image_url = HiddenField()
 
     # the incoming image can either be: original static, new upload, none
     # the following are the required conditions for each transition of the image
-    # stays as original static:  if image_url and not image_changed
-    # stays as none:             if not image_url and not image_changed
-    # original static -> none:   if image_url and image_changed and not image
-    # original static -> upload: if image_url and image_changed and image
-    # none -> upload:            if not image_url and image_changed and image
-    image_url = HiddenField() # stores the static url if it exists
+    # stays as original:  if not image_changed
+    # original -> none:   if image_changed and not image
+    # original -> upload: if image_changed and image
     image_changed = BooleanField(validators=[InputRequired()], default=False)
     image = FileField(validators=[Optional(), FileAllowed(valid_images, message="Images allowed only")])
 
@@ -47,7 +65,6 @@ class ProductForm(FlaskForm):
     stock = IntegerField(validators=[NumberRange(min=0, max=10000), InputRequired()])
     delivery_days = IntegerField(validators=[NumberRange(min=1, max=1000), InputRequired()])
     warranty_days = IntegerField(validators=[NumberRange(min=1, max=1000), InputRequired()])
-
 
     submit_button = SubmitField('Submit Form')
 
