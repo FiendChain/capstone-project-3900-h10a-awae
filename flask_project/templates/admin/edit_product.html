@@ -1,14 +1,12 @@
-{% import "bootstrap/wtf.html" as wtf %}
-{% extends 'base.html' %}
+{% extends 'admin/admin_base.html' %}
 
 {% block head %}
-<title>Cafe AWAE Admin Product</title>
+{{ super() }}
+<title>Cafe AWAE Admin Edit Product</title>
 {% endblock %}
 
 
-{% block content %}
-{% include 'admin/navbar.html' %}
-
+{% block subcontent %}
 {% from "admin/product_form.html" import render_product_form %}
 
 <!--Navigation breadcrumb-->
@@ -21,22 +19,16 @@
 </nav>
 
 <!--Homepage-->
-<div class="container w-75">
-<div class="row mr-0 justify-contents-between w-100">
-  <div class="col-auto mr-auto text-left"><h3>Edit Product</h3></div>
-  <div class="col-auto px-0 text-right">
-    <a href="{{ url_for("user_bp.product_page", id=form.id.data) }}" class="btn btn-outline-secondary">View Page</a>
-  </div>
-</div>
-<form class="wtf-ajax-form" id="edit-product" method="POST" action="{{ url_for("admin_api_bp.edit_product", id=id) }}" enctype="multipart/form-data">
-  {{ form.csrf_token }}
-  {{ render_product_form(form, categories) }}
-  <!--Form controls-->
-  <div class="form-group row text-right">
-    <div class="col">
-      <button type="submit" class="btn btn-primary">Submit Changes</button>
+<div class="container-fluid px-0">
+  <div class="row px-0 justify-contents-between w-100">
+    <div class="col-auto me-auto text-start"><h3>Edit Product</h3></div>
+    <div class="col-auto text-end">
+      <a href="{{ url_for("user_bp.product_page", id=form.id.data) }}" class="btn btn-outline-secondary"><i class="bi bi-eye fs-6 me-2"></i>View Page</a>
     </div>
   </div>
-</form>
+  <form class="wtf-ajax-form" id="edit-product" method="POST" action="{{ url_for("admin_api_bp.edit_product", id=id) }}" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    {{ render_product_form(form, categories, "Submit changes") }}
+  </form>
 </div>
 {% endblock %}

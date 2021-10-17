@@ -1,14 +1,12 @@
-{% import "bootstrap/wtf.html" as wtf %}
-{% extends 'base.html' %}
+{% extends 'admin/admin_base.html' %}
 
 {% block head %}
-<title>Cafe AWAE Admin Product</title>
+{{ super() }}
+<title>Cafe AWAE Admin Add Product</title>
 {% endblock %}
 
 
-{% block content %}
-{% include 'admin/navbar.html' %}
-
+{% block subcontent %}
 {% from "admin/product_form.html" import render_product_form %}
 
 <!--Navigation breadcrumb-->
@@ -20,18 +18,11 @@
   </ol>
 </nav>
 
-<!--Homepage-->
-<div class="container w-75">
-<h3>Add Product</h3>
-<form class="wtf-ajax-form" id="add-product" method="POST" action="{{ url_for("admin_api_bp.add_product") }}" enctype="multipart/form-data">
-  {{ form.csrf_token }}
-  {{ render_product_form(form, categories) }}
-  <!--Form controls-->
-  <div class="form-group row text-right">
-    <div class="col">
-      <button type="submit" class="btn btn-primary">Add Product</button>
-    </div>
-  </div>
-</form>
+<div class="container-fluid px-0">
+  <h3>Add Product</h3>
+  <form class="wtf-ajax-form" id="add-product" method="POST" action="{{ url_for("admin_api_bp.add_product") }}" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    {{ render_product_form(form, categories, "Add product") }}
+  </form>
 </div>
 {% endblock %}

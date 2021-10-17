@@ -8,11 +8,17 @@
 {% include 'user_navbar.html' %}
 
 <nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
-    <li class="breadcrumb-item active">Profile</li>
-  </ol>
 </nav>
+
+<!--Breadcrumb-->
+<div class="container-fluid justify-content-md-center text-center border-bottom pb-0 mb-3">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb mb-2">
+      <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
+      <li class="breadcrumb-item active">Profile</li>
+    </ol>
+  </nav>
+</div>
 
 <script>
 $("document").ready(function() {
@@ -28,7 +34,7 @@ $("document").ready(function() {
 <div class="col-md-4 mx-2 my-2 border profile-tile" href="{{ url }}">
   <div class="row my-3 mx-2">
     <div class="col-sm-1"></div>
-    <div class="col text-left">
+    <div class="col text-start">
       <div class="row"><h6>{{ heading }}</h6></div>
       <div class="row"><p>{{ description }}</p></div>
     </div>
@@ -37,7 +43,7 @@ $("document").ready(function() {
 {% endmacro %}
 
 <!--TODO: Add iconography-->
-<div class="container w-50">
+<div class="container">
   <div class="row justify-content-center">
     {{ render_tile("Your Orders", "Track, return, or buy things again", url_for("user_bp.home")) }}
     {{ render_tile("Login & Security", "Edit login, name, and phone number", url_for("user_bp.profile_edit_login_security")) }}

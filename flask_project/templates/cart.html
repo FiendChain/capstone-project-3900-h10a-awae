@@ -10,30 +10,30 @@
 <script src="/static/js/cart.js"></script>
 
 <div class="container-fluid">
-  <div class="row justify-content-center">
+  <div class="row mx-4 justify-content-center">
     <!--Cart items-->
     <div class="col">
       {% for p in products %}
-      <div class="row cart-product w-100" id="{{ p.id }}">
-        <div class="col-md-2 thumbnail"><img src="{{ p.image_url }}" class="product-img rounded img-fluid"></div>
+      <div class="row cart-product w-100 border mb-3" id="{{ p.id }}">
+        <div class="col-md-2 thumbnail ps-0"><img src="{{ p.image_url }}" class="product-img rounded img-fluid"></div>
         <!--Product info-->
-        <div class="col mr-auto">
+        <div class="col py-2 me-auto">
           <a href="{{ url_for('user_bp.product_page', id=p.id) }}">
-            <p class="text-left my-0"><strong>{{ p.name }}</strong> in {{ p.category }}</p>
+            <p class="text-start my-0"><strong>{{ p.name }}</strong> in {{ p.category }}</p>
           </a>
           <!--Stock status-->
           {% if p.stock > 0 %}
-          <p class="text-left my-0 text-success">In stock</p>
+          <p class="text-start my-0 text-success">In stock</p>
           {% else %}
-          <p class="text-left my-0 text-danger">Out of stock</p>
+          <p class="text-start my-0 text-danger">Out of stock</p>
           {% endif %}
           <!--Product description tags-->
-          <p class="text-left text-bottom">{{ p.description }}</p>
+          <p class="text-start text-bottom">{{ p.description }}</p>
         </div>
         <!--Product cost and quantity control-->
-        <div class="col-md-3 text-right">
-          <div class="row text-right">
-            <p class="text-right"><strong class="text-right">{{ "$%.2f"|format(p.unit_price) }}</strong></p>
+        <div class="col-md-3 py-2 me-3 text-end">
+          <div class="row text-end">
+            <p class="text-end"><strong class="text-end">{{ "$%.2f"|format(p.unit_price) }}</strong></p>
           </div>
           <!--Quantity editing form-->
           <div class="row">
@@ -57,8 +57,8 @@
         </div>
         <!--Details of art-->
         <div class="card-body">
-          <div class="row mx-2"><strong class="mx-1">Total cost: </strong>$<span id="cart-summary-total-cost">{{ "%.2f"|format(summary.total_cost) }}</span></div>
-          <div class="row mx-2"><strong class="mx-1">Total items: </strong><span id="cart-summary-total-items">{{ summary.total_items }}</span></div>
+          <div class="d-flex flex-nowrap"><strong class="mx-1">Total cost: </strong>$<span id="cart-summary-total-cost">{{ "%.2f"|format(summary.total_cost) }}</span></div>
+          <div class="d-flex flex-nowrap"><strong class="mx-1">Total items: </strong><span id="cart-summary-total-items">{{ summary.total_items }}</span></div>
         </div>
         <!--Buy now button-->
         <div class="card-footer">

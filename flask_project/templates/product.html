@@ -10,6 +10,7 @@
 <!--Script for adding product to cart, or immediate purchase-->
 <script>
 $("document").ready(function() {
+  // add items to cart or buy them
   $('.product_form').submit(function(ev) {
     ev.preventDefault();
 
@@ -41,74 +42,107 @@ $("document").ready(function() {
 })
 </script>
 
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{ url_for('user_bp.search') }}">Products</a></li>
-    <li class="breadcrumb-item active">{{ product.category }}</li>
-  </ol>
-</nav>
+<form id="breadcrumb-category-search" action="{{ url_for("user_bp.search") }}" method="POST">
+  <input name="categories" value="{{ product.category }}" hidden>
+</form>
 
+<!--Breadcrumb-->
+<div class="container-fluid justify-content-md-center text-center border-bottom pb-0 mb-3">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb mb-0">
+      <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('user_bp.search') }}">Products</a></li>
+      <li class="breadcrumb-item"><button class="btn btn-link pt-0 px-0" type="submit" form="breadcrumb-category-search">{{ product.category }}</button></li>
+      <li class="breadcrumb-item active">Product details</li>
+    </ol>
+  </nav>
+</div>
+
+<!--Product description-->
 <div class="container w-75">
   <div class="row justify-content-between">
     <!--Image panel-->
     <div class="col-md-4 text-center">
-      <div class="d-block">
-        <!--Primary image-->
-        <div class="row my-1">
-          <div class="col thumbnail"><img src="{{ product.image_url }}" class="product-img rounded img-fluid"></div>
+      <div class="carousel carousel-dark slide border shadow-sm" data-bs-ride="carousel" id="product-image-carousel">
+        <!--Carousel images-->
+        <div class="carousel-inner">
+          <div class="carousel-item active" data-bs-interval="1000">
+            <div class="thumbnail"><img src="{{ product.image_url }}" class="rounded img-fluid"></div>
+          </div>
+          <div class="carousel-item" data-bs-interval="1000">
+            <div class="thumbnail"><img src="{{ product.image_url }}" class="rounded img-fluid"></div>
+          </div>
+          <div class="carousel-item" data-bs-interval="1000">
+            <div class="thumbnail"><img src="{{ product.image_url }}" class="rounded img-fluid"></div>
+          </div>
         </div>
-        <!--Mini images-->
-        <div class="row">
-          <div class="col"><div class="thumbnail"><img src="{{ product.image_url }}" class="product-img rounded img-fluid"></div></div>
-          <div class="col"><div class="thumbnail"><img src="{{ product.image_url }}" class="product-img rounded img-fluid"></div></div>
-          <div class="col"><div class="thumbnail"><img src="{{ product.image_url }}" class="product-img rounded img-fluid"></div></div>
-        </div>
+        <!--Carousel controls-->
+        <button class="carousel-control-prev" type="button" data-bs-target="#product-image-carousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#product-image-carousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
       </div>
     </div>
 
     <!--Product description-->
     <div class="col-md-6">
       <div class="row justify-content-between">
-        <div class="col text-left px-0"><h3>{{ product.name }}</h3></div>
-        <div class="col-auto text-right px-0"><span style="font-size:150%;">{{ "$%.2f"|format(product.unit_price) }}</span></div>
+        <div class="col text-start"><h3>{{ product.name }}</h3></div>
+        <div class="col-auto text-end"><span style="font-size:150%;">{{ "$%.2f"|format(product.unit_price) }}</span></div>
         {% if current_user.admin %}
-        <div class="col-auto text-right pl-2 pr-0">
-          <a href="{{ url_for("admin_bp.edit_product", id=product.id) }}" class="btn btn-outline-secondary">Edit</a>
+        <div class="col-auto text-end ps-2">
+          <a href="{{ url_for("admin_bp.edit_product", id=product.id) }}" class="btn btn-outline-secondary rounded-circle"><i class="bi bi-pen"></i></a>
         </div>
         {% endif %}
       </div>
       <div class="row">
         {% if product.stock > 0 %}
-        <p class="text-left my-0 text-success">In stock</p>
+        <p class="text-start my-0 text-success">In stock</p>
         {% else %}
-        <p class="text-left my-0 text-danger">Out of stock</p>
+        <p class="text-start my-0 text-danger">Out of stock</p>
         {% endif %}
       </div>
       <div class="row">
         <p>{{ product.description }}</p>
       </div>
-      <div class="row">
-        <div class="row w-100"><span class="col"><strong>Brand: </strong>{{ product.brand }}</span></div>
-        <div class="row w-100"><span class="col"><strong>Warranty days: </strong>{{ product.warranty_days }}</span></div>
-        <div class="row w-100"><span class="col"><strong>Delivery days: </strong>{{ product.delivery_days }}</span></div>
-        <div class="row w-100"><span class="col"><strong>In stock: </strong>{{ product.stock }}</span></div>
+
+      <!--Product details info-->
+      <div>
+        <div class="row">
+          <div class="col-sm-3"><strong>Brand</strong></div>
+          <div class="col-auto">{{ product.brand }}</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3"><strong>Warranty days</strong></div>
+          <div class="col-auto">{{ product.warranty_days }}</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3"><strong>Delivery days</strong></div>
+          <div class="col-auto">{{ product.delivery_days }}</div>
+        </div>
+        <div class="row">
+          <div class="col-sm-3"><strong>In stock</strong></div>
+          <div class="col-auto">{{ product.stock }}</div>
+        </div>
       </div>
+
       <!--Purchasing form-->
       <form class='product_form my-2' id="product_form" method='POST'>
         <input type="hidden" id="product_id" name="id" value="{{ product.id }}">
-        <div class="row justify-content-between">
-          <div class="col-md-5 pl-0">
-            <div class="form-group row">
-              <label class="col text-center" for="quantity">Quantity</label>
+        <div class="row mx-0 px-0 w-100 justify-content-between">
+          <div class="col-md-5 ps-0">
+            <div class="row form-group text-start">
+              <label class="col-sm-7 me-3 text-start" for="quantity">Quantity</label>
               <input class="col form-control" type="number" min="1" max="99" id="quantity" name="quantity" value=1> 
             </div>
           </div>
-          <div class="col pr-0 text-right">
-            <div class="btn-group">
-              <button type="submit" id='cart_add' v-link="{{ url_for('api_bp.product_add') }}" class="btn btn-outline-primary mb-2">Add to Cart</button>
-              <button type="submit" id='buy_now' v-link="{{ url_for('api_bp.product_buy') }}" class="btn btn-primary mb-2">Buy Now</button>
-            </div>
+          <div class="col-auto btn-group pe-0 align-self-end text-end">
+            <button type="submit" id='cart_add' v-link="{{ url_for('api_bp.product_add') }}" class="btn btn-outline-primary mb-2">Add to Cart</button>
+            <button type="submit" id='buy_now' v-link="{{ url_for('api_bp.product_buy') }}" class="btn btn-primary mb-2">Buy Now</button>
           </div>
         </div>
       </form>

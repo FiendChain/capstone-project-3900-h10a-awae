@@ -1,13 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'admin/admin_base.html' %}
 
 {% block head %}
+{{ super() }}
 <title>Cafe AWAE Admin Products</title>
 {% endblock %}
 
-
-{% block content %}
-{% include 'admin/navbar.html' %}
-
+{% block subcontent %}
 <script>
 $('document').ready(function () {
 
@@ -37,16 +35,14 @@ $('document').ready(function () {
 </nav>
 
 <!--Product page-->
-<div class="container w-75">
+<div class="container-fluid px-0">
   <!--Table header-->
-  <div class="row mx-0 justify-content-center">
-    <div class="col text-left">
-      <h4>My Products</h4>
+  <div class="row px-0 justify-content-between">
+    <div class="col text-start">
+      <h3>My Products</h3>
     </div>
-    <div class="col text-right">
-      <a href="{{ url_for("admin_bp.add_product") }}">
-        <div class="btn btn-sm btn-primary">Add Product</div>
-      </a>
+    <div class="col-auto align-self-end text-end">
+      <a href="{{ url_for("admin_bp.add_product") }}" class="btn btn-sm btn-primary align-self-end">Add Product</a>
     </div>
   </div>
 
@@ -57,6 +53,9 @@ $('document').ready(function () {
       <th scope="col">UID</th>
       <th scope="col">Name</th>
       <th scope="col">Price ($)</th>
+      <th scope="col">Category</th>
+      <th scope="col">Brand</th>
+      <th scope="col">Warranty</th>
       <th scope="col">Est. Delivery</th>
       <th scope="col">In Stock</th>
       <th scope="col">Actions</th>
@@ -68,16 +67,17 @@ $('document').ready(function () {
       <th scope="row">{{ p.id }}</th>
       <td>{{ p.name }}</td>
       <td>{{ "$%.2f"|format(p.unit_price) }}</td>
+      <td>{{ p.category }}</td>
+      <td>{{ p.brand }}</td>
+      <td>{{ "%d"|format(p.warranty_days) }} days</td>
       <td>{{ "%d"|format(p.delivery_days) }} days</td>
-      <td>{{ p.stock }}</td>
+      <td><span class="{{ 'text-success' if p.stock > 0 else 'text-danger' }}">{{ p.stock }}</span></td>
       <td>
-        <div class="text-right">
-          <a class="btn btn-sm btn-outline-primary" href="{{ url_for("user_bp.product_page", id=p.id) }}">Details</a>
-          <a href="{{ url_for("admin_bp.edit_product", id=p.id) }}">
-            <div class="btn btn-sm btn-outline-primary">Edit</div>
-          </a>
+        <div class="d-flex flex-row justify-content-end">
+          <a class="mx-1 btn btn-sm btn-outline-primary" href="{{ url_for("user_bp.product_page", id=p.id) }}">Details</a>
+          <a class="mx-1 btn btn-sm btn-outline-primary" href="{{ url_for("admin_bp.edit_product", id=p.id) }}">Edit</a>
           <div 
-            class="btn btn-sm btn-danger" id="product-remove" 
+            class="ms-1 btn btn-sm btn-danger" id="product-remove" 
             url="{{ url_for("admin_api_bp.delete_product", id=p.id) }}">Remove</div>
         </div>
       </td>

@@ -1,0 +1,34 @@
+<!--Utility macro for image drag and drop-->
+{% macro input_product_image(image_name, image_changed_name, default_url) %}
+<div class="dragndrop-image round">
+  <!--Image preview-->
+  <div class="preview d-none">
+    <!--Overlay to show edit buttons-->
+    <div class="overlay">
+      <div class="row h-100 text-center justify-content-center">
+        <div class="col my-auto mx-auto">
+          <div class="btn btn-outline-danger rounded-circle" id="delete"><i class="bi bi-trash fs-4"></i></div>
+        </div>
+      </div>
+    </div>
+    <img class="img-fluid" src="" default-src="{{ default_url or '' }}"/>
+    <p class="filename text-center"></p>
+  </div>
+
+  <!--Image drop zone-->
+  <div class="dropzone w-100">
+    <!--Reset control for dropzone if original src url was provided-->
+    <div class="overlay d-none">
+      <div class="btn btn-outline-secondary rounded-circle" id="reset"><i class="bi bi-arrow-counterclockwise fs-4"></i></div>
+    </div>
+    <div class="dropzone-description">
+      <p>Choose an image file or drag it here?</p>
+    </div>
+    <!--If there was an original src image, store its url here-->
+    <input type="checkbox" checked=false name="{{ image_changed_name }}" class="dropzone-dirty" required hidden>
+    <!--Input that actually handles the drag and drop-->
+    <input type="file" id="{{ image_name }}" name="{{ image_name }}" accept="image/*" class="dropzone-input">
+    <div id="{{ image_name }}" class="invalid-feedback d-none"></div>
+  </div>
+</div>
+{% endmacro %}

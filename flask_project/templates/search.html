@@ -20,16 +20,6 @@ $("document").ready(function () {
 
 <!--Homepage-->
 <div class="container-fluid">
-  <!--Navigation-->
-  <div class="row">
-    <div class="col align-self-center text-center">
-      <div class="btn-group">
-        <a class="btn btn-primary" href="{{ url_for('user_bp.search') }}">Products</a>
-        <div class="btn btn-outline-primary">Reviews</div>
-        <div class="btn btn-outline-primary">Curators</div>
-      </div>
-    </div>
-  </div>
   <!--Products-->
   <div class="container-fluid w-75">
     <form action="{{ url_for("user_bp.search") }}" method='POST' id="product-search-form">
@@ -37,20 +27,16 @@ $("document").ready(function () {
       <!--Sort controls-->
       <div class="row my-2 justify-content-between">
         <!--Search description-->
-        <div class="col text-left">
-          {% if form.name.data %}
-          <p class="my-1"><strong>Showing results for </strong>{{ form.name.data or "" }}</p>
-          {% else %}
-          <p class="my-1"><strong>Showing results for {{ products.__len__() }} matches</strong></p>
-          {% endif %}
+        <div class="col text-start">
+          <p class="my-1">Showing {{ products.__len__() }} results for <strong class="text-success">"{{ form.name.data or '' }}"</strong></p>
         </div>
         <!--Sort by price-->
-        <div class="col-md-auto text-right">
+        <div class="col-md-auto text-end">
           <div class="input-group">
             <div class="input-group-prepend">
               <span class="input-group-text" id="">Sort by</span>
             </div>
-            <select class="custom-select" id="{{ form.sort_type.id }}" name="{{ form.sort_type.id }}">
+            <select class="form-select" id="{{ form.sort_type.id }}" name="{{ form.sort_type.id }}">
               <option value="price_low_to_high" {{ 'selected' if form.sort_type.data == 'price_low_to_high' }}>Price (Low to High)</option>
               <option value="price_high_to_low" {{ 'selected' if form.sort_type.data == 'price_high_to_low' }}>Price (High to Low)</option>
             </select>
@@ -61,8 +47,7 @@ $("document").ready(function () {
       <div class="row w-100">
         <!--Filter by category-->
         <div class="col-md-2">
-          <div class="row"><strong>Filter by</strong></div>
-          <div class="row">Category</div>
+          <div class="row"><strong class="px-0">Filter by category</strong></div>
           <div class="row">
             <div class="col">
               <!--Default all categories-->
@@ -85,13 +70,13 @@ $("document").ready(function () {
         </div>
         <!--Show products-->
         <div class="col">
-          <div class="row">
+          <div class="row justify-content-start">
             {% for p in products %}
-            <div class="col-sm-2 px-0 mx-1 rounded border">
+            <div class="col-md-2 px-0 mx-1 my-1 rounded border">
               <div class="thumbnail">
-                <a href="{{ url_for("user_bp.product_page", id=p.id) }}" class="text-decoration-none">
+                <a href="{{ url_for("user_bp.product_page", id=p.id) }}" class="text-dark text-decoration-none">
                   <img src="{{ p.image_url }}" class="product-img rounded img-fluid">
-                  <div class="text-center">
+                  <div class="px-2 text-center">
                     <h6>{{ p.name }}</h6>
                     <p class="text-muted my-0">{{ "$%.2f"|format(p.unit_price) }}</p>
                   </div>

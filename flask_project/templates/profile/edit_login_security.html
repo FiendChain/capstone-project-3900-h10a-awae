@@ -7,18 +7,20 @@
 {% block content %}
 {% include 'user_navbar.html' %}
 
-<nav aria-label="breadcrumb">
-  <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
-    <li class="breadcrumb-item"><a href="{{ url_for('user_bp.profile') }}">Profile</a></li>
-    <li class="breadcrumb-item active">Edit login & security</li>
-  </ol>
-</nav>
+<div class="container-fluid justify-content-md-center text-center border-bottom pb-0 mb-3">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb mb-2">
+      <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('user_bp.profile') }}">Profile</a></li>
+      <li class="breadcrumb-item active">Edit login & security</li>
+    </ol>
+  </nav>
+</div>
 
 <script src="/static/js/wtf_ajax_form.js"></script>
 
 <!--TODO: Add iconography-->
-<div class="container w-50">
+<div class="container">
   <div class="row justify-content-center">
     <div class="col-md-5 my-auto">
       <div class="card">
@@ -28,29 +30,29 @@
         <div class="card-body">
           <form method="POST" action="{{ url_for('api_bp.profile_edit_login_security') }}" id="user-login-security-form" class="wtf-ajax-form">
             {{ form.csrf_token }}
-            <div class="form-group">
-              <label for="{{ form.password.id }}">Password</label>
+            <div class="form-floating mb-3">
               <input type="password" class="form-control" id="{{ form.password.id }}" name="{{ form.password.id }}" value="{{ form.password.data or '' }}" placeholder="Password" required>
+              <label for="{{ form.password.id }}">Password</label>
               <div class="invalid-feedback d-none" id="{{ form.password.id }}"></div>
             </div>
-            <div class="form-group">
-              <label for="{{ form.new_password.id }}">New password</label>
+            <div class="form-floating mb-3">
               <input type="password" class="form-control" id="{{ form.new_password.id }}" name="{{ form.new_password.id }}" value="{{ form.new_password.data or '' }}" placeholder="New password" required>
+              <label for="{{ form.new_password.id }}">New password</label>
               <div class="invalid-feedback d-none" id="{{ form.new_password.id }}"></div>
             </div>
-            <div class="form-group">
-              <label for="{{ form.confirm_password.id }}">Confirm new password</label>
+            <div class="form-floating mb-3">
               <input type="password" class="form-control" id="{{ form.confirm_password.id }}" name="{{ form.confirm_password.id }}" value="{{ form.confirm_password.data or '' }}" placeholder="Re-enter new password" required>
+              <label for="{{ form.confirm_password.id }}">Confirm new password</label>
               <div class="invalid-feedback d-none" id="{{ form.confirm_password.id }}"></div>
             </div>
-            <div class="form-group">
-              <label for="{{ form.email.id }}">Email</label>
+            <div class="form-floating mb-3">
               <input type="email" class="form-control" id="{{ form.email.id }}" name="{{ form.email.id }}" value="{{ form.email.data or '' }}" placeholder="Enter email" required>
+              <label for="{{ form.email.id }}">Email</label>
               <div class="invalid-feedback d-none" id="{{ form.email.id }}"></div>
             </div>
-            <div class="form-group">
-              <label for="{{ form.phone.id }}">Phone</label>
+            <div class="form-floating mb-3">
               <input type="phone" class="form-control" id="{{ form.phone.id }}" name="{{ form.phone.id }}" value="{{ form.phone.data or '' }}" placeholder="Enter phone number" required>
+              <label for="{{ form.phone.id }}">Phone</label>
               <div class="invalid-feedback d-none" id="{{ form.phone.id }}"></div>
             </div>
             <div class="form-row my-2">
