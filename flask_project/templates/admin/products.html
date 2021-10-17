@@ -8,21 +8,34 @@
 {% block subcontent %}
 <script>
 $('document').ready(function () {
+  // datatable
+  let product_list = $("#product-list").DataTable({
+    "columnDefs": [
+      {
+        "targets": [8], 
+        "searchable": false,
+      },
+    ],
+  });
 
-  $("[id='product-remove']").click(function() {
+  // remove product entry
+  $("[id='product-remove']").click(function(ev) {
+    ev.preventDefault();
+
     let btn = $(this);
     let url = btn.attr("url");
-    let row_entry = btn.parents("tr").first();
+    let row_id = btn.parents("tr").first().attr("id");
 
     $.ajax({
       url, type: 'POST',
-      success: () => {
-        row_entry.remove();
+      success: (data) => {
+        product_list.row(`#${row_id}`).remove()
+        product_list.draw("page");
       },
-      error: () => location.reload(),
     })
-
   });
+
+
 });
 </script>
 
@@ -37,7 +50,7 @@ $('document').ready(function () {
 <!--Product page-->
 <div class="container-fluid px-0">
   <!--Table header-->
-  <div class="row px-0 justify-content-between">
+  <div class="row px-0 mb-3 justify-content-between">
     <div class="col text-start">
       <h3>My Products</h3>
     </div>
@@ -47,7 +60,7 @@ $('document').ready(function () {
   </div>
 
   <!--Product list--> 
-  <table class="table table-hover">
+  <table class="table table-hover" id="product-list">
   <thead>
     <tr>
       <th scope="col">UID</th>
@@ -63,7 +76,7 @@ $('document').ready(function () {
   </thead>
   <tbody>
     {% for p in products %}
-    <tr>
+    <tr id="{{ p.id }}">
       <th scope="row">{{ p.id }}</th>
       <td>{{ p.name }}</td>
       <td>{{ "$%.2f"|format(p.unit_price) }}</td>
