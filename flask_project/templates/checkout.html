@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Checkout Successful</title>
+{% endblock %}
+
+{% block content %}
+{% include 'user_navbar.html' %}
+<script src="/static/js/cart.js"></script>
+
+<!--Breadcrumb-->
+<div class="container-fluid justify-content-md-center text-center border-bottom pb-0 mb-3">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb mb-2">
+      <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
+      <li class="breadcrumb-item active">Checkout Success</li>
+    </ol>
+  </nav>
+</div>
+
+<!--Cart-->
+<div class="container">
+  <div class="row mx-4 justify-content-center">
+    <!--Cart items-->
+    <div class="col-8">
+      <!--Success header on successful checkout-->
+      <div class="d-flex flex-row flex-nowrap py-0 border mb-3 py-3 justify-content-center text-center shadow-sm"> 
+        {% if is_success %}
+        <h3 class="text-success">Checkout Successful<i class="bi bi-check-circle mx-2"></i></h3>
+        {% else %}
+        <h3 class="text-danger">Checkout Cancelled<i class="bi bi-x-circle mx-2"></i></h3>
+        {% endif %}
+      </div>
+
+      <!--If for some reason the checkout is empty-->
+      {% if not products %}
+      <div class="row justify-content-center text-center py-3 border shadow-sm">
+        <h5>Checkout is empty</h5>
+      </div>
+      {% endif %}
+
+      <!--Our checkout items-->
+      {% for p in products %}
+      <div class="d-flex flex-row flex-nowrap py-0 border mb-1"> 
+        <!--Product image-->
+        <div class="col-3 ps-0">
+          <img src="{{ p.image_url }}" class="product-img-small img-fluid border-end"></img>
+        </div>
+        <!--Product info-->
+        <div class="col ms-4 py-2 me-auto">
+          <a href="{{ url_for('user_bp.product_page', id=p.id) }}">
+            <p class="text-start my-0"><strong>{{ p.name }}</strong> in {{ p.category }}</p>
+          </a>
+          <!--Stock status-->
+          <div class="d-flex flex-row flex-nowrap mb-1">
+            {% if p.stock > 0 %}
+            <p class="text-start my-0 text-success">In stock</p>
+            {% else %}
+            <p class="text-start my-0 text-danger">Out of stock</p>
+            {% endif %}
+          </div>
+          <!--Product description tags-->
+          <div class="d-flex flex-row">
+            <form class="product-buy-or-add-form" method="POST">
+              <input type="text" name="id" value="{{ p.id }}" hidden>
+              <input type="number" name="quantity" value="1" hidden>
+              <button type="submit" id="buy_now" v-link="{{ url_for("api_bp.product_buy") }}" class="me-2 btn btn-sm btn-primary">
+                <i class="bi bi-bag-check fs-7 me-2"></i>Buy again
+              </button>
+              <button type="submit" id="cart_add" v-link="{{ url_for("api_bp.product_add") }}" class="me-2 btn btn-sm btn-outline-primary">Add to cart</button>
+            </form>
+          </div>
+        </div>
+        <!--Product pricing information-->
+        <div class="col-md-3 py-2 me-3 text-end">
+          <!--Product price-->
+          <div class="row text-end">
+            <span class="text-end"><strong class="text-end">{{ "$%.2f"|format(p.unit_price) }}</strong></span>
+          </div>
+          <!--Quantity-->
+          <div class="mt-1 row justify-content-end text-end">
+            <div class="ms-auto">
+              <span class="badge bg-danger text-end rounded-pill">x{{ p.quantity }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <!--Cart sidebar-->
+    <div class="col-3">
+      <!--Details of cost-->
+      <div class="d-flex flex-row flex-nowrap card mb-3">
+        <div class="card-body">
+          <h6 class="card-title border-bottom pb-2">Checkout Details</h6>
+          <div class="card-text">
+            <div class="d-flex flex-nowrap"><strong class="mx-1">Total cost: </strong>${{ "%.2f"|format(summary.total_cost) }}</div>
+            <div class="d-flex flex-nowrap"><strong class="mx-1">Total items: </strong>{{ summary.total_items }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!--Print our checkout summary-->
+      <div class="d-block text-center">
+        <div class="btn btn-primary w-100 mb-1" onclick="window.print(); return false;">Print Summary</div>
+        {% if current_user.is_authenticated %}
+        <div class="btn btn-outline-primary w-100 mb-1">View Order</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

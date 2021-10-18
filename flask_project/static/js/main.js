@@ -26,12 +26,14 @@ $("document").ready(function() {
       })
       break;
 
+    // Buying now lets the browser redirect us to stripe page
+    // For $.redirect, we need to flatten form data into a json
     case 'buy_now':
-      $.ajax({
-        url, data, type: 'POST',
-        success: () => location.reload(),
-        error: () => location.reload(),
-      })
+      let json = data.reduce((m, o) => {  
+        m[o.name] = o.value; 
+        return m;
+      }, {});
+      $.redirect(url, json, "POST")
       break;
     }
   });

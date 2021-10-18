@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block head %}
@@ -20,13 +19,20 @@
 </div>
 
 <!--Cart-->
-<div class="container-fluid">
+<div class="container">
   <div class="row mx-4 justify-content-center">
     <!--Cart items-->
-    <div class="col">
+    <div class="col-8">
+      {% if not products %}
+      <div class="row justify-content-center text-center py-3 border shadow-sm">
+        <h5>Cart is empty</h5>
+      </div>
+      {% endif %}
       {% for p in products %}
-      <div class="row cart-product w-100 border mb-3" id="{{ p.id }}">
-        <div class="col-md-2 thumbnail ps-0"><img src="{{ p.image_url }}" class="product-img rounded img-fluid"></div>
+      <div class="row cart-product w-100 border mb-2" id="{{ p.id }}">
+        <div class="col-md-2 thumbnail ps-0">
+          <img src="{{ p.image_url }}" class="product-img rounded img-fluid border">
+        </div>
         <!--Product info-->
         <div class="col py-2 me-auto">
           <a href="{{ url_for('user_bp.product_page', id=p.id) }}">
@@ -38,39 +44,45 @@
           {% else %}
           <p class="text-start my-0 text-danger">Out of stock</p>
           {% endif %}
-          <!--Product description tags-->
-          <p class="text-start text-bottom">{{ p.description }}</p>
+          <div class="d-flex flex-row fs-8">
+            <div class="col-auto me-1 badge badge-outline">Brand: {{ p.brand }}</div>
+            <div class="col-auto me-1 badge badge-outline">Est. Delivery: {{ p.delivery_days }} days</div>
+          </div>
         </div>
         <!--Product cost and quantity control-->
         <div class="col-md-3 py-2 me-3 text-end" id="cart-controls">
           <div class="row text-end">
-            <p class="text-end pe-0"><strong class="text-end">{{ "$%.2f"|format(p.unit_price) }}</strong></p>
+            <p class="text-end pe-0"><strong class="text-end fs-6">{{ "$%.2f"|format(p.unit_price) }}</strong></p>
           </div>
           <!--Quantity editing form-->
           <div class="row">
             <form class='quantity_form' id="{{ p.id }}" method='POST' action="{{ url_for('api_bp.product_update') }}">
               <input type="hidden" id="product_id" name="id" value="{{ p.id }}">
-              <div class="form-group row">
-                <label class="col text-center" for="quantity">Quantity</label>
-                <input class="col form-control" type="number" min="1" max="99" id="quantity" name="quantity" value={{ p.quantity }}> 
+              <div class="form-group row justify-content-end">
+                <label class="col-auto me-0 text-end" for="quantity">Quantity</label>
+                <div class="col-4 px-0 text-end">
+                  <input class="form-control form-control-sm" type="number" min="1" max="99" id="quantity" name="quantity" value={{ p.quantity }}> 
+                </div>
               </div>
             </form>
           </div>
           <!--Product deletion link-->
-          <div class="row justify-content-end text-end">
+          <div class="row align-end justify-content-end text-end">
             <div 
               class="col-auto btn btn-link text-danger text-decoration-none pe-0" 
               data-bs-toggle="modal" data-bs-target="#cart-product-delete-modal"
-              data-bs-product-id="{{ p.id }}" data-bs-product-name="{{ p.name }}">Delete this item</div>
+              data-bs-product-id="{{ p.id }}" data-bs-product-name="{{ p.name }}">
+              <small>Delete this item</small>
+            </div>
           </div>
         </div>
       </div>
       {% endfor %}
     </div>
-    <!--Cart summary-->
-    <div class="col-md-2">
+    <!--Cart sidebar-->
+    <div class="col-3">
+      <!--Details of cost-->
       <div class="d-flex flex-row flex-nowrap card mb-3">
-        <!--Details of art-->
         <div class="card-body">
           <h6 class="card-title border-bottom pb-2">Checkout Details</h6>
           <div class="card-text">
@@ -81,7 +93,9 @@
       </div>
       <!--Buy now button-->
       <div class="d-block flex-row flex-nowrap">
-        <a href="{{ url_for("user_bp.cart_checkout") }}" class="btn btn-success w-100">Buy Now</a>
+        <form action="{{ url_for("user_bp.cart_checkout") }}" method="POST">
+          <button type="submit" class="btn btn-success w-100" {{ "disabled" if not products }}>Proceed to checkout</a>
+        </form>
       </div>
     </div>
   </div>

@@ -9,9 +9,14 @@ from .forms import LoginForm, RegisterForm, UserPurchaseForm, UserProfileLoginSe
 from classes.flaskuser import FlaskUser
 
 import datetime
+import stripe
+from stripe_keys import STRIPE_API_KEY, STRIPE_ENDPOINT_SECRET
 
 user_bp  = Blueprint('user_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
 api_bp = Blueprint('api_bp', __name__)
+
+# stripe api key
+stripe.api_key = STRIPE_API_KEY
 
 # Product browsing
 @user_bp.route('/', methods=["GET", "POST"])
@@ -232,7 +237,6 @@ def cart():
 
     return render_template('cart.html', **data)
 
-
 # Add product to cart
 @api_bp.route('/transaction/add', methods=['POST'])
 def product_add():
@@ -266,20 +270,164 @@ def product_update():
 
     return jsonify(dict(quantity=form.quantity.data, summary=summary))
 
-# TODO: Buy the product immediately
+# Use stripe to immediately buy the product
 @api_bp.route('/transaction/buy', methods=['POST'])
 def product_buy():
-    form = request.form
-    print(f'Buying: {form}')
-    return jsonify(dict(success=True))
+    form = UserPurchaseForm(meta=dict(csrf=False))
+    if not form.validate_on_submit():
+        return jsonify(serialize_form(form)), 403
+    
+    if not validate_product_id(form.id.data):
+        form.id.errors.append("Invalid product id")
+        return jsonify(serialize_form(form)), 403
 
-# TODO: handle cart checkout
-@user_bp.route('/checkout', methods=['GET'])
+    id = form.id.data
+    quantity = form.quantity.data
+    items = []
+
+    with app.app_context():
+        db = get_db()
+        product = db.get_entry_by_id("products", id)
+        item = {
+            "price_data": {
+                "currency": "aud",
+                "product_data": {
+                    "name": product["name"],
+                    "metadata": {
+                        "db_id": product["id"],
+                    },
+                },
+                "unit_amount": int(100*product["unit_price"]),
+            },
+            "quantity": quantity,
+        }
+        items.append(item)
+    
+    config = dict(
+        payment_method_types=['card'],
+        line_items=items,
+        mode='payment',
+        success_url="http://localhost:5002/checkout_status?session_id={CHECKOUT_SESSION_ID}&success=true",
+        cancel_url="http://localhost:5002/checkout_status?session_id={CHECKOUT_SESSION_ID}&success=false",
+    )
+
+    session = stripe.checkout.Session.create(**config)
+    return redirect(session.url, code=303)
+
+# Setups stripe and redirects the user there
+# TODO: store stripe sessions and keep data persisting
+# TODO: pass in billing address and card information if stored
+@user_bp.route('/checkout', methods=['POST'])
 def cart_checkout():
-    print("Buying everything inside the cart")
     cart = get_user_cart()
-    cart.empty()
-    return redirect(url_for("user_bp.cart"))
+    items = []
+
+    with app.app_context():
+        db = get_db()
+        for id, quantity in cart.to_list():
+            product = db.get_entry_by_id("products", id)
+            item = {
+                "price_data": {
+                    "currency": "aud",
+                    "product_data": {
+                        "name": product["name"],
+                        "metadata": {
+                            "db_id": product["id"],
+                        },
+                    },
+                    "unit_amount": int(100*product["unit_price"]),
+                },
+                "quantity": quantity,
+            }
+            items.append(item)
+    
+    if len(items) == 0:
+        abort(403)
+
+    config = dict(
+        payment_method_types=['card'],
+        line_items=items,
+        mode='payment',
+        success_url="http://localhost:5002/checkout_status?session_id={CHECKOUT_SESSION_ID}&success=true",
+        cancel_url="http://localhost:5002/checkout_status?session_id={CHECKOUT_SESSION_ID}&success=false",
+    )
+
+    session = stripe.checkout.Session.create(**config)
+    return redirect(session.url, code=303)
+
+# when stripe succeeds, it goes to this page
+# shows a list of the stripe items in the checkout session
+# the price and quantity may have changed, so we use the stripe ones
+@user_bp.route("/checkout_status", methods=['GET'])
+def checkout_status():
+    try:
+        session_id = request.args['session_id']
+        is_success = request.args['success']
+        session = stripe.checkout.Session.retrieve(session_id)
+        line_items = stripe.checkout.Session.list_line_items(session_id, limit=100)
+    except stripe.error.InvalidRequestError as ex:
+        print("Customer tried to access checkout successful without session")
+        abort(403)
+    except KeyError as ex:
+        print(ex)
+        abort(403)
+    
+    is_success = True if is_success == 'true' else False
+
+    # get the product from the database
+    # override the cost and quantity of the product with actual checkout price
+    products = []
+    total_items = 0
+    total_cost = 0
+    with app.app_context():
+        db = get_db()
+        for item in line_items.data:
+            quantity = item.quantity
+            unit_price = item.price.unit_amount / 100
+
+            stripe_product = stripe.Product.retrieve(item.price.product)
+            id = stripe_product.metadata.db_id
+
+            product = db.get_entry_by_id("products", id)
+            product.update(quantity=quantity, unit_price=unit_price)
+            products.append(product)
+
+            total_cost += quantity*unit_price
+            total_items += quantity
+
+    data = dict(
+        success=is_success,
+        products=products, 
+        summary=dict(total_items=total_items, total_cost=total_cost))
+
+    # TODO: Determine if this session belonged to the cart, and if it did empty it
+    # cart.empty()
+    return render_template("checkout.html", **data)
+
+# stripe webhook where we process sessions from our stripe api
+# TODO: Use the information here to update our customer's orders 
+# TODO: Customer's paymetn and billing address could be included here
+#       if it is and user hasn't update their profile, we add this in for them
+@api_bp.route("/stripe-webhook", methods=["POST"])
+def stripe_webhook():
+    payload = request.data
+    signature_header = request.headers.get("Stripe-Signature")
+    event = None
+
+    try:
+        event = stripe.Webhook.construct_event(payload, signature_header, STRIPE_ENDPOINT_SECRET)
+    except ValueError as ex:
+        return jsonify(dict(error='Invalid payload')), 400
+    except stripe.error.SignatureVerificationError as ex:
+        return jsonify(dict(error="Invalid signature")), 400
+    
+    # if the checkout sesson was completed, update store to reflect this
+    if event['type'] == 'checkout.session.completed':
+        session = event['data']['object']
+        print("Confirmed that the session was successful")
+        print(session)
+
+    return jsonify(dict(success=True)), 200
 
 # Keep cart total count public
 @app.context_processor
