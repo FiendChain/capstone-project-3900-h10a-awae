@@ -9,6 +9,16 @@
 {% include 'user_navbar.html' %}
 <script src="/static/js/cart.js"></script>
 
+<!--Breadcrumb-->
+<div class="container-fluid justify-content-md-center text-center border-bottom pb-0 mb-3">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb mb-2">
+      <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
+      <li class="breadcrumb-item active">My Cart</li>
+    </ol>
+  </nav>
+</div>
+
 <div class="container-fluid">
   <div class="row mx-4 justify-content-center">
     <!--Cart items-->
@@ -51,19 +61,19 @@
     </div>
     <!--Cart summary-->
     <div class="col-md-2">
-      <div class="card">
-        <div class="card-header">
-          <h6>Details</h6>
-        </div>
+      <div class="d-flex flex-row flex-nowrap card mb-3">
         <!--Details of art-->
         <div class="card-body">
-          <div class="d-flex flex-nowrap"><strong class="mx-1">Total cost: </strong>$<span id="cart-summary-total-cost">{{ "%.2f"|format(summary.total_cost) }}</span></div>
-          <div class="d-flex flex-nowrap"><strong class="mx-1">Total items: </strong><span id="cart-summary-total-items">{{ summary.total_items }}</span></div>
+          <h6 class="card-title border-bottom pb-2">Checkout Details</h6>
+          <div class="card-text">
+            <div class="d-flex flex-nowrap"><strong class="mx-1">Total cost: </strong>$<span id="cart-summary-total-cost">{{ "%.2f"|format(summary.total_cost) }}</span></div>
+            <div class="d-flex flex-nowrap"><strong class="mx-1">Total items: </strong><span id="cart-summary-total-items">{{ summary.total_items }}</span></div>
+          </div>
         </div>
-        <!--Buy now button-->
-        <div class="card-footer">
-          <a href="{{ url_for("user_bp.cart_checkout") }}" class="btn btn-success w-100">Buy Now</a>
-        </div>
+      </div>
+      <!--Buy now button-->
+      <div class="d-block flex-row flex-nowrap">
+        <a href="{{ url_for("user_bp.cart_checkout") }}" class="btn btn-success w-100">Buy Now</a>
       </div>
     </div>
   </div>

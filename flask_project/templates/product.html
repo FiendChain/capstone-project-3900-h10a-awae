@@ -7,41 +7,6 @@
 {% block content %}
 {% include 'user_navbar.html' %}
 
-<!--Script for adding product to cart, or immediate purchase-->
-<script>
-$("document").ready(function() {
-  // add items to cart or buy them
-  $('.product_form').submit(function(ev) {
-    ev.preventDefault();
-
-    let form = $(this);
-    let btn = $(ev.originalEvent.submitter)
-    let action = btn.attr('id');
-    let url = btn.attr('v-link');
-    let data = form.serializeArray();
-
-    switch (action) 
-    {
-    case 'cart_add':
-      $.ajax({
-        url, data, type: 'POST',
-        success: () => location.reload(),
-        error: () => location.reload(),
-      })
-      break;
-
-    case 'buy_now':
-      $.ajax({
-        url, data, type: 'POST',
-        success: () => location.reload(),
-        error: () => location.reload(),
-      })
-      break;
-    }
-  });
-})
-</script>
-
 <form id="breadcrumb-category-search" action="{{ url_for("user_bp.search") }}" method="POST">
   <input name="categories" value="{{ product.category }}" hidden>
 </form>
@@ -113,30 +78,30 @@ $("document").ready(function() {
       <!--Product details info-->
       <div>
         <div class="row">
-          <div class="col-sm-3"><strong>Brand</strong></div>
-          <div class="col-auto">{{ product.brand }}</div>
-        </div>
-        <div class="row">
-          <div class="col-sm-3"><strong>Warranty days</strong></div>
-          <div class="col-auto">{{ product.warranty_days }}</div>
-        </div>
-        <div class="row">
-          <div class="col-sm-3"><strong>Delivery days</strong></div>
-          <div class="col-auto">{{ product.delivery_days }}</div>
-        </div>
-        <div class="row">
-          <div class="col-sm-3"><strong>In stock</strong></div>
-          <div class="col-auto">{{ product.stock }}</div>
+          <div class="col-auto">
+            <strong>
+              <div class="flex-nowrap">Brand</div>
+              <div class="flex-nowrap">Warranty days</div>
+              <div class="flex-nowrap">Delivery days</div>
+              <div class="flex-nowrap">In stock</div>
+            </strong>
+          </div>
+          <div class="col-auto ms-2">
+            <div class="flex-nowrap">{{ product.brand }}</div>
+            <div class="flex-nowrap">{{ product.warranty_days }}</div>
+            <div class="flex-nowrap">{{ product.delivery_days }}</div>
+            <div class="flex-nowrap">{{ product.stock }}</div>
+          </div>
         </div>
       </div>
 
       <!--Purchasing form-->
-      <form class='product_form my-2' id="product_form" method='POST'>
+      <form class='product-buy-or-add-form mt-4' method='POST'>
         <input type="hidden" id="product_id" name="id" value="{{ product.id }}">
         <div class="row mx-0 px-0 w-100 justify-content-between">
           <div class="col-md-5 ps-0">
             <div class="row form-group text-start">
-              <label class="col-sm-7 me-3 text-start" for="quantity">Quantity</label>
+              <label class="col-auto me-3 text-start" for="quantity">Quantity</label>
               <input class="col form-control" type="number" min="1" max="99" id="quantity" name="quantity" value=1> 
             </div>
           </div>

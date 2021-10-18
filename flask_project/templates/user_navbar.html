@@ -27,15 +27,15 @@ $("document").ready(function () {
 <header class="p-2 mb-2 border-bottom">
   <div class="container-fluid">
     <div class="row align-items-center justify-content-center justify-content-lg-start flex-no-wrap">
-      <div class="col-md-2 flex-nowrap">
-        <div class="row">
+      <div class="col-2">
+        <div class="row flex-nowrap">
           <!--Header-->
           <a href="{{ url_for("user_bp.home") }}" class="col-auto align-items-center mb-2 mb-lg-0 text-dark me-2 text-decoration-none">
             <i class="bi bi-house-fill fs-3"></i>
           </a>
 
           <!--Browsing buttons-->
-          <ul class="nav col-md-auto flex mb-2 justify-content-start mb-md-0">
+          <ul class="nav col-auto flex-nowrap mb-2 justify-content-start mb-md-0">
             <li><a href="{{ url_for('user_bp.search') }}" class="nav-link px-2 link-dark">Products</a></li>
             <li><a href="#" class="nav-link px-2 link-dark">Reviews</a></li>
             <li><a href="#" class="nav-link px-2 link-dark">Curators</a></li>
@@ -44,13 +44,13 @@ $("document").ready(function () {
       </div>
 
       <!--Search bar-->
-      <div class="col-md-6 mx-auto align-self-center text-center">
+      <div class="col-6 mx-auto align-self-center text-center">
         <input 
           type="search" class="form-control" id="search-bar-nav" placeholder="Search..." aria-label="Search for..." autocomplete="off" spellcheck="false" 
           form="product-search-form" name="name">
       </div>
 
-      <div class="col-md-2">
+      <div class="col-2">
         <div class="row justify-content-end text-end">
           <!--Cart-->
           <div class="col-auto">
