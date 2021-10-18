@@ -18,6 +18,8 @@ api_bp = Blueprint('api_bp', __name__)
 # stripe api key
 stripe.api_key = STRIPE_API_KEY
 
+STRIPE_REFERRAL_URL = "http://localhost:5002"
+
 # Product browsing
 @user_bp.route('/', methods=["GET", "POST"])
 def home():
@@ -270,6 +272,71 @@ def product_update():
 
     return jsonify(dict(quantity=form.quantity.data, summary=summary))
 
+# cart is an array of (<product_id:str>, <quantity:int>)
+def create_stripe_session(cart):
+    items = []
+    PLACEHOLDER_STRIPE_IMAGE = "https://thumbs.dreamstime.com/z/portrait-attractive-young-woman-who-sitting-cafe-cafe-urban-lifestyle-random-portrait-portrait-attractive-184387567.jpg"
+
+    with app.app_context():
+        db = get_db()
+        for id, quantity in cart:
+            product = db.get_entry_by_id("products", id)
+
+            # get all images of product for stripe
+            images = []
+            image_url = product["image_url"]
+            if image_url and image_url != '':
+                images.append(PLACEHOLDER_STRIPE_IMAGE)
+            
+            product_url = STRIPE_REFERRAL_URL+url_for("user_bp.product_page", id=product["id"])
+
+            # TODO: Stripe allows you to keep track of product, so replace id with our id
+            stripe_product = stripe.Product.create(
+                name=product["name"],
+                url=product_url,
+                images=images,
+                description=product["description"],
+                metadata={
+                    "db_id": product["id"],
+                }
+            )
+
+            stripe_price = stripe.Price.create(
+                currency="aud",
+                product=stripe_product.id,
+                unit_amount=int(100*product["unit_price"]),
+            )
+
+            item = {
+                "price": stripe_price.id,
+                "quantity": quantity,
+            }
+            items.append(item)
+
+    # setup payment type 
+    config = dict(
+        payment_method_types=['card'],
+        line_items=items,
+        mode='payment',
+        shipping_address_collection={
+            'allowed_countries': ['AU'],
+        },
+        success_url=STRIPE_REFERRAL_URL+"/checkout_status?session_id={CHECKOUT_SESSION_ID}&success=true",
+        cancel_url=STRIPE_REFERRAL_URL+"/checkout_status?session_id={CHECKOUT_SESSION_ID}&success=false",
+    )
+
+    # add current user data if it exists
+    # TODO: Add stored customer credit card or billing address if it exists
+    if current_user.get_id() is not None:
+        id = current_user.get_id()
+        with app.app_context():
+            db = get_db()
+            user = db.get_entry_by_id("users", ord(id))
+            config["customer_email"] = user["email"]
+
+    session = stripe.checkout.Session.create(**config)
+    return session
+
 # Use stripe to immediately buy the product
 @api_bp.route('/transaction/buy', methods=['POST'])
 def product_buy():
@@ -283,35 +350,7 @@ def product_buy():
 
     id = form.id.data
     quantity = form.quantity.data
-    items = []
-
-    with app.app_context():
-        db = get_db()
-        product = db.get_entry_by_id("products", id)
-        item = {
-            "price_data": {
-                "currency": "aud",
-                "product_data": {
-                    "name": product["name"],
-                    "metadata": {
-                        "db_id": product["id"],
-                    },
-                },
-                "unit_amount": int(100*product["unit_price"]),
-            },
-            "quantity": quantity,
-        }
-        items.append(item)
-    
-    config = dict(
-        payment_method_types=['card'],
-        line_items=items,
-        mode='payment',
-        success_url="http://localhost:5002/checkout_status?session_id={CHECKOUT_SESSION_ID}&success=true",
-        cancel_url="http://localhost:5002/checkout_status?session_id={CHECKOUT_SESSION_ID}&success=false",
-    )
-
-    session = stripe.checkout.Session.create(**config)
+    session = create_stripe_session([(id, quantity)])
     return redirect(session.url, code=303)
 
 # Setups stripe and redirects the user there
@@ -320,39 +359,11 @@ def product_buy():
 @user_bp.route('/checkout', methods=['POST'])
 def cart_checkout():
     cart = get_user_cart()
-    items = []
-
-    with app.app_context():
-        db = get_db()
-        for id, quantity in cart.to_list():
-            product = db.get_entry_by_id("products", id)
-            item = {
-                "price_data": {
-                    "currency": "aud",
-                    "product_data": {
-                        "name": product["name"],
-                        "metadata": {
-                            "db_id": product["id"],
-                        },
-                    },
-                    "unit_amount": int(100*product["unit_price"]),
-                },
-                "quantity": quantity,
-            }
-            items.append(item)
-    
+    items = list(cart.to_list())
     if len(items) == 0:
         abort(403)
 
-    config = dict(
-        payment_method_types=['card'],
-        line_items=items,
-        mode='payment',
-        success_url="http://localhost:5002/checkout_status?session_id={CHECKOUT_SESSION_ID}&success=true",
-        cancel_url="http://localhost:5002/checkout_status?session_id={CHECKOUT_SESSION_ID}&success=false",
-    )
-
-    session = stripe.checkout.Session.create(**config)
+    session = create_stripe_session(items)
     return redirect(session.url, code=303)
 
 # when stripe succeeds, it goes to this page
@@ -371,8 +382,9 @@ def checkout_status():
     except KeyError as ex:
         print(ex)
         abort(403)
-    
+
     is_success = True if is_success == 'true' else False
+    print(f"Checkout completed with success={is_success}")
 
     # get the product from the database
     # override the cost and quantity of the product with actual checkout price
@@ -396,7 +408,7 @@ def checkout_status():
             total_items += quantity
 
     data = dict(
-        success=is_success,
+        is_success=is_success,
         products=products, 
         summary=dict(total_items=total_items, total_cost=total_cost))
 
