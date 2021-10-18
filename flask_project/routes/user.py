@@ -165,16 +165,16 @@ def profile_orders():
             {
                 "time_placed": datetime.datetime.now(),
                 "delivery_date": datetime.datetime.now(),
-                "products": [db.get_entry_by_id("products", i) for i in range(1,5)]
+                "products": list(filter(lambda x: x is not None, (db.get_entry_by_id("products", i) for i in range(1,5)))),
             },
             {
                 "time_placed": datetime.datetime.now(),
-                "products": [db.get_entry_by_id("products", i) for i in range(10,12)]
+                "products": list(filter(lambda x: x is not None, (db.get_entry_by_id("products", i) for i in range(10,12)))),
             },
             {
                 "cancelled": True,
                 "time_placed": datetime.datetime.now(),
-                "products": [db.get_entry_by_id("products", i) for i in range(14,15)]
+                "products": list(filter(lambda x: x is not None, (db.get_entry_by_id("products", i) for i in range(14,15)))),
             },
         ]
     return render_template('orders.html', orders=orders)

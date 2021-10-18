@@ -19,6 +19,7 @@
   </nav>
 </div>
 
+<!--Cart-->
 <div class="container-fluid">
   <div class="row mx-4 justify-content-center">
     <!--Cart items-->
@@ -41,9 +42,9 @@
           <p class="text-start text-bottom">{{ p.description }}</p>
         </div>
         <!--Product cost and quantity control-->
-        <div class="col-md-3 py-2 me-3 text-end">
+        <div class="col-md-3 py-2 me-3 text-end" id="cart-controls">
           <div class="row text-end">
-            <p class="text-end"><strong class="text-end">{{ "$%.2f"|format(p.unit_price) }}</strong></p>
+            <p class="text-end pe-0"><strong class="text-end">{{ "$%.2f"|format(p.unit_price) }}</strong></p>
           </div>
           <!--Quantity editing form-->
           <div class="row">
@@ -51,9 +52,16 @@
               <input type="hidden" id="product_id" name="id" value="{{ p.id }}">
               <div class="form-group row">
                 <label class="col text-center" for="quantity">Quantity</label>
-                <input class="col form-control" type="number" min="0" max="99" id="quantity" name="quantity" value={{ p.quantity }}> 
+                <input class="col form-control" type="number" min="1" max="99" id="quantity" name="quantity" value={{ p.quantity }}> 
               </div>
             </form>
+          </div>
+          <!--Product deletion link-->
+          <div class="row justify-content-end text-end">
+            <div 
+              class="col-auto btn btn-link text-danger text-decoration-none pe-0" 
+              data-bs-toggle="modal" data-bs-target="#cart-product-delete-modal"
+              data-bs-product-id="{{ p.id }}" data-bs-product-name="{{ p.name }}">Delete this item</div>
           </div>
         </div>
       </div>
@@ -77,7 +85,26 @@
       </div>
     </div>
   </div>
-  
+</div>
+
+<!--Delete product confirmation modal-->
+<div class="modal fade" id="cart-product-delete-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Product Removal</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        Are you sure you want to remove the following from your cart? <br>
+        <strong>"<span id="product-name"></span>"</strong>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
+        <button type="button" id="delete-cart-product" class="btn btn-danger" data-bs-dismiss="modal">Yes</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 {% endblock %}

@@ -3,9 +3,28 @@ $('document').ready(() => {
     let el_total_items = $("#cart-summary-total-items");
     let el_cart_count = $("#navbar-cart-count");
 
+    // handle modal when confirming product deletion
+    $("#cart-product-delete-modal").on('show.bs.modal', function (ev) {
+        // we pass in a callback to continue form submission
+        let button = $(ev.relatedTarget);
+        let product_name = button.attr("data-bs-product-name");
+
+        let description = $(this).find("#product-name");
+        let confirm_btn = $(this).find("#delete-cart-product");
+
+        description.html(product_name);
+        confirm_btn.on("click", () => {
+            // find form and edit value and submit
+            let form = button.parents("#cart-controls:first").find("form");
+            let quantity = form.find("input[name='quantity']");
+            quantity.val(0)
+            form.submit();
+        });
+    });
+    
     // on quantity change, submit changes
-    $('.quantity_form').find('input[id="quantity"]').change(ev => {
-        let input = $(ev.currentTarget);
+    $('.quantity_form').find('input[id="quantity"]').change(function(ev) {
+        let input = $(this);
         let form = input.parents('form:first');
         form.submit();
     });
@@ -43,7 +62,6 @@ $('document').ready(() => {
             // if item was deleted, then remove entry
             if (quantity == 0) {
                 let product_entry = form.parents(".cart-product:first");
-                console.log(product_entry);
                 product_entry.remove();
             // update entry quantity
             } else {

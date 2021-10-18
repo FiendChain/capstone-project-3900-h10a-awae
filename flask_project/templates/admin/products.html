@@ -23,8 +23,8 @@ $('document').ready(function () {
     ev.preventDefault();
 
     let btn = $(this);
-    let url = btn.attr("url");
-    let row_id = btn.parents("tr").first().attr("id");
+    let url = btn.attr("data-bs-product-url");
+    let row_id = btn.attr("data-bs-product-id");
 
     $.ajax({
       url, type: 'POST',
@@ -35,7 +35,21 @@ $('document').ready(function () {
     })
   });
 
+  // Update delete product modal dynamically
+  // The confirm button should contain information to delete product via ajax
+  $("#product-delete-modal").on('show.bs.modal', function (ev) {
+    let button = $(ev.relatedTarget);
 
+    let product_id = button.attr("data-bs-product-id");
+    let product_name = button.attr("data-bs-product-name");
+    let product_url = button.attr("data-bs-product-url");
+
+    let confirm_button = $(this).find("#product-remove");
+    confirm_button.attr("data-bs-product-id", product_id);
+    confirm_button.attr("data-bs-product-url", product_url);
+
+    $(this).find("#product-name").html(product_name);
+  });
 });
 </script>
 
@@ -61,42 +75,63 @@ $('document').ready(function () {
 
   <!--Product list--> 
   <table class="table table-hover" id="product-list">
-  <thead>
-    <tr>
-      <th scope="col">UID</th>
-      <th scope="col">Name</th>
-      <th scope="col">Price ($)</th>
-      <th scope="col">Category</th>
-      <th scope="col">Brand</th>
-      <th scope="col">Warranty</th>
-      <th scope="col">Est. Delivery</th>
-      <th scope="col">In Stock</th>
-      <th scope="col">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for p in products %}
-    <tr id="{{ p.id }}">
-      <th scope="row">{{ p.id }}</th>
-      <td>{{ p.name }}</td>
-      <td>{{ "$%.2f"|format(p.unit_price) }}</td>
-      <td>{{ p.category }}</td>
-      <td>{{ p.brand }}</td>
-      <td>{{ "%d"|format(p.warranty_days) }} days</td>
-      <td>{{ "%d"|format(p.delivery_days) }} days</td>
-      <td><span class="{{ 'text-success' if p.stock > 0 else 'text-danger' }}">{{ p.stock }}</span></td>
-      <td>
-        <div class="d-flex flex-row justify-content-end">
-          <a class="mx-1 btn btn-sm btn-outline-primary" href="{{ url_for("user_bp.product_page", id=p.id) }}">Details</a>
-          <a class="mx-1 btn btn-sm btn-outline-primary" href="{{ url_for("admin_bp.edit_product", id=p.id) }}">Edit</a>
-          <div 
-            class="ms-1 btn btn-sm btn-danger" id="product-remove" 
-            url="{{ url_for("admin_api_bp.delete_product", id=p.id) }}">Remove</div>
-        </div>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+    <thead>
+      <tr>
+        <th scope="col">UID</th>
+        <th scope="col">Name</th>
+        <th scope="col">Price ($)</th>
+        <th scope="col">Category</th>
+        <th scope="col">Brand</th>
+        <th scope="col">Warranty</th>
+        <th scope="col">Est. Delivery</th>
+        <th scope="col">In Stock</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in products %}
+      <tr id="{{ p.id }}">
+        <th scope="row">{{ p.id }}</th>
+        <td>{{ p.name }}</td>
+        <td>{{ "$%.2f"|format(p.unit_price) }}</td>
+        <td>{{ p.category }}</td>
+        <td>{{ p.brand }}</td>
+        <td>{{ "%d"|format(p.warranty_days) }} days</td>
+        <td>{{ "%d"|format(p.delivery_days) }} days</td>
+        <td><span class="{{ 'text-success' if p.stock > 0 else 'text-danger' }}">{{ p.stock }}</span></td>
+        <td>
+          <div class="d-flex flex-row justify-content-end">
+            <a class="mx-1 btn btn-sm btn-outline-primary" href="{{ url_for("user_bp.product_page", id=p.id) }}">Details</a>
+            <a class="mx-1 btn btn-sm btn-outline-primary" href="{{ url_for("admin_bp.edit_product", id=p.id) }}">Edit</a>
+            <div 
+              class="ms-1 btn btn-sm btn-danger" 
+              data-bs-toggle="modal" data-bs-target="#product-delete-modal"
+              data-bs-product-id="{{ p.id }}" data-bs-product-name="{{ p.name }}" 
+              data-bs-product-url="{{ url_for("admin_api_bp.delete_product", id=p.id) }}">Remove</div>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!--Delete product confirmation modal-->
+<div class="modal fade" id="product-delete-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Product Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        Are you sure you want to delete <strong>"<span id="product-name"></span>"</strong>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
+        <button type="button" class="btn btn-danger" id="product-remove" data-bs-dismiss="modal">Yes</button>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}
