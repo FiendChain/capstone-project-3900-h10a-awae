@@ -1,13 +1,10 @@
 from flask import json, redirect, request, render_template, url_for, abort, jsonify
-from flask import Blueprint
+
+from server import app, get_db
+from .endpoints import admin_bp, admin_api_bp
 
 from .forms import ProductForm, serialize_form
-from .temp_db import db, InvalidFileExtension
 from .roles import admin_required
-from server import app, get_db
-
-admin_bp = Blueprint('admin_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
-admin_api_bp = Blueprint('admin_api_bp', __name__, static_folder='static', static_url_path='/static', template_folder='templates')
 
 @admin_bp.route('/', methods=['GET'])
 @admin_required
