@@ -27,12 +27,12 @@
             <div class="form-floating mb-3">
               <input type="text" class="form-control" id="{{ form.name.id }}" name="{{ form.name.id }}" placeholder="Enter username" minlength="5" maxlength="25" required>
               <label for="{{ form.name.id }}">Username</label>
-              <div class="invalid-feedback d-none" id="{{ form.name.id }}"></div>
+              <div class="invalid-feedback wtf-ajax-error d-none" id="{{ form.name.id }}"></div>
             </div>
             <div class="form-floating mb-3">
               <input type="password" class="form-control" id="{{ form.password.id }}" name="{{ form.password.id }}" placeholder="Password" minlength="5" maxlength="25" required>
               <label for="{{ form.password.id }}">Password</label>
-              <div class="invalid-feedback d-none" id="{{ form.password.id }}"></div>
+              <div class="invalid-feedback wtf-ajax-error d-none" id="{{ form.password.id }}"></div>
             </div>
             <div class="checkbox align-items-center mb-3">
               <label>

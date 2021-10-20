@@ -1,27 +1,43 @@
 
+from flask.app import Flask
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField, FileRequired
 from flask_uploads import UploadSet, IMAGES, configure_uploads
 
 from wtforms import StringField, IntegerField, FloatField, SubmitField
-from wtforms import validators
 from wtforms.fields.core import BooleanField
 from wtforms.fields.simple import HiddenField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import Email, EqualTo, InputRequired, Length, NumberRange, AnyOf, Optional, ValidationError
+from wtforms.validators import Email, EqualTo, InputRequired, Length, NumberRange, AnyOf, Optional, Regexp, ValidationError
 from wtforms.widgets.core import Input
 
 import phonenumbers
 import os
+import re
 
 from server import app
 
+# convert a wtform to a json response object
+# used for form validation
+def serialize_form(form):
+    data = [] 
+    for field in form:
+        name = field.id
+        value = field.data
+        errors = field.errors
+
+        if isinstance(field, FileField):
+            continue
+
+        data.append({"name": name, "errors": errors})
+
+    return data
 
 # TODO: Find a better place to put this
-
 # valid_product_sort = ["price_low_to_high", "price_high_to_low"]
 valid_delivery_units = ["days", "weeks", "months", "years"]
 valid_images = UploadSet('images', IMAGES)
+valid_states = ["New South Wales", "Western Australia", "Northern Territory", "South Australia", "Queensland", "Victoria", "Tasmania", "ACT"]
 
 configure_uploads(app, (valid_images,))
 
@@ -121,16 +137,38 @@ class ProductSearchParams(FlaskForm):
     categories = StringField(Optional(), default="")
     sort_type = StringField(Optional(), default="price_low_to_high")
 
-def serialize_form(form):
-    data = [] 
-    for field in form:
-        name = field.id
-        value = field.data
-        errors = field.errors
+# form for card validation
+class PaymentCardForm(FlaskForm):
+    cc_name = StringField(
+        validators=[
+            Length(5, 50),
+            InputRequired("Card name is required"),
+        ]
+    )
 
-        if isinstance(field, FileField):
-            continue
+    cc_number = StringField(
+        validators=[
+            # we include the spaces in the card number
+            Length(19,19, message="Card number must have 16 digits"),
+            Regexp(re.compile("(\d){4}\s(\d){4}\s(\d){4}\s(\d){4}"), "Card number has incorrect format"),
+            InputRequired("Card number is required")])
+    
+    cc_expiry = StringField(
+        validators=[
+            Length(7,7, message="Card expiry must be in the format MM / YY"),
+            Regexp(re.compile(r"(\d){2}\s\/\s(\d){2}"), message="Card expiry must be in the format MM / YY"),
+            InputRequired()])
+    
+    cc_cvc = StringField(
+        validators=[
+            Length(3,4, "Card CVC must be between 3 and 4 digits"), 
+            Regexp(re.compile("(\d){3,4}")),
+            InputRequired()]
+    )
 
-        data.append({"name": name, "value": value, "errors": errors})
-
-    return data
+    country = StringField(validators=[AnyOf(["Australia"]), InputRequired()])
+    address = StringField(validators=[Length(min=5), InputRequired()])
+    state = StringField(validators=[AnyOf(valid_states), InputRequired()])
+    zip_code = StringField(validators=[
+        Regexp(re.compile(r"(\d){4}"), message="Zip code must be 4 digits"), 
+        InputRequired()])

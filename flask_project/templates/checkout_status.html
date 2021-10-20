@@ -1,7 +1,11 @@
 {% extends 'base.html' %}
 
 {% block head %}
+{% if is_success %}
 <title>Checkout Successful</title>
+{% else %}
+<title>Checkout Cancelled</title>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -13,7 +17,11 @@
   <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
     <ol class="breadcrumb mb-2">
       <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
+      {% if is_success %}
       <li class="breadcrumb-item active">Checkout Success</li>
+      {% else %}
+      <li class="breadcrumb-item active">Checkout Cancelled</li>
+      {% endif %}
     </ol>
   </nav>
 </div>
@@ -24,7 +32,7 @@
     <!--Cart items-->
     <div class="col-8">
       <!--Success header on successful checkout-->
-      <div class="d-flex flex-row flex-nowrap py-0 border mb-3 py-3 justify-content-center text-center shadow-sm"> 
+      <div class="d-flex flex-row flex-nowrap py-0 border mb-3 py-3 justify-content-center text-center shadow-sm rounded"> 
         {% if is_success %}
         <h3 class="text-success">Checkout Successful<i class="bi bi-check-circle mx-2"></i></h3>
         {% else %}

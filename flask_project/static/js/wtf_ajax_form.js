@@ -1,6 +1,6 @@
 // A small jquery library for handling serialized wtform errors over ajax
 // For a form marked as wtf-ajax-form, we dynamically add in bootstrap validation 
-// For an input to display an error, it must have an associated div.invalid-feedback with id='input.name'
+// For an input to display an error, it must have an associated .wtf-ajax-error with id='input.name'
 
 // The expected wtform error response looks like
 // responseJSON = {
@@ -34,7 +34,7 @@ $("document").ready(function() {
 
         let el_sel = `[name='${name}']`;
         let el_input = form.find(el_sel);
-        let el_error = form.find(`div.invalid-feedback[id='${name}']`);
+        let el_error = form.find(`.wtf-ajax-error[id='${name}']`);
 
         // TODO: update input field value with wtform value
         

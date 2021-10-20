@@ -28,7 +28,7 @@
     <input type="checkbox" checked=false name="{{ image_changed_name }}" class="dropzone-dirty" required hidden>
     <!--Input that actually handles the drag and drop-->
     <input type="file" id="{{ image_name }}" name="{{ image_name }}" accept="image/*" class="dropzone-input">
-    <div id="{{ image_name }}" class="invalid-feedback d-none"></div>
+    <div id="{{ image_name }}" class="invalid-feedback wtf-ajax-error d-none"></div>
   </div>
 </div>
 {% endmacro %}
