@@ -37,7 +37,7 @@ def product_buy():
         summary=dict(total_cost=total_cost, total_items=total_items),
     )
 
-    return render_template("checkout.html", **data)
+    return render_template("checkout_status.html", **data)
 
 # handle checkout on cart checkout
 @user_bp.route("/checkout", methods=["POST"])
@@ -69,4 +69,4 @@ def checkout_status():
         products=products,
         summary=summary,
     )
-    return render_template("checkout.html", **data)
+    return render_template("checkout_status.html", **data)

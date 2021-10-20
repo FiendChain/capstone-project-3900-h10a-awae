@@ -160,7 +160,7 @@ def checkout_status():
 
     # TODO: Determine if this session belonged to the cart, and if it did empty it
     # cart.empty()
-    return render_template("checkout.html", **data)
+    return render_template("checkout_status.html", **data)
 
 # stripe webhook where we process sessions from our stripe api
 # TODO: Use the information here to update our customer's orders 
