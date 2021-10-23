@@ -3,9 +3,9 @@
 
 class FlaskUser(object):
     def __init__(self, username, authenticated, active, anonymous, id, admin):
-        self.username = username,
-        self.authenticated = authenticated,
-        self.active = active,
+        self.username = username
+        self.authenticated = authenticated
+        self.active = active
         self.anonymous = anonymous
         self.id = id    # Must be unicode
         self.admin = admin

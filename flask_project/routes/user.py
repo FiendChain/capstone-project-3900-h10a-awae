@@ -1,6 +1,6 @@
 """
-Routes for basic ecommerce functionalities
-This includes browsing and visitng product pages
+Routes for basic ecommerce functionalities available to register or unregistered users
+This includes browsing and visitng product pages and viewing orders
 """
 
 from flask import json, redirect, request, render_template, url_for, jsonify, abort, session
@@ -39,4 +39,9 @@ def search():
         sort_by = dict_sort_by[form.sort_type.data]
         products = db.search_product_by_name(form.name.data, form.categories.data, sort_by)
     return render_template('search.html', products=products, categories=valid_categories, form=form)
+
+@user_bp.route('/order/<string:id>', methods=['GET'])
+def order_page(id):
+    order = None 
+    return render_template('order.html', order=order)
 

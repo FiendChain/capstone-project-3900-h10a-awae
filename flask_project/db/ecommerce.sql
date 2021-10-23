@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS "users" (
   "password" text,
   "email" text,
   "phone" int,
-  "is_admin" int
+  "is_admin" int,
+  "is_authenticated" int
 );
 
 CREATE TABLE IF NOT EXISTS "products" (
