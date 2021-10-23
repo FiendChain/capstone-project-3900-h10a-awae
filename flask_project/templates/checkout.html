@@ -73,7 +73,7 @@ $("document").ready(function() {
     <!--Cart items-->
     <div class="col-6">
       <!--Our checkout items-->
-      {% for p in products %}
+      {% for p in checkout.products %}
       <div class="d-flex flex-row flex-nowrap py-0 border mb-1"> 
         <!--Product image-->
         <div class="col-3 ps-0">
@@ -103,7 +103,7 @@ $("document").ready(function() {
     </div>
     <!--Cart sidebar-->
     <div class="col-4">
-      <form role="form" class="wtf-ajax-form" id="payment-information" action="{{ url_for("api_bp.cart_checkout_billing", session_id=session_id) }}" method="POST">
+      <form role="form" class="wtf-ajax-form" id="payment-information" action="{{ url_for("api_bp.cart_checkout_billing", checkout_id=checkout_id) }}" method="POST">
       <!--Shipping form-->
       {{ form.csrf_token }}
       <div class="row">
@@ -188,7 +188,7 @@ $("document").ready(function() {
       <!--Pay now button-->
       <div class="row mt-3">
         <button type="submit" class="btn btn-success">
-          <strong>Pay ${{ "%.2f"|format(summary.total_cost) }}</strong>
+          <strong>Pay ${{ "%.2f"|format(checkout.total_cost) }}</strong>
         </button>
       </div>
       </form>
