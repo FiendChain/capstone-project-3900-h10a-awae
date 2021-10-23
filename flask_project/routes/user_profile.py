@@ -14,7 +14,6 @@ import datetime
 
 # User account
 @user_bp.route('/profile', methods=["GET"])
-@login_required
 def profile():
     return render_template("profile.html")
 

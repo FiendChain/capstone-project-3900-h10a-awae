@@ -114,40 +114,38 @@ $("document").ready(function() {
           <div class="btn btn-link btn-sm" id="prefill-shipping-default">Use default</div>
         </div>
       </div>
-      <div class="row mx-1">
-        <div class="row">
-          <div class="col input-group px-0">
-            <select type="text" name="{{ form.country.id }}" id="{{ form.country.id }}" class="form-select" placeholder="Country" required>
-              <option value="Australia" selected>Australia</option>
-            </select>
-            <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.country.id }}"></div>
-          </div>
+      <div class="row">
+        <div class="col input-group px-0">
+          <select type="text" name="{{ form.country.id }}" id="{{ form.country.id }}" class="form-select" placeholder="Country" required>
+            <option value="Australia" selected>Australia</option>
+          </select>
+          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.country.id }}"></div>
         </div>
-        <div class="row">
-          <div class="col input-group px-0">
-            <input type="text" name="{{ form.address.id }}" id="{{ form.address.id }}" class="form-control" placeholder="Address" required>
-            <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.address.id }}"></div>
-          </div>
+      </div>
+      <div class="row">
+        <div class="col input-group px-0">
+          <input type="text" name="{{ form.address.id }}" id="{{ form.address.id }}" class="form-control" placeholder="Address" required>
+          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.address.id }}"></div>
         </div>
-        <div class="row">
-          <div class="col input-group px-0">
-            <select type="text" name="{{ form.state.id }}" id="{{ form.state.id }}" class="form-select" placeholder="State" required>
-              <option value="New South Wales" selected>New South Wales</option>
-              <option value="Northern Territory">Northern Territory</option>
-              <option value="Western Australia">Western Australia</option>
-              <option value="South Australia">South Australia</option>
-              <option value="Queensland">Queensland</option>
-              <option value="Tasmania">Tasmania</option>
-              <option value="ACT">ACT</option>
-            </select>
-            <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.state.id }}"></div>
-          </div>
+      </div>
+      <div class="row">
+        <div class="col input-group px-0">
+          <select type="text" name="{{ form.state.id }}" id="{{ form.state.id }}" class="form-select" placeholder="State" required>
+            <option value="New South Wales" selected>New South Wales</option>
+            <option value="Northern Territory">Northern Territory</option>
+            <option value="Western Australia">Western Australia</option>
+            <option value="South Australia">South Australia</option>
+            <option value="Queensland">Queensland</option>
+            <option value="Tasmania">Tasmania</option>
+            <option value="ACT">ACT</option>
+          </select>
+          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.state.id }}"></div>
         </div>
-        <div class="row">
-          <div class="col input-group px-0">
-            <input type="text" name="{{ form.zip_code.id }}" id="{{ form.zip_code.id }}" class="form-control" placeholder="Zip Code" minlength="4" maxlength="4" required>
-            <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.zip_code.id }}"></div>
-          </div>
+      </div>
+      <div class="row">
+        <div class="col input-group px-0">
+          <input type="text" name="{{ form.zip_code.id }}" id="{{ form.zip_code.id }}" class="form-control" placeholder="Zip Code" minlength="4" maxlength="4" required>
+          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.zip_code.id }}"></div>
         </div>
       </div>
 

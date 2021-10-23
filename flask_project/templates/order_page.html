@@ -8,6 +8,10 @@
 {% include 'user_navbar.html' %}
 <script src="/static/js/cart.js"></script>
 
+{% macro text_item(name, description) %}
+<div class="d-flex flex-nowrap"><strong class="mx-1">{{ name }}: </strong>{{ description }}</div>
+{% endmacro %}
+
 <!--Breadcrumb-->
 <div class="container-fluid justify-content-md-center text-center border-bottom pb-0 mb-3">
   <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
@@ -24,7 +28,7 @@
 <div class="container">
   <div class="row mx-4 justify-content-center">
     <!--Cart items-->
-    <div class="col-8">
+    <div class="col-7">
       <!--Success header on successful checkout-->
       <div class="d-flex flex-row flex-nowrap py-0 border mb-3 py-3 justify-content-center text-center shadow-sm rounded"> 
         <h3 class="text-success">Order Successful</h3>
@@ -92,8 +96,34 @@
         <div class="card-body">
           <h6 class="card-title border-bottom pb-2">Checkout Details</h6>
           <div class="card-text">
-            <div class="d-flex flex-nowrap"><strong class="mx-1">Total cost: </strong>${{ "%.2f"|format(order.total_cost) }}</div>
-            <div class="d-flex flex-nowrap"><strong class="mx-1">Total items: </strong>{{ order.total_items }}</div>
+            {{ text_item("Total cost", "${0:.2f}".format(order.total_cost)) }}
+            {{ text_item("Total items", order.total_items) }}
+          </div>
+        </div>
+      </div>
+
+      <!--Payment details-->
+      <div class="d-flex flex-row flex-nowrap card mb-3">
+        <div class="card-body">
+          <h6 class="card-title border-bottom pb-2">Payment Details</h6>
+          <div class="card-text">
+            {{ text_item("Name", order.payment.name) }}
+            {{ text_item("Credit Card", order.payment.number) }}
+            {{ text_item("Expiry", order.payment.expiry) }}
+            {{ text_item("CVC", order.payment.cvc) }}
+          </div>
+        </div>
+      </div>
+
+      <!--Billing details-->
+      <div class="d-flex flex-row flex-nowrap card mb-3">
+        <div class="card-body">
+          <h6 class="card-title border-bottom pb-2">Billing Details</h6>
+          <div class="card-text">
+            {{ text_item("Address", order.billing.address) }}
+            {{ text_item("Country", order.billing.country) }}
+            {{ text_item("State", order.billing.state) }}
+            {{ text_item("Zip Code", order.billing.zip_code) }}
           </div>
         </div>
       </div>
