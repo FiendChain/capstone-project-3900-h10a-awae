@@ -41,7 +41,7 @@ def profile_edit_login_security():
             user = db.get_entry_by_id("users", id)
             if not db.validate_user(user["username"], form.password.data): # If entered password does not match password in database, return error
                 form.password.errors.append("Incorrect password")
-                return jsonify(serialize_form(form)), 403
+                return jsonify(serialize_form(form)), 400
 
             # Create new user tuple and update old entry in db
             print("new password: ", form.new_password.data)
@@ -51,7 +51,7 @@ def profile_edit_login_security():
             user_new = (user["id"], user["username"], form.new_password.data, form.email.data, form.phone.data, user["is_admin"])
             db.update("users", user_old, user_new)
         return jsonify(dict(redirect=url_for("user_bp.profile")))
-    return jsonify(serialize_form(form)), 403
+    return jsonify(serialize_form(form)), 400
 
 @user_bp.route('/profile/orders', methods=['GET'])
 @login_required

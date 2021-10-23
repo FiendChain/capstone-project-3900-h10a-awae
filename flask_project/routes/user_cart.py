@@ -35,11 +35,11 @@ def cart():
 def product_add():
     form = UserPurchaseForm(meta=dict(csrf=False))
     if not form.validate_on_submit():
-        return jsonify(serialize_form(form)), 403
+        return jsonify(serialize_form(form)), 400
 
     if not validate_product_id(form.id.data):
         form.id.errors.append("Invalid product id")
-        return jsonify(serialize_form(form)), 403
+        return jsonify(serialize_form(form)), 400
 
     cart = get_user_cart()
     cart.add_product(form.id.data, form.quantity.data)
@@ -51,11 +51,11 @@ def product_add():
 def product_update():
     form = UserPurchaseForm(meta=dict(csrf=False))
     if not form.validate_on_submit():
-        return jsonify(serialize_form(form)), 403
+        return jsonify(serialize_form(form)), 400
     
     if not validate_product_id(form.id.data):
         form.id.errors.append("Invalid product id")
-        return jsonify(serialize_form(form)), 403
+        return jsonify(serialize_form(form)), 400
 
     cart = get_user_cart()
     cart.update_product(form.id.data, form.quantity.data)

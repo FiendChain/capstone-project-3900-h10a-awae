@@ -37,7 +37,7 @@ def add_product():
     form = ProductForm()
 
     if not form.validate_on_submit():
-        return jsonify(serialize_form(form)), 403
+        return jsonify(serialize_form(form)), 400
 
     print(f"Adding product: {form}")
 
@@ -81,7 +81,7 @@ def edit_product(id):
 
     form = ProductForm()
     if not form.validate_on_submit():
-        return jsonify(serialize_form(form)), 403
+        return jsonify(serialize_form(form)), 400
 
     print(f"Editing product: {form}")
     with app.app_context():

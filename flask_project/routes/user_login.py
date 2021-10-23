@@ -37,7 +37,7 @@ def login():
     form = LoginForm()
 
     if not form.validate_on_submit():
-        return jsonify(serialize_form(form)), 403
+        return jsonify(serialize_form(form)), 400
 
     if form.validate_on_submit():
         username = form.name.data
@@ -56,7 +56,7 @@ def login():
             else:
                 form.name.errors.append("Invalid credentials")
                 form.password.errors.append("Invalid credentials")
-                return jsonify(serialize_form(form)), 403
+                return jsonify(serialize_form(form)), 400
 
 # Perform registration validation
 @api_bp.route("/register", methods=["POST"])
@@ -70,7 +70,7 @@ def register():
                 db.add("users", user_data)
             except Exception as e:
                 form.username.errors.append("Username already taken")
-                return jsonify(serialize_form(form)), 403
+                return jsonify(serialize_form(form)), 400
 
             print(f"User registered: {serialize_form(form)}")
 
@@ -80,7 +80,7 @@ def register():
             login_user(flask_user, remember=form.remember_me.data)
             return jsonify(dict(redirect=url_for("user_bp.home")))
     
-    return jsonify(serialize_form(form)), 403
+    return jsonify(serialize_form(form)), 400
 
 # Make sure a user is either given a guest account or is already logged in
 @app.before_request

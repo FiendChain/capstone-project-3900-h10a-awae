@@ -19,14 +19,14 @@ def seed_checkout_sessions():
     with app.app_context():
         id = "502d78b0-2025-4163-a873-3c1a25a25a60" 
         db = get_db()
-        checkout_db.create_checkout(items, db, None, checkout_id=id)
+        checkout_db.create_checkout(items, db, chr(1), checkout_id=id)
 
 # handle checkout on instant buy
 @api_bp.route('/transaction/buy', methods=['POST'])
 def product_buy():
     form = UserPurchaseForm(meta=dict(csrf=False))
     if not form.validate_on_submit():
-        return jsonify(serialize_form(form)), 403
+        return jsonify(serialize_form(form)), 400
     
     id = form.id.data
     quantity = form.quantity.data
@@ -84,11 +84,11 @@ def cart_checkout_billing(checkout_id):
 def cart_checkout_billing(checkout_id):
     form = PaymentCardForm()
     if not form.validate_on_submit():
-        return jsonify(serialize_form(form)), 403
+        return jsonify(serialize_form(form)), 400
     
     if form.cc_name.data != "Hugh Mungus":
         form.cc_name.errors.append("Your name must be Hugh Mungus")
-        return jsonify(serialize_form(form)), 403
+        return jsonify(serialize_form(form)), 400
     
     #TODO: Assign a the checkout session an order id
     with app.app_context():

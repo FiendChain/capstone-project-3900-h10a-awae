@@ -88,11 +88,11 @@ def create_stripe_session(cart):
 def product_buy():
     form = UserPurchaseForm(meta=dict(csrf=False))
     if not form.validate_on_submit():
-        return jsonify(serialize_form(form)), 403
+        return jsonify(serialize_form(form)), 400
     
     if not validate_product_id(form.id.data):
         form.id.errors.append("Invalid product id")
-        return jsonify(serialize_form(form)), 403
+        return jsonify(serialize_form(form)), 400
 
     id = form.id.data
     quantity = form.quantity.data
@@ -107,7 +107,7 @@ def cart_checkout():
     cart = get_user_cart()
     items = list(cart.to_list())
     if len(items) == 0:
-        abort(403)
+        abort(400)
 
     session = create_stripe_session(items)
     return redirect(session.url, code=303)
@@ -124,10 +124,10 @@ def checkout_status():
         line_items = stripe.checkout.Session.list_line_items(session_id, limit=100)
     except stripe.error.InvalidRequestError as ex:
         print("Customer tried to access checkout successful without session")
-        abort(403)
+        abort(400)
     except KeyError as ex:
         print(ex)
-        abort(403)
+        abort(400)
 
     is_success = True if is_success == 'true' else False
     print(f"Checkout completed with success={is_success}")

@@ -7,8 +7,8 @@
 //    'bad_field' : {name:'field.name', value: 'field.value', 'errors': ['An error', 'Another error']},
 //    'good_field': {name:'field.name', value: 'field.value', 'errors': []},
 // }
-// status_code = 403 (Must be this to show errors on the form)
-// If the status code is not 403, then we refresh the page
+// status_code = 400 (Must be this to show errors on the form)
+// If the status code is not 400, then we refresh the page
 
 // On a successful form submission, wtform expects the following to redirect
 // If the responseJSON doesn't have a redirect field, then we just reload the page
@@ -63,7 +63,7 @@ $("document").ready(function() {
 
     // if we got an error, check to see if it is a form error
     function on_error(xhr, options, error) {
-      if (xhr.status == 403) {
+      if (xhr.status == 400) {
         update_from_ajax(xhr.responseJSON);
       } else {
         location.reload();
