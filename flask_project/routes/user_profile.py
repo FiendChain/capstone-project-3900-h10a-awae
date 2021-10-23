@@ -52,26 +52,3 @@ def profile_edit_login_security():
             db.update("users", user_old, user_new)
         return jsonify(dict(redirect=url_for("user_bp.profile")))
     return jsonify(serialize_form(form)), 400
-
-@user_bp.route('/profile/orders', methods=['GET'])
-@login_required
-def profile_orders():
-    with app.app_context():
-        db = get_db()
-        orders = [
-            {
-                "time_placed": datetime.datetime.now(),
-                "delivery_date": datetime.datetime.now(),
-                "products": list(filter(lambda x: x is not None, (db.get_entry_by_id("products", i) for i in range(1,5)))),
-            },
-            {
-                "time_placed": datetime.datetime.now(),
-                "products": list(filter(lambda x: x is not None, (db.get_entry_by_id("products", i) for i in range(10,12)))),
-            },
-            {
-                "cancelled": True,
-                "time_placed": datetime.datetime.now(),
-                "products": list(filter(lambda x: x is not None, (db.get_entry_by_id("products", i) for i in range(14,15)))),
-            },
-        ]
-    return render_template('orders.html', orders=orders)

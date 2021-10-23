@@ -11,7 +11,8 @@ from .forms import UserPurchaseForm, PaymentCardForm, serialize_form
 from .cart import  get_user_cart
 
 from classes.checkout import CheckoutExpired, CheckoutAlreadyCompleted
-from db.checkout_db import checkout_db
+from classes.order import Order, Payment, Billing
+from db.checkout_db import checkout_db, order_db
 
 @app.before_first_request
 def seed_checkout_sessions():
@@ -66,7 +67,7 @@ def cart_checkout_billing(checkout_id):
         abort(403)
     
     if checkout.is_completed:
-        return redirect(url_for("user_bp.checkout_status", checkout_id=checkout_id))
+        return redirect(url_for("user_bp.order_page", id=checkout.order_id))
 
     # TODO: Prefill with user details if available
     form = PaymentCardForm()
@@ -83,14 +84,10 @@ def cart_checkout_billing(checkout_id):
 @api_bp.route("/checkout_billing/<string:checkout_id>", methods=["POST"])
 def cart_checkout_billing(checkout_id):
     form = PaymentCardForm()
+    #TODO: Add additional payment validation here 
     if not form.validate_on_submit():
         return jsonify(serialize_form(form)), 400
-    
-    if form.cc_name.data != "Hugh Mungus":
-        form.cc_name.errors.append("Your name must be Hugh Mungus")
-        return jsonify(serialize_form(form)), 400
-    
-    #TODO: Assign a the checkout session an order id
+
     with app.app_context():
         db = get_db()
         try:
@@ -105,34 +102,25 @@ def cart_checkout_billing(checkout_id):
     if checkout.user_id != current_user.get_id():
         abort(404)
 
-    try: 
-        # TODO: replace with db id
-        checkout.order_id = 1
-    except CheckoutAlreadyCompleted:
-        # just redirect to checkout status page
-        pass
+    # if order already exists
+    if checkout.order_id is not None:
+        res =  dict(redirect=url_for("user_bp.order_page", id=checkout.order_id))
+        return jsonify(res), 200
 
-    res =  dict(redirect=url_for("user_bp.checkout_status", checkout_id=checkout_id))
+    # create order and redirect
+    payment = Payment(
+        form.cc_name.data, form.cc_number.data, 
+        form.cc_expiry.data, form.cc_cvc.data)
+    
+    billing = Billing(
+        form.country.data, form.address.data,
+        form.state.data, form.zip_code.data
+    )
+
+    order = Order(current_user.get_id(), checkout.products, payment, billing)
+    order_id = order_db.add_order(order)
+    checkout.order_id = order_id
+
+    res =  dict(redirect=url_for("user_bp.order_page", id=order_id))
     return jsonify(res), 200
 
-
-# checkout status page
-@user_bp.route("/checkout_status/<string:checkout_id>", methods=["GET"])
-def checkout_status(checkout_id):
-    with app.app_context():
-        db = get_db()
-        try:
-            checkout = checkout_db.get_checkout(checkout_id, db)
-        except KeyError as ex:
-            abort(404)
-        except CheckoutExpired as ex:
-            abort(404)
-
-    if checkout.user_id != current_user.get_id():
-        abort(403)
-
-    data = dict(
-        is_success=True,
-        checkout=checkout
-    )
-    return render_template("checkout_status.html", **data)

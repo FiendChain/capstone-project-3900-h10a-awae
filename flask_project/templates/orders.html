@@ -49,7 +49,7 @@
   </ul>
 
   <!--Render an order-->
-  {% for order in orders %}
+  {% for order_id, order in orders %}
   <div class="row card mb-3 shadow-sm">
     <div class="card-header">
       <span>Order placed: {{ order.time_placed.strftime("%d %b %y") }}</span>
@@ -99,7 +99,7 @@
               <!--Quantity-->
               <div class="mt-1 row justify-content-end text-end">
                 <div class="ms-auto">
-                  <span class="badge bg-danger text-end rounded-pill">x{{ 10 }}</span>
+                  <span class="badge bg-danger text-end rounded-pill">x{{ p.quantity }}</span>
                 </div>
               </div>
             </div>
@@ -143,7 +143,7 @@
           <!--Order controls-->
           <div class="d-block text-center">
             <div class="btn btn-primary w-100 mb-1">Buy again</div>
-            <div class="btn btn-outline-primary w-100 mb-1">View order details</div>
+            <a class="btn btn-outline-primary w-100 mb-1" href="{{ url_for("user_bp.order_page", id=order_id) }}">View order details</a>
             <div class="btn btn-outline-primary w-100">Confirm delivery</div>
           </div>
         </div>

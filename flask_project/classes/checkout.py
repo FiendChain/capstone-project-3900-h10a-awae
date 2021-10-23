@@ -16,6 +16,7 @@ class CheckoutAlreadyCompleted(Exception):
 # Checkout contains the items and total cost and number of items
 class Checkout:
     def __init__(self, products, user_id):
+        assert user_id is not None
         # each checkout has a list of products, and a user id
         self.products = products 
         self.user_id = user_id

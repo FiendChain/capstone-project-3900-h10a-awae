@@ -4,10 +4,14 @@ This includes browsing and visitng product pages and viewing orders
 """
 
 from flask import json, redirect, request, render_template, url_for, jsonify, abort, session
+from flask_login import current_user
 
 from server import app, get_db
 from .endpoints import user_bp, api_bp
 from .forms import ProductSearchParams, serialize_form
+
+from db.checkout_db import order_db
+import datetime
 
 # Product browsing
 @user_bp.route('/', methods=["GET", "POST"])
@@ -15,6 +19,7 @@ def home():
     with app.app_context():
         db = get_db()
         products = db.get_random_entries("products", 5)
+    
     return render_template("homepage.html", products=products)
 
 @user_bp.route('/products/<string:id>', methods=['GET'])
@@ -40,8 +45,25 @@ def search():
         products = db.search_product_by_name(form.name.data, form.categories.data, sort_by)
     return render_template('search.html', products=products, categories=valid_categories, form=form)
 
+@user_bp.route('/profile/orders', methods=['GET'])
+def profile_orders():
+    orders = order_db.get_orders_by_user_id(current_user.get_id())
+    print(orders)
+    return render_template('orders.html', orders=orders)
+
 @user_bp.route('/order/<string:id>', methods=['GET'])
 def order_page(id):
-    order = None 
-    return render_template('order.html', order=order)
+    order = order_db.get_order(id)
+    if order is None:
+        abort(404)
+    
+    if order.user_id != current_user.get_id():
+        abort(403)
+
+
+    data = dict(
+        is_success=True,
+        order=order,
+    )
+    return render_template("order_page.html", **data)
 
