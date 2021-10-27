@@ -92,6 +92,7 @@ def create_guest_account():
     # attempt to get guest id from session
     try:
         guest_id = session["guest_id"]
+        guest_id = ord(guest_id)
     except TypeError:
         guest_id = None
     except KeyError:
