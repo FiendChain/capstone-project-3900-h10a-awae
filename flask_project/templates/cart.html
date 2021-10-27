@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from "utility.html" import format_price %}
 
 {% block head %}
 <title>Cart</title>
@@ -22,45 +23,38 @@
 <div class="container">
   <div class="row mx-4 justify-content-center">
     <!--Cart items-->
-    <div class="col-8">
+    <div class="col-7">
       {% if not products %}
-      <div class="row justify-content-center text-center py-3 border shadow-sm">
+      <div class="row justify-content-center text-center py-3 rounded border">
         <h5>Cart is empty</h5>
       </div>
       {% endif %}
       {% for p in products %}
-      <div class="row cart-product w-100 border mb-2" id="{{ p.id }}">
-        <div class="col-md-2 thumbnail ps-0">
-          <img src="{{ p.image_url }}" class="product-img rounded img-fluid border">
+      <div class="row cart-product w-100 {{ 'border-bottom' if not loop.last }} mb-2" id="{{ p.id }}">
+        <div class="col-auto ps-0">
+          <img src="{{ p.image_url }}" class="rounded" width="150" height="150">
         </div>
         <!--Product info-->
-        <div class="col py-2 me-auto">
-          <a href="{{ url_for('user_bp.product_page', id=p.id) }}">
-            <p class="text-start my-0"><strong>{{ p.name }}</strong> in {{ p.category }}</p>
-          </a>
+        <div class="col py-3 me-auto">
+          <h5 class="mb-1"><a href="{{ url_for('user_bp.product_page', id=p.id) }}" class="text-dark text-link">{{ p.name }}</a></h5>
           <!--Stock status-->
-          {% if p.stock > 0 %}
-          <p class="text-start my-0 text-success">In stock</p>
-          {% else %}
-          <p class="text-start my-0 text-danger">Out of stock</p>
-          {% endif %}
-          <div class="d-flex flex-row fs-8">
-            <div class="col-auto me-1 badge badge-outline">Brand: {{ p.brand }}</div>
-            <div class="col-auto me-1 badge badge-outline">Est. Delivery: {{ p.delivery_days }} days</div>
+          <small>
+            <div>Brand: <strong>{{ p.brand }}</strong></div>
+            <div>Est. Delivery: <strong>{{ p.delivery_days }} days</strong></div>
+          </small>
+          <div class="mt-1">
+            <h5 class="text-primary align-bottom">{{ format_price(p.unit_price) }}</h5>
           </div>
         </div>
         <!--Product cost and quantity control-->
-        <div class="col-md-3 py-2 me-3 text-end" id="cart-controls">
-          <div class="row text-end">
-            <p class="text-end pe-0"><strong class="text-end fs-6">{{ "$%.2f"|format(p.unit_price) }}</strong></p>
-          </div>
+        <div class="col-md-3 py-3 me-3 text-end" id="cart-controls">
           <!--Quantity editing form-->
           <div class="row">
+            <div class="text-end px-0 pb-2">Quantity</div>
             <form class='quantity_form' id="{{ p.id }}" method='POST' action="{{ url_for('api_bp.product_update') }}">
               <input type="hidden" id="product_id" name="id" value="{{ p.id }}">
               <div class="form-group row justify-content-end">
-                <label class="col-auto me-0 text-end" for="quantity">Quantity</label>
-                <div class="col-4 px-0 text-end">
+                <div class="col-auto px-0 text-end">
                   <input class="form-control form-control-sm" type="number" min="1" max="99" id="quantity" name="quantity" value={{ p.quantity }}> 
                 </div>
               </div>
@@ -72,7 +66,7 @@
               class="col-auto btn btn-link text-danger text-decoration-none pe-0" 
               data-bs-toggle="modal" data-bs-target="#cart-product-delete-modal"
               data-bs-product-id="{{ p.id }}" data-bs-product-name="{{ p.name }}">
-              <small>Delete this item</small>
+              <small><i class="bi bi-x-circle me-1"></i>Remove</small>
             </div>
           </div>
         </div>
@@ -80,22 +74,28 @@
       {% endfor %}
     </div>
     <!--Cart sidebar-->
-    <div class="col-3">
+    <div class="col-4">
       <!--Details of cost-->
-      <div class="d-flex flex-row flex-nowrap card mb-3">
-        <div class="card-body">
-          <h6 class="card-title border-bottom pb-2">Checkout Details</h6>
-          <div class="card-text">
-            <div class="d-flex flex-nowrap"><strong class="mx-1">Total cost: </strong>$<span id="cart-summary-total-cost">{{ "%.2f"|format(summary.total_cost) }}</span></div>
-            <div class="d-flex flex-nowrap"><strong class="mx-1">Total items: </strong><span id="cart-summary-total-items">{{ summary.total_items }}</span></div>
-          </div>
+      <div class="shadow-sm rounded mb-3 p-4">
+        <div class="text-center">
+          <h6>Subtotal</h6>
+          <h4>
+            <span id="cart-summary-total-cost">{{ format_price(summary.total_cost) }}</span>
+          </h4>
         </div>
-      </div>
-      <!--Buy now button-->
-      <div class="d-block flex-row flex-nowrap">
-        <form action="{{ url_for("user_bp.cart_checkout") }}" method="POST">
-          <button type="submit" class="btn btn-success w-100" {{ "disabled" if not products }}>Proceed to checkout</a>
+        <form class="wtf-ajax-form text-start">
+          <div class="form-group mb-3">
+            <label for="promo_code"><small>Promo Code</small></label>
+            <input type="text" class="form-control" id="promo_code" name="promo_code" placeholder="Enter code" minlength="6" maxlength="6" required>
+            <div class="invalid-feedback wtf-ajax-error d-none" id="promo_code"></div>
+          </div>
         </form>
+        <!--Buy now button-->
+        <div>
+          <form action="{{ url_for("user_bp.cart_checkout") }}" method="POST">
+            <button type="submit" class="btn btn-success w-100" {{ "disabled" if not products }}>Proceed to checkout</a>
+          </form>
+        </div>
       </div>
     </div>
   </div>

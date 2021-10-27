@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from "utility.html" import format_price %}
 
 {% block head %}
 <title>Cafe AWAE Products</title>
@@ -18,12 +19,14 @@ $("document").ready(function () {
 })
 </script>
 
+<form action="{{ url_for("user_bp.search") }}" method='POST' id="product-search-form">
+  {{ form.csrf_token }}
+</form>
+
 <!--Homepage-->
 <div class="container-fluid">
   <!--Products-->
-  <div class="container-fluid w-75">
-    <form action="{{ url_for("user_bp.search") }}" method='POST' id="product-search-form">
-      {{ form.csrf_token }}
+  <div class="container-fluid px-4">
       <!--Sort controls-->
       <div class="row my-2 justify-content-between">
         <!--Search description-->
@@ -36,7 +39,10 @@ $("document").ready(function () {
             <div class="input-group-prepend">
               <span class="input-group-text" id="">Sort by</span>
             </div>
-            <select class="form-select" id="{{ form.sort_type.id }}" name="{{ form.sort_type.id }}">
+            <select 
+              class="form-select" id="{{ form.sort_type.id }}" name="{{ form.sort_type.id }}" 
+              form="product-search-form"
+              onchange="this.form.submit()">
               <option value="price_low_to_high" {{ 'selected' if form.sort_type.data == 'price_low_to_high' }}>Price (Low to High)</option>
               <option value="price_high_to_low" {{ 'selected' if form.sort_type.data == 'price_high_to_low' }}>Price (High to Low)</option>
             </select>
@@ -53,6 +59,8 @@ $("document").ready(function () {
               <!--Default all categories-->
               <div class="form-check">
                 <input 
+                  form="product-search-form"
+                  onchange="this.form.submit()"
                   class="form-check-input" type="radio"
                   name="{{ form.categories.id }}" id="filter_category_all" value="" {{ 'checked' if form.categories.data == "" }}>
                 <label class="form-check-label" for="filter_category_all">All</label>
@@ -60,6 +68,8 @@ $("document").ready(function () {
               {% for category in categories %}
               <div class="form-check">
                 <input 
+                  form="product-search-form"
+                  onchange="this.form.submit()"
                   class="form-check-input" type="radio"
                   name="{{ form.categories.id }}" id="filter_category_{{category}}" value="{{ category }}" {{ 'checked' if form.categories.data == category }}>
                 <label class="form-check-label" for="filter_category_{{ category }}">{{ category }}</label>
@@ -72,15 +82,25 @@ $("document").ready(function () {
         <div class="col">
           <div class="row justify-content-start">
             {% for p in products %}
-            <div class="col-md-2 px-0 mx-1 my-1 rounded border">
-              <div class="thumbnail">
-                <a href="{{ url_for("user_bp.product_page", id=p.id) }}" class="text-dark text-decoration-none">
-                  <img src="{{ p.image_url }}" class="product-img rounded img-fluid">
-                  <div class="px-2 text-center">
-                    <h6>{{ p.name }}</h6>
-                    <p class="text-muted my-0">{{ "$%.2f"|format(p.unit_price) }}</p>
-                  </div>
-                </a>
+            <div class="col-2 px-0 mx-1 my-1 rounded border">
+              <a class="text-dark text-link" href="{{ url_for("user_bp.product_page", id=p.id) }}">
+                <div class="text-center">
+                  <img src="{{ p.image_url }}" class="rounded" width="100" height="100">
+                </div>
+                <div class="px-3 my-2 text-center">
+                  <h6 class="text-truncate">{{ p.name }}</h6>
+                </div>
+              </a>
+              <div class="d-flex flex-row flex-nowrap justify-content-between px-3 my-2">
+                <div class="text-primary">{{ format_price(p.unit_price) }}</div>
+                <!--Add to cart button-->
+                <form class='product-buy-or-add-form' method='POST'>
+                  <input type="hidden" id="product_id" name="id" value="{{ p.id }}">
+                  <input id="quantity" name="quantity" value="1" hidden>
+                  <button type="submit" id='cart_add' v-link="{{ url_for('api_bp.product_add') }}" class="btn btn-primary btn-sm">
+                    +<i class="bi bi-cart"></i>
+                  </button>
+                </form>
               </div>
             </div>
             {% endfor %}

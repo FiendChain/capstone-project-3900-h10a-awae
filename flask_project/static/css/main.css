@@ -20,3 +20,22 @@
     border: 1px solid #999;
     background-color: transparent;
 }
+
+/* Text colours */
+.text-link {
+    transition: color .25s ease-in-out;
+    text-decoration: none;
+}
+
+.text-link:hover {
+    color: #b34418 !important;
+    text-decoration: none;
+}
+
+.text-accent {
+    color: #b34418 !important;
+}
+
+body {
+  font-family: 'Roboto', sans-serif !important;
+}

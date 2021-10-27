@@ -32,3 +32,9 @@
   </div>
 </div>
 {% endmacro %}
+
+<!--Macro for price formatting-->
+{% macro format_price(price, currency="$") %}
+{% set i, d = "{:.2f}".format(price).split('.') %}
+{{ currency }}{{ i }}.<small>{{ d }}</small>
+{% endmacro %}
