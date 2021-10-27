@@ -49,7 +49,7 @@ def login():
             # invalid credentials
             if valid == True:
                 user = db.get_entries_by_heading("users", "username", username)[0]
-                flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, chr(user["id"]), user["is_admin"])    # user id must be unicode
+                flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, user["id"], user["is_admin"])    # user id must be unicode
                 print(f"User {flask_user.get_username()}logged in: {serialize_form(form)}")
                 login_user(flask_user, remember=form.remember_me.data)
                 return jsonify(dict(redirect=url_for("user_bp.home")))
@@ -91,7 +91,7 @@ def create_guest_account():
     
     # attempt to get guest id from session
     try:
-        guest_id = ord(session["guest_id"])
+        guest_id = session["guest_id"]
     except TypeError:
         guest_id = None
     except KeyError:
@@ -103,7 +103,7 @@ def create_guest_account():
             user = db.get_entry_by_id("users", guest_id)
             # login the guest account
             if user is not None and not user["is_authenticated"]:
-                flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, chr(user["id"]), user["is_admin"])
+                flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, user["id"], user["is_admin"])
                 login_user(flask_user, True)
                 return
 
@@ -121,7 +121,7 @@ def create_guest_account():
             break
     
     user = db.get_entries_by_heading("users", "username", username)[0]
-    guest_id = chr(user["id"])
+    guest_id = user["id"]
     flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, guest_id, user["is_admin"])    # user id must be unicode
     login_user(flask_user, remember=True)
     session["guest_id"] = guest_id
@@ -135,12 +135,12 @@ def load_user(id):
     with app.app_context():
         db = get_db()
         try:
-            user = db.get_entry_by_id("users", ord(id)) # convert unicode id back to int
+            user = db.get_entry_by_id("users", id) # convert unicode id back to int
         except:
             user = None
         
         if user is None:
             return None
 
-        flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, chr(user["id"]), user["is_admin"])
+        flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, user["id"], user["is_admin"])
         return flask_user

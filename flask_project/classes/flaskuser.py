@@ -7,7 +7,7 @@ class FlaskUser(object):
         self.authenticated = authenticated
         self.active = active
         self.anonymous = anonymous
-        self.id = id    # Must be unicode
+        self.id = chr(id)    # Must be unicode
         self.admin = admin
 
     def get_username(self):
@@ -26,4 +26,4 @@ class FlaskUser(object):
         return self.anonymous
     
     def get_id(self):
-        return self.id
+        return ord(self.id) # convert unicode back to int
