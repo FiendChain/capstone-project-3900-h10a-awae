@@ -19,7 +19,7 @@ class Database(object):
         cur = conn.cursor()
         self.conn = conn
         self.cur = cur
-        print("db connected, use db.conn and db.cur")
+        #print("db connected, use db.conn and db.cur")
     
     def tables_create(self, f):
         self.cur.executescript(f.read()) # Read sql schema and create tables

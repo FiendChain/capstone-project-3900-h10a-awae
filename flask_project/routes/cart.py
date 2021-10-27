@@ -64,7 +64,7 @@ class DictCart(Cart):
                 db.add("cart_item", (product_id, self.user_id, quantity))
             else:
                 assert(len(cart_item) == 1)
-                cart_item = tuple(x for x in cart_item[0].values())
+                cart_item = tuple(x for x in cart_item[0].values()) # Convert dict to tuple of dict values
                 db.update("cart_item", cart_item, cart_item)
         # if id not in self.items:
         #     self.items[id] = quantity
@@ -72,18 +72,35 @@ class DictCart(Cart):
         #     return
         # self.items[id] += quantity
     
-    def update_product(self, id, quantity):
-        if id not in self.items and quantity > 0:
-            self.items[id] = quantity
-            return
-        
-        if id not in self.items:
-            return
-        
-        if quantity > 0:
-            self.items[id] = quantity
+    def update_product(self, product_id, quantity):
+        with app.app_context():
+            db = get_db()
+            cart_item = db.get_entries_by_multiple_headings("cart_item", ("user_id", "product_id"), (self.user_id, product_id)) # should only return 1 item
+            print(cart_item)
+        assert(len(cart_item) == 1)
+        cart_item = cart_item[0]
+        if quantity == 0:
+            print("DELETE CART ITEM")
+            db.delete_by_id("cart_item", cart_item["id"])
         else:
-            del self.items[id]
+            print("UPDATE CART ITEM")
+            cart_item["quantity"] = quantity
+            cart_item = tuple(x for x in cart_item.values()) # Convert dict to tuple of dict values
+            # Update quantity amount to non-zero value
+            db.update("cart_item", cart_item, cart_item)
+
+
+        # if id not in self.items and quantity > 0:
+        #     self.items[id] = quantity
+        #     return
+        
+        # if id not in self.items:
+        #     return
+        
+        # if quantity > 0:
+        #     self.items[id] = quantity
+        # else:
+        #     del self.items[id]
     
     def empty(self):
         self.items = {}
