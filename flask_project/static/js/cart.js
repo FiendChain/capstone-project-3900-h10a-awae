@@ -47,8 +47,13 @@ $('document').ready(() => {
             if (res.summary !== undefined) {
                 let total_cost = res.summary.total_cost;
                 let total_items = res.summary.total_items;
+                
+                let cost_str = `${total_cost.toFixed(2)}`;
+                const cost_parts = cost_str.split(".");
+                let i = cost_parts[0];
+                let d = cost_parts[1];
 
-                el_total_cost.html(`${total_cost.toFixed(2)}`);
+                el_total_cost.html(`$${i}.<small>${d}</small>`);
                 el_total_items.html(`${total_items}`);
                 el_cart_count.html(`${total_items}`);
             }

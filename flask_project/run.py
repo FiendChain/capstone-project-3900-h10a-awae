@@ -1,7 +1,9 @@
 from livereload import Server
 from server import app, login_manager
+
+import routes
 from routes import user_bp, admin_bp, api_bp, admin_api_bp
-import flask_db
+
 from flask_bootstrap import Bootstrap
 
 import argparse 
