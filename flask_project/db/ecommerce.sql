@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 );
 
 CREATE TABLE IF NOT EXISTS "products" (
-  "id" integer PRIMARY KEY NOT NULL,
+  "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
   "name" text,
   "unit_price" real,
   "brand" text,
@@ -25,11 +25,11 @@ CREATE TABLE IF NOT EXISTS "products" (
 
 CREATE TABLE IF NOT EXISTS "cart_item" (
   "id" integer PRIMARY KEY NOT NULL,
-  "product_id" int UNIQUE NOT NULL,
-  "cart_id" int UNIQUE NOT NULL,
-  "quantity" int DEFAULT 1,
+  "product_id" int NOT NULL,
+  "user_id" int NOT NULL,
+  "quantity" int NOT NULL,
   FOREIGN KEY ("product_id") REFERENCES Product("id"),
-  FOREIGN KEY ("cart_id") REFERENCES Cart("id")
+  FOREIGN KEY ("user_id") REFERENCES Cart("id")
 );
 
 CREATE TABLE IF NOT EXISTS "cart" (

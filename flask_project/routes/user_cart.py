@@ -43,7 +43,7 @@ def product_add():
 
     cart = get_user_cart()
     cart.add_product(form.id.data, form.quantity.data)
-
+    print("Adding id " + form.id.data)
     return jsonify(serialize_form(form))
 
 # Update the quantity of a product in the cart

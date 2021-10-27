@@ -94,6 +94,7 @@ class Database(object):
         subquery2 = ', '.join(f"?" for i in enumerate(cols_no_id))
         query = f"INSERT INTO {table_name} ({subquery1}) VALUES ({subquery2})"
         params = entry_no_id
+        print(query, params)
         self.cur.execute(query, params)
         self.conn.commit()
         print(f"Entry {entry_no_id[0]} added")
@@ -115,8 +116,10 @@ class Database(object):
         print(f"Entry {id} deleted")
         return id
 
-
+    # Please put old id in new id
     def update(self, table_name, entry_old, entry_new):
+        print(f"ID {entry_old} {entry_new}")
+        assert(entry_old[0] == entry_new[0])    # Check IDs are same
         cols = self.get_table_headings(table_name)
         #cols_no_id = [col for col in cols if col != "id"]   # Drop rowid from entry class
 
@@ -160,6 +163,17 @@ class Database(object):
         entries = self.cur.fetchall()
         entries = [self.make_dict(self.cur, entry) for entry in entries]
         return entries
+    
+    def get_entries_by_multiple_headings(self, table_name, headings, values):
+        subquery1 = ' AND '.join(f"{heading} = ?" for heading in headings)
+        #subquery2 = ', '.join(value for value in values)
+        query = f"SELECT * from {table_name} where {subquery1}"
+        params = values
+        print(query, params)
+        self.cur.execute(query, params)
+        entries = self.cur.fetchall()
+        entries = [self.make_dict(self.cur, entry) for entry in entries]
+        return entries
 
     def validate_user(self, username, password):
         query = f"SELECT * from users WHERE username = ? AND password = ?"
@@ -171,6 +185,9 @@ class Database(object):
             return True
         return False
     
+
+
+
     # Get unique values for a chosen table heading, eg: product categories
     def get_unique_values(self, table_name, heading):
         query = f"SELECT DISTINCT {heading} from {table_name}"
@@ -197,4 +214,7 @@ class Database(object):
         file.save(os.path.join(app.config['UPLOADED_IMAGES_DEST'], rand_filename))
         image_url = f"/static/uploads/images/{rand_filename}"
         return image_url
+    
+
+    
 # %%
