@@ -18,16 +18,20 @@ import datetime
 def home():
     with app.app_context():
         db = get_db()
-        products = db.get_random_entries("products", 5)
+        recommended_products = db.get_random_entries("products", 16)
+        popular_items = db.get_random_entries("products", 12)
     
-    return render_template("homepage.html", products=products)
+    data = dict(recommended_products=recommended_products, popular_items=popular_items)
+    
+    return render_template("homepage.html", **data)
 
 @user_bp.route('/products/<string:id>', methods=['GET'])
 def product_page(id):
     with app.app_context():
         db = get_db()
         product = db.get_entry_by_id("products", id)
-    return render_template('product.html', product=product)
+        similar_items = db.get_random_entries("products", 12)
+    return render_template('product.html', product=product, similar_items=similar_items)
 
 @user_bp.route('/search', methods=['GET', 'POST'])
 def search():

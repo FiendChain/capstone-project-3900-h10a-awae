@@ -30,9 +30,11 @@
       </div>
       {% endif %}
       {% for p in products %}
-      <div class="row cart-product w-100 {{ 'border-bottom' if not loop.last }} mb-2" id="{{ p.id }}">
+      <div class="row cart-product w-100 {{ 'border-bottom' if not loop.last }} pb-2 mb-2" id="{{ p.id }}">
         <div class="col-auto ps-0">
-          <img src="{{ p.image_url }}" class="rounded" width="150" height="150">
+          <div>
+            <img src="{{ p.image_url }}" class="product-img rounded">
+          </div>
         </div>
         <!--Product info-->
         <div class="col py-3 me-auto">
@@ -55,7 +57,10 @@
               <input type="hidden" id="product_id" name="id" value="{{ p.id }}">
               <div class="form-group row justify-content-end">
                 <div class="col-auto px-0 text-end">
-                  <input class="form-control form-control-sm" type="number" min="1" max="99" id="quantity" name="quantity" value={{ p.quantity }}> 
+                  <div class="input-group">
+                    <input class="form-control form-control-sm" type="number" min="1" max="99" id="quantity" name="quantity" value={{ p.quantity }}> 
+                    <div class="invalid-tooltip d-none"></div>
+                  </div>
                 </div>
               </div>
             </form>

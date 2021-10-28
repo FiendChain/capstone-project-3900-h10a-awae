@@ -11,7 +11,9 @@
         </div>
       </div>
     </div>
-    <img class="img-fluid" src="" default-src="{{ default_url or '' }}"/>
+    <div class="text-center">
+      <img class="product-img-lg" src="" default-src="{{ default_url or '' }}"/>
+    </div>
     <p class="filename text-center"></p>
   </div>
 
@@ -37,4 +39,56 @@
 {% macro format_price(price, currency="$") %}
 {% set i, d = "{:.2f}".format(price).split('.') %}
 {{ currency }}{{ i }}.<small>{{ d }}</small>
+{% endmacro %}
+
+<!--Utility for rendering products or carousels-->
+{% macro render_product(p, img_class="product-img") %}
+<div class="col-xl-3 col-lg-3 col-md-3 col-sm-3">
+  <div class="rounded border shadow-sm mx-1">
+    <a class="text-dark text-link" href="{{ url_for("user_bp.product_page", id=p.id) }}">
+      <div class="text-center">
+        <img src="{{ p.image_url }}" class="{{ img_class }} rounded">
+      </div>
+      <div class="px-3 my-2 text-start">
+        <h6 class="text-truncate">{{ p.name }}</h6>
+      </div>
+    </a>
+    <div class="d-flex flex-row flex-nowrap justify-content-between px-3 my-2">
+      <div class="text-primary">{{ format_price(p.unit_price) }}</div>
+      <!--Add to cart button-->
+      <form class='product-buy-or-add-form' method='POST'>
+        <input type="hidden" id="product_id" name="id" value="{{ p.id }}">
+        <input id="quantity" name="quantity" value="1" hidden>
+        <button type="submit" id='cart_add' v-link="{{ url_for('api_bp.product_add') }}" class="btn btn-outline-primary btn-sm">
+          +<i class="bi bi-cart"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro render_carousel(products, id, N=4, img_class="product-img") %}
+{% set rows = chunk(N, products) %}
+<div id="{{ id }}" class="carousel carousel-dark slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    {% for products in rows %}
+    <div class="carousel-item {{ 'active' if loop.first }}">
+      <div class="row mx-5 my-2 justify-content-center">
+        {% for p in products %}
+        {{ render_product(p, img_class=img_class) }}
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  <button class="carousel-control-prev justify-content-start ms-3 w-auto" type="button" data-bs-target="#{{ id }}" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon shadow" aria-hidden="true"></span>
+    <span class="visually-hidden">Previous</span>
+  </button>
+  <button class="carousel-control-next justify-content-end me-3 w-auto" type="button" data-bs-target="#{{ id }}" data-bs-slide="next">
+    <span class="carousel-control-next-icon shadow" aria-hidden="true"></span>
+    <span class="visually-hidden">Next</span>
+  </button>
+</div>
 {% endmacro %}

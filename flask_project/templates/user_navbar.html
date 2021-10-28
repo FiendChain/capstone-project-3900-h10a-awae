@@ -1,3 +1,5 @@
+{% from "utility.html" import format_price %}
+
 <!--Search bar functionality changes depending on context-->
 <!--If the form is present, then we let that handle the submission-->
 <!--If the form is not present, then we send it via ajax and redirect-->
@@ -27,7 +29,7 @@ $("document").ready(function () {
 <header class="p-2 mb-2 border-bottom">
   <div class="container-fluid">
     <div class="row align-items-center justify-content-center justify-content-lg-start flex-no-wrap">
-      <div class="col-2">
+      <div class="col-3">
         <div class="row flex-nowrap">
           <!--Header-->
           <a href="{{ url_for("user_bp.home") }}" class="col-auto align-items-center mb-2 mb-lg-0 text-dark me-2 text-decoration-none">
@@ -50,41 +52,112 @@ $("document").ready(function () {
           form="product-search-form" name="name">
       </div>
 
-      <div class="col-2">
-        <div class="row justify-content-end text-end">
-          <!--Cart-->
+      <div class="col-3">
+        <div class="row justify-content-end text-end lh-sm">
+          <!--Battlepass-->
+          {% if current_user.is_authenticated %}
           <div class="col-auto">
-            <a href="{{ url_for('user_bp.cart') }}" class="d-flex flex-no-wrap text-dark text-decoration-none">
-              <div class="fs-5">
-                <i class="bi {{ 'bi-cart-fill' if current_cart.total_items > 0 else 'bi-cart' }}"></i>
+            <!--Progress bar-->
+            <div class="dropdown" id="battlepass-dropdown" data-bs-toggle="dropdown">
+              <div class="battlepass-progress mx-auto" data-value='25'>
+                <span class="progress-left">
+                  <span class="progress-bar border-warning"></span>
+                </span>
+                <span class="progress-right">
+                  <span class="progress-bar border-warning"></span>
+                </span>
+                <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
+                  <div class="fs-6">1</div>
+                </div>
               </div>
-              <div class="ms-1 fs-5">
-                <span id="navbar-cart-count">{{ current_cart.total_items }}</span>
+            </div>
+            <!--Dropdown contents-->
+            <div class="dropdown-menu dropdown-menu-end text-small shadow" aria-labelledby="battlepass-dropdown" style="">
+              <div class="d-flex flex-column flex-nowrap p-3" style="width: 250px">
+                <div class="d-flex flex-row justify-content-between pb-2 mb-2 border-bottom">
+                  <h5 class="align-self-center mb-0">Battlepass</h5>
+                  <a 
+                    class="btn btn-outline-secondary rounded-circle py-1 btn-sm align-self-top"
+                    href="{{ url_for("user_bp.profile_membership") }}">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                </div>
+                <div class="d-flex flex-row flex-nowrap mb-2">
+                  <div class="col-3 text-start text-nowrap">
+                    <small>{{ format_price(100) }}</small>
+                  </div>
+                  <div class="col-6 text-center py-2">
+                    <div class="progress w-100" style="height:5px;">
+                      <div class="progress-bar bg-warning" role="progressbar" style="width: 75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                  </div>
+                  <div class="col-3 text-end text-nowrap">
+                    <small>{{ format_price(100) }}</small>
+                  </div>
+                </div>
+                <small>
+                  <div class="d-flex flex-row justify-content-between">
+                    <div class="me-5 text-muted">Level</div>
+                    <div>1</div>
+                  </div>
+                  <div class="d-flex flex-row justify-content-between">
+                    <div class="me-5 text-muted">Tier</div>
+                    <div>Free</div>
+                  </div>
+                  <div class="d-flex flex-row justify-content-between">
+                    <div class="me-5 text-muted">Discount</div>
+                    <div class="text-success">{{ format_price(5) }}</div>
+                  </div>
+                  <div class="d-flex flex-row justify-content-between">
+                    <div class="me-5 text-muted">Current level</div>
+                    <div>{{ format_price(1) }}</div>
+                  </div>
+                </small>
+                <div class="my-2"></div>
+                <a class="btn btn-success btn-sm" href="{{ url_for("user_bp.profile_membership") }}">Upgrade</a>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <!--Cart-->
+          <div class="col-auto text-start">
+            <a href="{{ url_for('user_bp.cart') }}" class="d-flex flex-no-wrap text-dark text-link">
+              <div class="fs-3 mx-1 my-0 py-0">
+                <i class="bi {{ 'bi-cart-check-fill' if current_cart.total_items > 0 else 'bi-cart' }}"></i>
+              </div>
+              <div class="mx-1 d-block">
+                <small>
+                  <div class="align-top"><span id="navbar-cart-count">{{ current_cart.total_items }}</span> item{{ 's' if current_cart.total_items != 1 }}</div>
+                  <div class="align-bottom text-primary">{{ format_price(current_cart.total_cost) }}</div>
+                </small>
               </div>
             </a>
           </div>
 
           <!--Profile-->
           <div class="col-auto">
-            <div class="dropdown text-end">
-              <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
-                {% if current_user.is_authenticated %}
-                <span class="mx-1">{{ current_user.username }}</span>
-                {% endif %}
-              </a>
-              <ul class="dropdown-menu dropdown-menu-end text-small" aria-labelledby="dropdownUser1" style="">
-                {% if current_user.admin %}
-                <li><a class="dropdown-item" href="{{ url_for('admin_bp.home') }}">Admin</a></li>
-                {% endif %}
-                <li><a class="dropdown-item" href="{{ url_for('user_bp.profile') }}">Profile</a></li>
-                <li><hr class="dropdown-divider"></li>
-                {% if current_user.is_authenticated %}
-                <li><a class="dropdown-item" href="{{ url_for('user_bp.logout') }}">Logout</a></li>
-                {% else %}
-                <li><a class="dropdown-item" href="{{ url_for('user_bp.login') }}">Login</a></li>
-                {% endif %}
-              </ul>
+            <div class="d-block align-items-center">
+              <div class="dropdown text-end">
+                <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+                  <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+                  {% if current_user.is_authenticated %}
+                  <span class="mx-1">{{ current_user.username }}</span>
+                  {% endif %}
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end text-small" aria-labelledby="dropdownUser1" style="">
+                  {% if current_user.admin %}
+                  <li><a class="dropdown-item" href="{{ url_for('admin_bp.home') }}">Admin</a></li>
+                  {% endif %}
+                  <li><a class="dropdown-item" href="{{ url_for('user_bp.profile') }}">Profile</a></li>
+                  <li><hr class="dropdown-divider"></li>
+                  {% if current_user.is_authenticated %}
+                  <li><a class="dropdown-item" href="{{ url_for('user_bp.logout') }}">Logout</a></li>
+                  {% else %}
+                  <li><a class="dropdown-item" href="{{ url_for('user_bp.login') }}">Login</a></li>
+                  {% endif %}
+                </ul>
+              </div>
             </div>
           </div>
         </div>

@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from "utility.html" import format_price %}
+{% from "utility.html" import format_price, render_carousel %}
 
 {% block head %}
 <title>Product page</title>
@@ -29,17 +29,23 @@
   <div class="row justify-content-between">
     <!--Image panel-->
     <div class="col-md-4 text-center">
-      <div class="carousel carousel-dark slide border shadow-sm" data-bs-ride="carousel" id="product-image-carousel">
+      <div class="carousel carousel-dark slide" data-bs-ride="carousel" id="product-image-carousel">
         <!--Carousel images-->
-        <div class="carousel-inner">
+        <div class="carousel-inner rounded shadow-sm border">
           <div class="carousel-item active" data-bs-interval="1000">
-            <div class="thumbnail"><img src="{{ product.image_url }}" class="rounded img-fluid"></div>
+            <div>
+              <img src="{{ product.image_url }}" class="product-img-lg">
+            </div>
           </div>
           <div class="carousel-item" data-bs-interval="1000">
-            <div class="thumbnail"><img src="{{ product.image_url }}" class="rounded img-fluid"></div>
+            <div>
+              <img src="{{ product.image_url }}" class="product-img-lg">
+            </div>
           </div>
           <div class="carousel-item" data-bs-interval="1000">
-            <div class="thumbnail"><img src="{{ product.image_url }}" class="rounded img-fluid"></div>
+            <div>
+              <img src="{{ product.image_url }}" class="product-img-lg">
+            </div>
           </div>
         </div>
         <!--Carousel controls-->
@@ -114,6 +120,13 @@
           </div>
         </form>
       </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center my-5">
+    <div class="col">
+      <h4 class="border-bottom pb-2 mb-2 mx-5">Similar Products</h4>
+      {{ render_carousel(similar_items, id="similar-products-carousel") }}
     </div>
   </div>
 </div>
