@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% from "utility.html" import format_price %}
+
+{% block head %}
+<title>Membership</title>
+{% endblock %}
+
+{% block content %}
+{% include 'user_navbar.html' %}
+
+<div class="container-fluid justify-content-md-center text-center border-bottom pb-0 mb-3">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb mb-2">
+      <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('user_bp.profile') }}">Profile</a></li>
+      <li class="breadcrumb-item active">Membership</li>
+    </ol>
+  </nav>
+</div>
+
+<script src="/static/js/wtf_ajax_form.js"></script>
+
+<div class="container w-75">
+  <h3>Membership</h3>
+  <p>Lorem ipsum some kind of information about battlepass</p>
+</div>
+
+{% endblock %}

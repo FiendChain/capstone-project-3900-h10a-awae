@@ -51,3 +51,8 @@ def profile_edit_login_security():
             db.update("users", user_old, user_new)
         return jsonify(dict(redirect=url_for("user_bp.profile")))
     return jsonify(serialize_form(form)), 400
+
+@user_bp.route('/profile/membership')
+@login_required
+def profile_membership():
+    return render_template("profile/membership.html")

@@ -92,22 +92,26 @@ def create_guest_account():
     # attempt to get guest id from session
     try:
         guest_id = session["guest_id"]
+        guest_id = int(guest_id)
     except TypeError:
         guest_id = None
     except KeyError:
         guest_id = None
 
+    # attempt to login a guest user if their id is available
     if guest_id is not None:
         with app.app_context():
             db = get_db()
             user = db.get_entry_by_id("users", guest_id)
             # login the guest account
             if user is not None and not user["is_authenticated"]:
+                print(f"Logging in already created guest user id={guest_id}")
                 flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, user["id"], user["is_admin"])
                 login_user(flask_user, True)
                 return
 
     # create guest account if not logged 
+    print("Creating a guest account")
     with app.app_context():
         db = get_db()
         while True:

@@ -15,3 +15,11 @@ Week 4
 Working on writing html templates for sprint 1 wireframes. 
 Decided that for sprint 1 we would just have basic bootstrap and jquery to get the basic functionality and design completed.
 Discussed how we would work as a team using the Django framework.
+
+Week 5
+Completed all my assigned sprint 1 user stories. Website reached satisfactory degree of completion on the frontend. 
+Discusses how we would restructure the project to deal with the loss of two team members.
+
+Week 6
+Refined the aesthetic and UX of the frontend. Worked on the user stories for checkout and orders on the frontend.
+Discussed with remaining teammate what functionalities should be reduced in scope.

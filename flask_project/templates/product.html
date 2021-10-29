@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from "utility.html" import format_price, render_carousel %}
 
 {% block head %}
 <title>Product page</title>
@@ -28,17 +29,23 @@
   <div class="row justify-content-between">
     <!--Image panel-->
     <div class="col-md-4 text-center">
-      <div class="carousel carousel-dark slide border shadow-sm" data-bs-ride="carousel" id="product-image-carousel">
+      <div class="carousel carousel-dark slide" data-bs-ride="carousel" id="product-image-carousel">
         <!--Carousel images-->
-        <div class="carousel-inner">
+        <div class="carousel-inner rounded shadow-sm border">
           <div class="carousel-item active" data-bs-interval="1000">
-            <div class="thumbnail"><img src="{{ product.image_url }}" class="rounded img-fluid"></div>
+            <div>
+              <img src="{{ product.image_url }}" class="product-img-lg">
+            </div>
           </div>
           <div class="carousel-item" data-bs-interval="1000">
-            <div class="thumbnail"><img src="{{ product.image_url }}" class="rounded img-fluid"></div>
+            <div>
+              <img src="{{ product.image_url }}" class="product-img-lg">
+            </div>
           </div>
           <div class="carousel-item" data-bs-interval="1000">
-            <div class="thumbnail"><img src="{{ product.image_url }}" class="rounded img-fluid"></div>
+            <div>
+              <img src="{{ product.image_url }}" class="product-img-lg">
+            </div>
           </div>
         </div>
         <!--Carousel controls-->
@@ -55,62 +62,71 @@
 
     <!--Product description-->
     <div class="col-md-6">
-      <div class="row justify-content-between">
-        <div class="col text-start"><h3>{{ product.name }}</h3></div>
-        <div class="col-auto text-end"><span style="font-size:150%;">{{ "$%.2f"|format(product.unit_price) }}</span></div>
-        {% if current_user.admin %}
-        <div class="col-auto text-end ps-2">
-          <a href="{{ url_for("admin_bp.edit_product", id=product.id) }}" class="btn btn-outline-secondary rounded-circle"><i class="bi bi-pen"></i></a>
+      <div class="rounded shadow-sm p-4">
+        <div class="row justify-content-between">
+          <div class="col text-start"><h3>{{ product.name }}</h3></div>
+          <div class="col-auto text-end"><h4 class="text-primary">{{ format_price(product.unit_price) }}</h4></div>
+          {% if current_user.admin %}
+          <div class="col-auto text-end ps-2">
+            <a href="{{ url_for("admin_bp.edit_product", id=product.id) }}" class="btn btn-outline-secondary rounded-circle"><i class="bi bi-pen"></i></a>
+          </div>
+          {% endif %}
         </div>
-        {% endif %}
-      </div>
-      <div class="row">
-        {% if product.stock > 0 %}
-        <p class="text-start my-0 text-success">In stock</p>
-        {% else %}
-        <p class="text-start my-0 text-danger">Out of stock</p>
-        {% endif %}
-      </div>
-      <div class="row">
-        <p>{{ product.description }}</p>
-      </div>
-
-      <!--Product details info-->
-      <div>
         <div class="row">
-          <div class="col-auto">
-            <strong>
-              <div class="flex-nowrap">Brand</div>
-              <div class="flex-nowrap">Warranty days</div>
-              <div class="flex-nowrap">Delivery days</div>
-              <div class="flex-nowrap">In stock</div>
-            </strong>
-          </div>
-          <div class="col-auto ms-2">
-            <div class="flex-nowrap">{{ product.brand }}</div>
-            <div class="flex-nowrap">{{ product.warranty_days }}</div>
-            <div class="flex-nowrap">{{ product.delivery_days }}</div>
-            <div class="flex-nowrap">{{ product.stock }}</div>
-          </div>
+          {% if product.stock > 0 %}
+          <p class="text-start my-0 text-success">In stock</p>
+          {% else %}
+          <p class="text-start my-0 text-danger">Out of stock</p>
+          {% endif %}
         </div>
-      </div>
+        <div class="row">
+          <p>{{ product.description }}</p>
+        </div>
 
-      <!--Purchasing form-->
-      <form class='product-buy-or-add-form mt-4' method='POST'>
-        <input type="hidden" id="product_id" name="id" value="{{ product.id }}">
-        <div class="row mx-0 px-0 w-100 justify-content-between">
-          <div class="col-md-5 ps-0">
-            <div class="row form-group text-start">
-              <label class="col-auto me-3 text-start" for="quantity">Quantity</label>
-              <input class="col form-control" type="number" min="1" max="99" id="quantity" name="quantity" value=1> 
+        <!--Product details info-->
+        <div>
+          <div class="row">
+            <div class="col-auto">
+              <strong>
+                <div class="flex-nowrap">Brand</div>
+                <div class="flex-nowrap">Warranty days</div>
+                <div class="flex-nowrap">Delivery days</div>
+                <div class="flex-nowrap">In stock</div>
+              </strong>
+            </div>
+            <div class="col-auto ms-2">
+              <div class="flex-nowrap">{{ product.brand }}</div>
+              <div class="flex-nowrap">{{ product.warranty_days }}</div>
+              <div class="flex-nowrap">{{ product.delivery_days }}</div>
+              <div class="flex-nowrap">{{ product.stock }}</div>
             </div>
           </div>
-          <div class="col-auto btn-group pe-0 align-self-end text-end">
-            <button type="submit" id='cart_add' v-link="{{ url_for('api_bp.product_add') }}" class="btn btn-outline-primary mb-2">Add to Cart</button>
-            <button type="submit" id='buy_now' v-link="{{ url_for('api_bp.product_buy') }}" class="btn btn-primary mb-2">Buy Now</button>
-          </div>
         </div>
-      </form>
+
+        <!--Purchasing form-->
+        <form class='product-buy-or-add-form mt-4' method='POST'>
+          <input type="hidden" id="product_id" name="id" value="{{ product.id }}">
+          <div class="row mx-0 px-0 w-100 justify-content-between">
+            <div class="col-md-5 ps-0">
+              <div class="row form-group text-start">
+                <label class="col-auto me-3 text-start" for="quantity">Quantity</label>
+                <input class="col form-control" type="number" min="1" max="99" id="quantity" name="quantity" value=1> 
+              </div>
+            </div>
+            <div class="col-auto btn-group pe-0 align-self-end text-end">
+              <button type="submit" id='cart_add' v-link="{{ url_for('api_bp.product_add') }}" class="btn btn-outline-primary mb-2">Add to Cart</button>
+              <button type="submit" id='buy_now' v-link="{{ url_for('api_bp.product_buy') }}" class="btn btn-primary mb-2">Buy Now</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center my-5">
+    <div class="col">
+      <h4 class="border-bottom pb-2 mb-2 mx-5">Similar Products</h4>
+      {{ render_carousel(similar_items, id="similar-products-carousel") }}
     </div>
   </div>
 </div>

@@ -7,3 +7,5 @@ from . import user, user_cart, user_login, user_profile
 from . import user_checkout_mock
 
 from . import admin
+
+from . import utility

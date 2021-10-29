@@ -1,8 +1,16 @@
 {% extends 'base.html' %}
+{% from "utility.html" import format_price %}
 
 {% block head %}
 <title>Orders</title>
 {% endblock %}
+
+{% macro text_item(name, description) %}
+<div class="row justify-content-between">
+  <div class="col-auto text-start">{{ name }}</div>
+  <div class="col text-end">{{ description }}</div>
+</div>
+{% endmacro %}
 
 {% block content %}
 {% include 'user_navbar.html' %}
@@ -21,13 +29,13 @@
   </nav>
 </div>
 
-<div class="container">
+<div class="container-sm">
   <!--Search for orders-->
   <div class="d-flex flex-row px-0 mb-2 justify-content-between">
-    <div class="col ps-0">
+    <div class="col-auto ps-0">
       <h3>Your Orders</h3>
     </div>
-    <div class="col pe-0">
+    <div class="col-sm-5 pe-0">
       <input type="search" class="form-control" placeholder="Search orders" name="name">
     </div>
   </div>
@@ -50,101 +58,99 @@
 
   <!--Render an order-->
   {% for order_id, order in orders %}
-  <div class="row card mb-3 shadow-sm">
-    <div class="card-header">
-      <span>Order placed: {{ order.time_placed.strftime("%d %b %y") }}</span>
-    </div>
-    <div class="card-body">
-      <div class="d-flex flex-row flex-nowrap">
-        <!--Product list-->
-        <div class="col-9 border mb-auto">
-          {% for p in order.products %}
-          <!--Product entry-->
-          <div class="d-flex flex-row flex-nowrap py-0 {{ "border-bottom" if not loop.last }}"> 
-            <!--Product image-->
-            <div class="col-3 ps-0">
-              <img src="{{ p.image_url }}" class="product-img-small img-fluid"></img>
+  <div class="d-inline mb-3 justify-content-center">
+    <div class="card shadow-sm mx-0 px-0">
+      <div class="card-header">
+        <div>Order placed: {{ order.time_placed.strftime("%d %b %y") }}</div>
+      </div>
+      <div class="card-body">
+        <div class="d-flex flex-row flex-nowrap">
+          <!--Product list-->
+          <div class="col border mb-auto">
+            {% for p in order.products %}
+            <!--Product entry-->
+            <div class="d-flex flex-row flex-nowrap py-0 {{ "border-bottom" if not loop.last }}"> 
+              <!--Product image-->
+              <div class="col-auto ps-0">
+                <div>
+                  <img src="{{ p.image_url }}" class="product-img-md"></img>
+                </div>
+              </div>
+              <!--Product info-->
+              <div class="col ms-4 py-2 me-auto">
+                <a href="{{ url_for('user_bp.product_page', id=p.id) }}" class="text-dark text-link">
+                  <p class="text-start my-0"><strong>{{ p.name }}</strong> in {{ p.category }}</p>
+                </a>
+                <!--Stock status-->
+                <div class="d-flex flex-row flex-nowrap mb-1">
+                  {% if p.stock > 0 %}
+                  <p class="text-start my-0 text-success">In stock</p>
+                  {% else %}
+                  <p class="text-start my-0 text-danger">Out of stock</p>
+                  {% endif %}
+                </div>
+                <!--Product description tags-->
+                <div class="d-flex flex-row">
+                  <form class="product-buy-or-add-form" method="POST">
+                    <input type="text" name="id" value="{{ p.id }}" hidden>
+                    <input type="number" name="quantity" value="1" hidden>
+                    <button type="submit" id="buy_now" v-link="{{ url_for("api_bp.product_buy") }}" class="me-2 btn btn-sm btn-primary">
+                      <i class="bi bi-bag-check fs-7 me-2"></i>Buy again
+                    </button>
+                    <button type="submit" id="cart_add" v-link="{{ url_for("api_bp.product_add") }}" class="me-2 btn btn-sm btn-outline-primary">Add to cart</button>
+                  </form>
+                </div>
+              </div>
+              <!--Product pricing information-->
+              <div class="col-md-3 py-2 me-3 text-end">
+                <!--Product price-->
+                <div class="row text-end">
+                  <h5 class="text-primary">{{ format_price(p.unit_price) }}</h5>
+                </div>
+                <!--Quantity-->
+                <div class="mt-1">x{{ p.quantity }}</div>
+              </div>
             </div>
-            <!--Product info-->
-            <div class="col ms-4 py-2 me-auto">
-              <a href="{{ url_for('user_bp.product_page', id=p.id) }}">
-                <p class="text-start my-0"><strong>{{ p.name }}</strong> in {{ p.category }}</p>
-              </a>
-              <!--Stock status-->
-              <div class="d-flex flex-row flex-nowrap mb-1">
-                {% if p.stock > 0 %}
-                <p class="text-start my-0 text-success">In stock</p>
+            {% endfor %}
+          </div>
+          <!--Order extras-->
+          <div class="col-4 ms-3">
+            <!--Order details-->
+            <div class="rounded border shadow-sm p-4">
+              <div class="d-flex flex-row flex-nowrap justify-content-between h5">
+                <div>Order details</div>
+                {% if order.delivery_date %}
+                <i class="bi bi-check-circle text-success"></i>
+                {% elif order.cancelled %}
+                <i class="bi bi-x-circle text-danger"></i>
                 {% else %}
-                <p class="text-start my-0 text-danger">Out of stock</p>
+                <i class="bi bi-dash-circle text-primary"></i>
                 {% endif %}
               </div>
-              <!--Product description tags-->
-              <div class="d-flex flex-row">
-                <form class="product-buy-or-add-form" method="POST">
-                  <input type="text" name="id" value="{{ p.id }}" hidden>
-                  <input type="number" name="quantity" value="1" hidden>
-                  <button type="submit" id="buy_now" v-link="{{ url_for("api_bp.product_buy") }}" class="me-2 btn btn-sm btn-primary">
-                    <i class="bi bi-bag-check fs-7 me-2"></i>Buy again
-                  </button>
-                  <button type="submit" id="cart_add" v-link="{{ url_for("api_bp.product_add") }}" class="me-2 btn btn-sm btn-outline-primary">Add to cart</button>
-                </form>
+              <div class="border-bottom my-2"></div>
+              <div class="row">
+                <strong>
+                {% if order.delivery_date %}
+                  Delivered {{ order.delivery_date.strftime("%A") }}
+                {% elif order.cancelled %}
+                  Delivery cancelled
+                {% else %}
+                  Delivery pending
+                {% endif %}
+                </strong>
+              </div>
+              {{ text_item("Total cost", format_price(order.total_cost)) }}
+              {{ text_item("Total items", order.total_items) }}
+
+              <div class="border-bottom mb-3 pb-2"></div>
+
+              <!--Order controls-->
+              <div class="d-block text-center">
+                <div class="btn btn-primary w-100 mb-1">Buy again</div>
+                <a class="btn btn-outline-primary w-100 mb-1" href="{{ url_for("user_bp.order_page", id=order_id) }}">View order details</a>
+                <div class="btn btn-outline-primary w-100">Confirm delivery</div>
               </div>
             </div>
-            <!--Product pricing information-->
-            <div class="col-md-3 py-2 me-3 text-end">
-              <!--Product price-->
-              <div class="row text-end">
-                <span class="text-end"><strong class="text-end">{{ "$%.2f"|format(p.unit_price) }}</strong></span>
-              </div>
-              <!--Quantity-->
-              <div class="mt-1 row justify-content-end text-end">
-                <div class="ms-auto">
-                  <span class="badge bg-danger text-end rounded-pill">x{{ p.quantity }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-        <!--Order extras-->
-        <div class="col ms-3">
-          <!--Order details-->
-          <div class="d-flex flex-row flex-nowrap card mb-3">
-            <div class="card-body">
-              <h5 class="card-title ps-1 pb-2 border-bottom">
-                <div class="d-flex flex-row flex-nowrap justify-content-between">
-                  <div>Order details</div>
-                  {% if order.delivery_date %}
-                  <i class="bi bi-check-circle text-success"></i>
-                  {% elif order.cancelled %}
-                  <i class="bi bi-x-circle text-danger"></i>
-                  {% else %}
-                  <i class="bi bi-dash-circle text-primary"></i>
-                  {% endif %}
-                </div>
-              </h5>
-              <div class="card-text">
-                <div class="d-flex flex-nowrap">
-                  <strong class="mx-1">
-                  {% if order.delivery_date %}
-                    Delivered {{ order.delivery_date.strftime("%A") }}
-                  {% elif order.cancelled %}
-                    Delivery cancelled
-                  {% else %}
-                    Delivery pending
-                  {% endif %}
-                  </strong>
-                </div>
-                <div class="d-flex flex-nowrap"><strong class="mx-1">Total cost: </strong>${{ "%.2f"|format(10) }}</div>
-                <div class="d-flex flex-nowrap"><strong class="mx-1">Total items: </strong>{{ 10 }}</div>
-              </div>
-            </div>
-          </div>
-          <!--Order controls-->
-          <div class="d-block text-center">
-            <div class="btn btn-primary w-100 mb-1">Buy again</div>
-            <a class="btn btn-outline-primary w-100 mb-1" href="{{ url_for("user_bp.order_page", id=order_id) }}">View order details</a>
-            <div class="btn btn-outline-primary w-100">Confirm delivery</div>
           </div>
         </div>
       </div>
