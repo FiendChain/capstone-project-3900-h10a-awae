@@ -47,6 +47,10 @@ class Checkout:
     @property
     def is_completed(self):
         return self.order_id is not None
+    
+    def get_products(self):
+        return self.products
+
 
 
 class CheckoutExpired(Exception):
@@ -98,3 +102,4 @@ class CheckoutDatabase:
             if id not in self.checkouts:
                 break
         return id
+    

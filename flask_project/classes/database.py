@@ -79,7 +79,7 @@ class Database(object):
             category = f"'{category}'"
             query = f"SELECT * FROM products WHERE name LIKE ? AND category={category} ORDER BY {order_by}"
         params = (f"%{name}%",)   # comma is intentional
-        print(query)
+        # print(query)
         self.cur.execute(query, params)
         entries = self.cur.fetchall()
         entries = [self.make_dict(self.cur, entry) for entry in entries]
@@ -94,7 +94,7 @@ class Database(object):
         subquery2 = ', '.join(f"?" for i in enumerate(cols_no_id))
         query = f"INSERT INTO {table_name} ({subquery1}) VALUES ({subquery2})"
         params = entry_no_id
-        print(query, params)
+        # print(query, params)
         self.cur.execute(query, params)
         self.conn.commit()
         print(f"Entry {entry_no_id[0]} added")
@@ -118,7 +118,7 @@ class Database(object):
 
     # Please put old id in new id
     def update(self, table_name, entry_old, entry_new):
-        print(f"ID {entry_old} {entry_new}")
+        #print(f"ID {entry_old} {entry_new}")
         assert(entry_old[0] == entry_new[0])    # Check IDs are same
         cols = self.get_table_headings(table_name)
         #cols_no_id = [col for col in cols if col != "id"]   # Drop rowid from entry class
@@ -129,7 +129,7 @@ class Database(object):
         #query = f"REPLACE into {table_name} VALUES ({subquery1}) WHERE id = {entry_old[0]}"
         
         params = entry_new
-        print(query, params)
+        #print(query, params)
         self.cur.execute(query, params)
         self.conn.commit()
         print(f"Entry {entry_new[0]} updated")
@@ -169,7 +169,7 @@ class Database(object):
         #subquery2 = ', '.join(value for value in values)
         query = f"SELECT * from {table_name} where {subquery1}"
         params = values
-        print(query, params)
+        # print(query, params)
         self.cur.execute(query, params)
         entries = self.cur.fetchall()
         entries = [self.make_dict(self.cur, entry) for entry in entries]

@@ -40,9 +40,10 @@ class DictCart(Cart):
         with app.app_context():
             db = get_db()
             cart_items = db.get_entries_by_heading("cart_item", "user_id", self.user_id)
-        for cart_item in cart_items:
-            id, quantity = cart_item["product_id"], cart_item["quantity"]
-            yield (id, quantity)
+        return cart_items
+        # for cart_item in cart_items:
+        #     id, quantity = cart_item["product_id"], cart_item["quantity"]
+        #     yield (id, quantity)
     # If a previously added product was deleted by the admin, don't show the product in the user's cart
     def purge(self, validator):
         with app.app_context():
@@ -54,40 +55,62 @@ class DictCart(Cart):
                     db.delete_by_id("cart_item", cart_item["id"])
                     print(f"Deleted non-existent product {cart_item['id']} from cart")
     
-    # Add product to cart object as well as database
+    # Add product to cart object
     def add_product(self, product_id, quantity):
-        with app.app_context():
-            db = get_db()
-            cart_item = db.get_entries_by_multiple_headings("cart_item", ("user_id", "product_id"), (self.user_id, product_id)) # should only return 1 or 0 item in list
-            print(cart_item)
-            if len(cart_item) == 0:
-                db.add("cart_item", (product_id, self.user_id, quantity))
-            else:
-                assert(len(cart_item) == 1)
-                cart_item = tuple(x for x in cart_item[0].values()) # Convert dict to tuple of dict values
-                db.update("cart_item", cart_item, cart_item)
+        pass
+        # with app.app_context():
+        #     db = get_db()
+        #     cart_item = db.get_entries_by_multiple_headings("cart_item", ("user_id", "product_id"), (self.user_id, product_id)) # should only return 1 or 0 item in list
+
+        #     # CASE 1: product does not exist in cart
+        #     if len(cart_item) == 0:
+        #         db.add("cart_item", (product_id, self.user_id, quantity))
+        #     # CASE 2: product already exist in user cart, so update the quantity amount
+        #     else:
+        #         assert(len(cart_item) == 1)
+        #         cart_item = cart_item[0]
+        #         # print(f"CART QUANTITY {cart_item['quantity']}")
+        #         cart_item["quantity"] += quantity
+        #         cart_item = tuple(x for x in cart_item.values()) # Convert dict to tuple of dict values
+        #         db.update("cart_item", cart_item, cart_item)
+                
         # if id not in self.items:
         #     self.items[id] = quantity
 
         #     return
         # self.items[id] += quantity
+
+    #         bool_existing_item = False
+    # for cart_item in cart.to_list():
+    #     if form.id.data == cart_item["id"]:
+    #         bool_existing_item = True
+    #         quantity_old = cart_item["quantity"]
+    #         # Update cart with additional quantity
+    #         cart.update_product(form.id.data, quantity_old + quantity_new)
+    #         break
     
+    # # CASE 2: Product does not exist in cart
+    # if bool_existing_item == False:
+    #     cart.add_product(form.id.data, quantity_new)
+    
+    # Change cart quantity to new quantity
     def update_product(self, product_id, quantity):
-        with app.app_context():
-            db = get_db()
-            cart_item = db.get_entries_by_multiple_headings("cart_item", ("user_id", "product_id"), (self.user_id, product_id)) # should only return 1 item
-            print(cart_item)
-        assert(len(cart_item) == 1)
-        cart_item = cart_item[0]
-        if quantity == 0:
-            print("DELETE CART ITEM")
-            db.delete_by_id("cart_item", cart_item["id"])
-        else:
-            print("UPDATE CART ITEM")
-            cart_item["quantity"] = quantity
-            cart_item = tuple(x for x in cart_item.values()) # Convert dict to tuple of dict values
-            # Update quantity amount to non-zero value
-            db.update("cart_item", cart_item, cart_item)
+        pass
+        # with app.app_context():
+        #     db = get_db()
+        #     cart_item = db.get_entries_by_multiple_headings("cart_item", ("user_id", "product_id"), (self.user_id, product_id)) # should only return 1 item
+        #     print(cart_item)
+        # assert(len(cart_item) == 1)
+        # cart_item = cart_item[0]
+        # if quantity == 0:
+        #     print("DELETE CART ITEM")
+        #     db.delete_by_id("cart_item", cart_item["id"])
+        # else:
+        #     print("UPDATE CART ITEM")
+        #     cart_item["quantity"] = quantity
+        #     cart_item = tuple(x for x in cart_item.values()) # Convert dict to tuple of dict values
+        #     # Update quantity amount to non-zero value
+        #     db.update("cart_item", cart_item, cart_item)
 
 
         # if id not in self.items and quantity > 0:
@@ -103,7 +126,8 @@ class DictCart(Cart):
         #     del self.items[id]
     
     def empty(self):
-        self.items = {}
+        pass
+        #self.items = {}
 
 # convert flask session object to store a cart 
 class SessionCart(DictCart):
@@ -166,9 +190,9 @@ def get_user_cart():
         
         # Get all product items belonging to the user
 
-    cart_items = db.get_entries_by_heading("cart_item", "user_id", user_id)
-    for cart_item in cart_items:
-        cart.add_product(cart_item['product_id'], cart_item['quantity'])
+    # cart_items = db.get_entries_by_heading("cart_item", "user_id", user_id)
+    # for cart_item in cart_items:
+    #     cart.add_product(cart_item['product_id'], cart_item['quantity'])
 
     # # Get the cart object from database for user
     # cart = db.get_entry_by_id("cart", user_id)
@@ -187,8 +211,8 @@ def get_cart_summary(cart):
     total_cost = 0
     with app.app_context():
         db = get_db()
-        for id, quantity in cart.to_list():
-            product = db.get_entry_by_id("products", id)
-            total_items += quantity
-            total_cost += quantity*product['unit_price']
+        for cart_item in cart.to_list():
+            product = db.get_entry_by_id("products", cart_item["product_id"])
+            total_items += cart_item["quantity"]
+            total_cost += cart_item["quantity"]*product['unit_price']
     return {"total_items": total_items, "total_cost": total_cost}

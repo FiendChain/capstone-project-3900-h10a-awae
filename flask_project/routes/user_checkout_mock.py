@@ -65,18 +65,31 @@ def cart_checkout_billing(checkout_id):
     
     if checkout.user_id != current_user.get_id():
         abort(403)
-    
+
+    # # Check if customer specified quantity is <= current stock in database
+    # products = checkout.get_products()
+    # error = False
+    # error_msg = None
+    # for product in products:
+    #     customer_quantity = product["quantity"]
+    #     db_quantity = db.get_entry_by_id("products", product["id"])
+    #     print(f"cq {customer_quantity} dq {db_quantity}")
+    #     if customer_quantity > db_quantity:
+    #         error = True
+    #         error_msg = f"Error, user specified quantity more than database stock for product id {product['id']}"
+    #         print(error_msg)
     if checkout.is_completed:
         return redirect(url_for("user_bp.order_page", id=checkout.order_id))
 
     # TODO: Prefill with user details if available
     form = PaymentCardForm()
-
     data = dict(
         checkout=checkout,
         form=form,
         checkout_id=checkout_id,
+
     )
+
 
     return render_template("checkout.html", **data)
 
@@ -122,5 +135,6 @@ def cart_checkout_billing(checkout_id):
     checkout.order_id = order_id
 
     res =  dict(redirect=url_for("user_bp.order_page", id=order_id))
+    
     return jsonify(res), 200
 

@@ -131,7 +131,7 @@ def create_guest_account():
 # Loads and returns the User object for current session
 @login_manager.user_loader
 def load_user(id):
-    print(f"Loading user with id={id}")
+    # print(f"Loading user with id={id}")
     with app.app_context():
         db = get_db()
         try:
