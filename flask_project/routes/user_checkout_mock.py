@@ -14,15 +14,6 @@ from classes.checkout import CheckoutExpired, CheckoutAlreadyCompleted
 from classes.order import Order, Payment, Billing
 from db.checkout_db import checkout_db, order_db
 
-@app.before_first_request
-def seed_checkout_sessions():
-    items = [(1,1),(2,3),(15,3),(10,5)]
-    items = [{"id":id, "quantity": quantity} for id, quantity in items]
-    with app.app_context():
-        id = "502d78b0-2025-4163-a873-3c1a25a25a60" 
-        db = get_db()
-        checkout_db.create_checkout(items, db, chr(1), checkout_id=id)
-
 # handle checkout on instant buy
 @api_bp.route('/transaction/buy', methods=['POST'])
 def product_buy():
@@ -33,7 +24,7 @@ def product_buy():
     id = form.id.data
     quantity = form.quantity.data
 
-    data = {"id": id, "quantity": quantity}
+    data = {"product_id": id, "quantity": quantity}
 
     with app.app_context():
         db = get_db()
