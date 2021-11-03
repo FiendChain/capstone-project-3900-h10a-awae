@@ -22,16 +22,16 @@ $("document").ready(function() {
     form.find("#state").val("{{ default_billing_info.state }}");
     form.find("#address").val("{{ default_billing_info.address }}");
     form.find("#zip_code").val("{{ default_billing_info.zip_code }}");
-  });
+  }).trigger("click");
   {% endif %}
 
   {% if default_payment_info %}
   $("#prefill-cc-default").on("click", function(ev) {
-    form.find("#cc_name").val("Guest Name");
-    form.find("#cc_number").val("4242 4242 4242 4242");
-    form.find("#cc_expiry").val("02 / 24");
-    form.find("#cc_cvc").val("123");
-  });
+    form.find("#cc_name").val("{{ default_payment_info.cc_name }}");
+    form.find("#cc_number").val("{{ default_payment_info.cc_number }}");
+    form.find("#cc_expiry").val("{{ default_payment_info.cc_expiry }}");
+    form.find("#cc_cvc").val("{{ default_payment_info.cc_cvc }}");
+  }).trigger("click");
   {% endif %}
 
   form.card({
@@ -58,7 +58,7 @@ $("document").ready(function() {
       cardNumber: '•' // optional - mask card number
     },
     debug: true
-  })
+  });
 });
 </script>
 

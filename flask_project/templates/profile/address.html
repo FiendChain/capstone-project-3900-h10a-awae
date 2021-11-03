@@ -50,7 +50,7 @@
     </div>
     <div class="row">
       <div class="col input-group">
-        <input type="text" name="{{ form.zip_code.id }}" id="{{ form.zip_code.id }}" class="form-control" placeholder="Zip Code" minlength="4" maxlength="4" value="{{ form.zip_code.value or '' }}" required>
+        <input type="text" name="{{ form.zip_code.id }}" id="{{ form.zip_code.id }}" class="form-control" placeholder="Zip Code" minlength="4" maxlength="4" value="{{ form.zip_code.data or '' }}" required>
         <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.zip_code.id }}"></div>
       </div>
     </div>

@@ -11,9 +11,10 @@ from .forms import UserPurchaseForm, PaymentCardForm, serialize_form, valid_stat
 from .cart import  get_user_cart
 
 from classes.checkout import CheckoutExpired, CheckoutAlreadyCompleted
-from classes.order import Order, Payment, Billing
 from classes.cafepass import refresh_cafepass_level, get_cafepass, CafepassInfo
-from db.checkout_db import checkout_db, order_db
+from classes.profile_payment import get_default_payment_info, get_default_billing_info
+from classes.profile_payment import set_default_billing_payment_info, set_default_payment_info
+from db.checkout_db import checkout_db
 
 import random
 import math
@@ -82,8 +83,6 @@ def cart_checkout_billing(checkout_id):
     if checkout.is_completed:
         return redirect(url_for("user_bp.order_page", id=checkout.order_id))
     
-
-
     # # Check if customer specified quantity is <= current stock in database
     # products = checkout.get_products()
     # error = False
@@ -113,21 +112,14 @@ def cart_checkout_billing(checkout_id):
             cc_expiry="01 / 26",
             cc_cvc="123" 
         )
-    # TODO: Prefill with user details if available
-    # TODO: Replace this with a more secure method of storage and loading
     else:
-        default_billing_info = dict(
-            country="Australia",
-            address="Kensignton Avenue 12th",
-            state=random.choice(valid_states),
-            zip_code="5678"
-        )
-
-        default_payment_info = dict(
-            cc_name="Jeff Goldblum",
-            cc_number="5555 5555 5555 5555",
-            cc_expiry="12 / 26",
-            cc_cvc="987" 
+        default_billing_info = get_default_billing_info()
+        info = get_default_payment_info()
+        default_payment_info = info and dict(
+            cc_name=info["name"],
+            cc_number=info["number"],
+            cc_expiry=info["expiry"],
+            cc_cvc=info["cvc"] 
         )
 
     form = PaymentCardForm()
@@ -183,12 +175,17 @@ def cart_checkout_billing(checkout_id):
         db.add("order2_item", order_item)
 
 
-    # TODO: Handle saving of user data for checkout
+    # Handle saving of user data for checkout
     if current_user.is_authenticated:
         if form.remember_billing.data:
-            print("TODO: Save billing information")
+            set_default_billing_payment_info(
+                form.address.data, form.country.data, 
+                form.state.data, form.zip_code.data)
+
         if form.remember_payment.data:
-            print("TODO: Save payment info")
+            set_default_payment_info(
+                form.cc_name.data, form.cc_number.data,
+                form.cc_expiry.data, form.cc_cvc.data)
 
     checkout.order_id = order_id    
 

@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS "cart" (
 
 CREATE TABLE IF NOT EXISTS "billing" (
   "id" integer PRIMARY KEY NOT NULL,
+  "user_id" int UNIQUE NOT NULL,
   "address" text,
   "country" text,
   "state" text,
@@ -49,6 +50,7 @@ CREATE TABLE IF NOT EXISTS "billing" (
 
 CREATE TABLE IF NOT EXISTS "payment" (
   "id" integer PRIMARY KEY NOT NULL,
+  "user_id" int UNIQUE NOT NULL,
   "name" text,
   "number" text,
   "expiry" text,

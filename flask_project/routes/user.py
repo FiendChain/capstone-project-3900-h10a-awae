@@ -9,8 +9,6 @@ from flask_login import current_user
 from server import app, get_db
 from .endpoints import user_bp, api_bp
 from .forms import ProductSearchParams, serialize_form
-from .cart import get_user_cart
-from db.checkout_db import order_db
 from datetime import datetime
 
 # Product browsing
