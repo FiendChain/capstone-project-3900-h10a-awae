@@ -78,7 +78,7 @@ $("document").ready(function () {
                   <h5 class="align-self-center mb-0">Cafepass</h5>
                   <a 
                     class="btn btn-outline-secondary rounded-circle py-1 btn-sm align-self-top"
-                    href="{{ url_for("user_bp.profile_membership") }}">
+                    href="{{ url_for("user_bp.profile_cafepass") }}">
                     <i class="bi bi-eye"></i>
                   </a>
                 </div>
@@ -115,9 +115,9 @@ $("document").ready(function () {
                     <div>{{ format_price(current_cafepass.remaining_xp) }}</div>
                   </div>
                 </small>
-                <div class="my-2"></div>
                 {% if not current_cafepass.paid %}
-                <a class="btn btn-success btn-sm" href="{{ url_for("user_bp.profile_membership") }}">Upgrade</a>
+                <div class="my-2"></div>
+                <a class="btn btn-success btn-sm" href="{{ url_for("user_bp.profile_cafepass") }}">Upgrade</a>
                 {% endif %}
               </div>
             </div>

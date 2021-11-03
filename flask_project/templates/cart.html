@@ -88,13 +88,13 @@
             <span id="cart-summary-total-cost">{{ format_price(summary.total_cost) }}</span>
           </h4>
         </div>
-        <form class="wtf-ajax-form text-start">
+        <!--<form class="wtf-ajax-form text-start">
           <div class="form-group mb-3">
             <label for="promo_code"><small>Promo Code</small></label>
             <input type="text" class="form-control" id="promo_code" name="promo_code" placeholder="Enter code" minlength="6" maxlength="6" required>
             <div class="invalid-feedback wtf-ajax-error d-none" id="promo_code"></div>
           </div>
-        </form>
+        </form>-->
         <!--Buy now button-->
         <div>
           <form action="{{ url_for("user_bp.cart_checkout") }}" method="POST">

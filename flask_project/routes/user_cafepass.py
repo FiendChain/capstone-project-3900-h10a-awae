@@ -14,6 +14,7 @@ import datetime
 
 from classes.cafepass import get_cafepass, CafepassInfo
 from classes.profile_payment import get_default_billing_info, get_default_payment_info
+from classes.profile_payment import set_default_payment_info, set_default_billing_payment_info
 
 @app.before_request
 def create_cafepass():
@@ -30,15 +31,13 @@ def create_cafepass():
         db = get_db()
         db.add("cafepass", (user_id, 0, 0, 1))
 
-@user_bp.route('/profile/membership')
+@user_bp.route('/profile/cafepass')
 @login_required
-def profile_membership():
+def profile_cafepass():
     user_id = current_user.get_id()
     cafepass = get_cafepass(user_id)
 
-    cafepass_form = CafePassForm()
     form = PaymentCardForm()
-    cafepass_form.paid.data = bool(cafepass['paid'])
 
     default_billing_info = get_default_billing_info()
     info = get_default_payment_info()
@@ -51,20 +50,29 @@ def profile_membership():
 
     data = dict(
         form=form,  # payment and billing form
-        cafepass_form=cafepass_form,
         default_billing_info=default_billing_info,
         default_payment_info=default_payment_info,
         valid_states=valid_states
     )
-    return render_template("profile/membership.html", **data)
+    return render_template("profile/cafepass.html", **data)
 
-@api_bp.route('/profile/membership', methods=["POST"])
+@api_bp.route('/profile/cafepass', methods=["POST"])
 @login_required
-def profile_membership():
+def profile_cafepass():
     print("BATTLEP[ASS BOUGHT")
-    form = CafePassForm()
+    form = PaymentCardForm()
     if not form.validate_on_submit():
-        return redirect(url_for("user_bp.profile_membership"))
+        return jsonify(serialize_form(form)), 400
+
+    if form.remember_billing.data:
+        set_default_billing_payment_info(
+            form.address.data, form.country.data, 
+            form.state.data, form.zip_code.data)
+
+    if form.remember_payment.data:
+        set_default_payment_info(
+            form.cc_name.data, form.cc_number.data,
+            form.cc_expiry.data, form.cc_cvc.data)
 
     user_id = current_user.get_id()
     cafepass = get_cafepass(user_id)
@@ -77,7 +85,7 @@ def profile_membership():
         db = get_db()
         db.update("cafepass", cafepass_old, cafepass_new)
     
-    return redirect(url_for("user_bp.profile_membership"))
+    return jsonify(dict(redirect=url_for("user_bp.profile_cafepass"))), 200
 
 @app.context_processor
 def battlepass_injector():

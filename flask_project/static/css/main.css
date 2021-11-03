@@ -87,6 +87,11 @@ body {
   cursor: pointer;
 }
 
+.battlepass-progress.large {
+  width: 150px !important;
+  height: 150px !important;
+}
+
 .battlepass-progress::after {
   content: "";
   width: 100%;
