@@ -2,15 +2,13 @@
 Routes for a user's profile specific information
 """
 
-from flask import redirect, request, render_template, url_for, jsonify, abort, session
+from flask import json, redirect, request, render_template, url_for, jsonify, abort, session
 from flask_login import current_user
 from flask_login.utils import login_required
 
 from server import app, get_db
 from .endpoints import user_bp, api_bp
-from .forms import UserProfileLoginSecurityForm, BillingAddressForm, CreditCardForm
-from .forms import valid_states
-from .forms import serialize_form
+from .forms import CafePassForm, serialize_form
 
 import datetime
 
@@ -34,16 +32,25 @@ def create_cafepass():
 @user_bp.route('/profile/membership')
 @login_required
 def profile_membership():
-    return render_template("profile/membership.html")
-
-@api_bp.route('/profile/cafepass_add', methods=["POST"])
-@login_required
-def profile_cafepass_add():
     user_id = current_user.get_id()
     cafepass = get_cafepass(user_id)
 
+    form = CafePassForm()
+    form.paid.data = bool(cafepass['paid'])
+
+    return render_template("profile/membership.html", form=form)
+
+@api_bp.route('/profile/membership', methods=["POST"])
+@login_required
+def profile_membership():
+    form = CafePassForm()
+    if not form.validate_on_submit():
+        return redirect(url_for("user_bp.profile_membership"))
+
+    user_id = current_user.get_id()
+    cafepass = get_cafepass(user_id)
     cafepass_old = list(cafepass.values())
-    cafepass['level'] += 1
+    cafepass['paid'] = int(form.paid.data)
     cafepass_new = list(cafepass.values())
 
     with app.app_context():

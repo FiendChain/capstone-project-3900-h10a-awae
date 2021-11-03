@@ -49,7 +49,7 @@ class CafepassInfo:
 
         delta = self.curr_level_info['xp']-self.prev_level_info['xp']
         completed_level_xp = self.net_xp-self.prev_level_info['xp']
-        return completed_level_xp / delta
+        return min(1, completed_level_xp / delta)
     
     @property
     def percent_complete(self):
@@ -68,7 +68,7 @@ class CafepassInfo:
     # Calculate total xp till next level
     @property
     def remaining_xp(self):
-        return self.curr_level_info['xp']-self.net_xp
+        return max(0, self.curr_level_info['xp']-self.net_xp)
     
     @property
     def curr_milestone(self):
