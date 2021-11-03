@@ -32,7 +32,7 @@ def product_buy():
 
     with app.app_context():
         db = get_db()
-        checkout_id = checkout_db.create_checkout([data], db, current_user.get_id())
+        checkout_id = checkout_db.create_checkout([data], db, current_user.get_id(), is_cart=False)
 
     return redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
 
@@ -43,7 +43,7 @@ def cart_checkout():
     print(f"CART ITEMS: {cart.to_list()}")
     with app.app_context():
         db = get_db()
-        checkout_id = checkout_db.create_checkout(cart.to_list(), db, current_user.get_id())
+        checkout_id = checkout_db.create_checkout(cart.to_list(), db, current_user.get_id(), is_cart=True)
     # x = checkout_db.get_checkout(checkout_id, db)
     return redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
 
@@ -128,7 +128,7 @@ def cart_checkout_billing(checkout_id):
 
     return render_template("checkout.html", **data)
 
-# payment validation 
+# payment validation and completion 
 @api_bp.route("/checkout_billing/<string:checkout_id>", methods=["POST"])
 def cart_checkout_billing(checkout_id):
     form = PaymentCardForm()
@@ -147,10 +147,10 @@ def cart_checkout_billing(checkout_id):
             abort(404)
 
     if checkout.user_id != current_user.get_id():
-        abort(404)
+        abort(403)
 
     # if order already exists
-    if checkout.order_id is not None:
+    if checkout.is_completed:
         res =  dict(redirect=url_for("user_bp.order_page", id=checkout.order_id))
         return jsonify(res), 200
 
@@ -175,7 +175,7 @@ def cart_checkout_billing(checkout_id):
         if form.remember_payment.data:
             print("TODO: Save payment info")
 
-    checkout.order_id = order_id    # Automatically sets checkout.is_completed to true
+    checkout.order_id = order_id    
 
     # increase battlepass here at checkout completion
     cafepass = get_cafepass(current_user.get_id())
@@ -188,6 +188,14 @@ def cart_checkout_billing(checkout_id):
             cafepass['level'] = refresh_cafepass_level(db, cafepass)
             cafepass_new = list(cafepass.values())
             db.update("cafepass", cafepass_old, cafepass_new)
+    
+    # empty cart if checkout originated from cart
+    if checkout.is_cart:
+        with app.app_context():
+            db = get_db()
+            cart_items = db.get_entries_by_heading("cart_item", "user_id", current_user.get_id())
+            for cart_item in cart_items:
+                db.delete_by_id("cart_item", cart_item["id"])
 
     res =  dict(redirect=url_for("user_bp.order_page", id=order_id))
     

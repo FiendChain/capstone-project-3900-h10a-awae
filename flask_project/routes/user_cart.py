@@ -98,13 +98,19 @@ def product_update():
     
     # Update cart with new quantity
     cart_item = db.get_entries_by_multiple_headings("cart_item", ("product_id", "user_id"), (form.id.data, current_user.get_id()))
-    assert(len(cart_item) == 1)
+    if not cart_item:
+        abort(400)
+
     cart_item = cart_item[0]
     quantity_old = cart_item["quantity"]
     quantity_new = form.quantity.data
-    cart_item["quantity"] = quantity_new
-    cart_item = tuple(v for v in cart_item.values())
-    db.update("cart_item", cart_item, cart_item)
+
+    if quantity_new > 0:
+        cart_item["quantity"] = quantity_new
+        cart_item = tuple(v for v in cart_item.values())
+        db.update("cart_item", cart_item, cart_item)
+    else:
+        db.delete_by_id("cart_item", cart_item["id"])
 
     # Update db with new quantity
     product["stock"] += quantity_old - quantity_new

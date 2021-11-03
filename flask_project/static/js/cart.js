@@ -78,7 +78,8 @@ $('document').ready(() => {
         
         $.ajax({
             url, data, type: 'POST',
-            success: data => update_quantity_from_res(data),
+            // success: data => update_quantity_from_res(data),
+            success: xhr => location.reload(),
             error: xhr => location.reload(),
         });
     })
