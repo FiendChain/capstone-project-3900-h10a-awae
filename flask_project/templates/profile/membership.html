@@ -23,6 +23,11 @@
 <div class="container w-75">
   <h3>Membership</h3>
   <p>Lorem ipsum some kind of information about battlepass</p>
+  <p>Level: {{ current_cafepass.level }}</p>
+  <p>Net xp: {{ current_cafepass.net_xp }}</p>
+  <form action="{{ url_for('api_bp.profile_cafepass_add') }}" method='POST'>
+    <button type='submit' class="btn btn-primary">Increase level</button>
+  </form>
 </div>
 
 {% endblock %}

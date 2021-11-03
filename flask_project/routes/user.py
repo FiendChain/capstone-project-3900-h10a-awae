@@ -61,24 +61,11 @@ def profile_orders():
             order_data["payment"] = db.get_entry_by_id("payment_past", order["payment_past_id"])
             order_data["billing"] = db.get_entry_by_id("billing_past", order["billing_past_id"])
             order_items = db.get_entries_by_heading("order2_item", "order2_id", order["id"])
-            order_data["products"] = [db.get_entry_by_id("products", order_item["product_id"]) for order_item in order_items]
+            products = [db.get_entry_by_id("products", order_item["product_id"]) for order_item in order_items]
+            products = [{**product, 'quantity': order_item['quantity']} for product, order_item in zip(products, order_items) ]
+            order_data["products"] = products
             order_datas.append(order_data)
-    print(order_datas)
 
-    #     orders = db.get_entries_by_heading("order2", "user_id", current_user.get_id())
-    #     print(orders)
-    #     order_dict = []
-    #     # has fields: order, list of products
-    #     for order in orders:
-    #         order_products = []
-    #         order_items = db.get_entries_by_heading("order2_item", "order2_id", order["id"])
-    #         for order_item in order_items:
-    #             product = db.get_entry_by_id("products", order_item["product_id"])
-    #             order_products.append(product)
-            
-    #         order_dict.append(order)
-    # print("order dict")
-    # print(order_dict)
     date = datetime.now().strftime("%d %b %y")
     
     return render_template('orders.html', data=order_datas, date=date)
@@ -89,17 +76,18 @@ def order_page(id):
     with app.app_context():
         db = get_db()
     order = db.get_entry_by_id("order2", id)
+    if order is None:
+        abort(404)
+
+    if order["user_id"] != current_user.get_id():
+        abort(403)
+
     payment = db.get_entry_by_id("payment_past", order["payment_past_id"])
     billing = db.get_entry_by_id("billing_past", order["billing_past_id"])
     order_items = db.get_entries_by_heading("order2_item", "order2_id", order["id"])
 
     products = [db.get_entry_by_id("products", order_item["product_id"]) for order_item in order_items]
-
-    if order is None:
-        abort(404)
-    if order["user_id"] != current_user.get_id():
-        abort(403)
-
+    products = [{**product, 'quantity': order_item['quantity']} for product, order_item in zip(products, order_items) ]
 
     data = dict(
         is_success=True,
@@ -108,12 +96,6 @@ def order_page(id):
         billing=billing,
         products=products
     )
-    #cart = get_user_cart()
-    for product in products:
-        cart_item = db.get_entries_by_heading("cart_item", "product_id", product["id"])
-        assert(len(cart_item) == 1)
-        cart_item = cart_item[0]
-        db.delete_by_id("cart_item", cart_item["id"])
-    # print(data)
+
     return render_template("order_page.html", **data)
 

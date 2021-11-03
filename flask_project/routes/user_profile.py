@@ -84,7 +84,3 @@ def profile_payment():
         return jsonify(serialize_form(form)), 400
     return jsonify(dict(redirect=url_for("user_bp.profile_payment"))), 200
 
-@user_bp.route('/profile/membership')
-@login_required
-def profile_membership():
-    return render_template("profile/membership.html")

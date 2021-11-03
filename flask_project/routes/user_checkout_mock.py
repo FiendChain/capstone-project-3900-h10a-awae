@@ -12,9 +12,11 @@ from .cart import  get_user_cart
 
 from classes.checkout import CheckoutExpired, CheckoutAlreadyCompleted
 from classes.order import Order, Payment, Billing
+from classes.cafepass import refresh_cafepass_level, get_cafepass
 from db.checkout_db import checkout_db, order_db
 
 import random
+import math
 
 # handle checkout on instant buy
 @api_bp.route('/transaction/buy', methods=['POST'])
@@ -99,8 +101,19 @@ def cart_checkout_billing(checkout_id):
     # TODO: Prefill with user details if available
     # TODO: Replace this with a more secure method of storage and loading
     else:
-        default_billing_info = None
-        default_payment_info = None
+        default_billing_info = dict(
+            country="Australia",
+            address="Kensignton Avenue 12th",
+            state=random.choice(valid_states),
+            zip_code="5678"
+        )
+
+        default_payment_info = dict(
+            cc_name="Jeff Goldblum",
+            cc_number="5555 5555 5555 5555",
+            cc_expiry="12 / 26",
+            cc_cvc="987" 
+        )
 
     form = PaymentCardForm()
     data = dict(
@@ -150,7 +163,8 @@ def cart_checkout_billing(checkout_id):
     order = (current_user.get_id(), payment_past_id, billing_past_id, checkout.total_cost, checkout.total_items)
     order_id = db.add("order2", order)
     for product in checkout.get_products():
-        order_item = (order_id, product["id"])
+        order_item = (order_id, product["id"], product["quantity"])
+        print(order_item)
         db.add("order2_item", order_item)
 
 
@@ -162,6 +176,18 @@ def cart_checkout_billing(checkout_id):
             print("TODO: Save payment info")
 
     checkout.order_id = order_id    # Automatically sets checkout.is_completed to true
+
+    # increase battlepass here at checkout completion
+    cafepass = get_cafepass(current_user.get_id())
+    if cafepass:
+        print("Updating cafepass")
+        with app.app_context():
+            db = get_db()
+            cafepass_old = list(cafepass.values())
+            cafepass['net_xp'] += int(math.floor(checkout.total_cost))
+            cafepass['level'] = refresh_cafepass_level(db, cafepass)
+            cafepass_new = list(cafepass.values())
+            db.update("cafepass", cafepass_old, cafepass_new)
 
     res =  dict(redirect=url_for("user_bp.order_page", id=order_id))
     

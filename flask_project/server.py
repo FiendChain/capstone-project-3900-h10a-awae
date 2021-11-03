@@ -58,6 +58,7 @@ def create_database():
 
         db.fill("products", "data/awae_products.xlsx")
         db.fill("users", "data/awae_accounts.xlsx")
+        db.fill("level", "data/awae_levels.xlsx")
         # db.add("users", (
         #     "Arnold", "Schwar", "arnold@gmail.com", "0404123456", 0
         # ))
