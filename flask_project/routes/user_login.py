@@ -75,7 +75,7 @@ def register():
             print(f"User registered: {serialize_form(form)}")
 
             user = db.get_entries_by_heading("users", "username", user_data[0])[0]
-            flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, chr(user["id"]), user["is_admin"])    # user id must be unicode
+            flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, user["id"], user["is_admin"])    # user id must be unicode
             print(f"User {flask_user.get_username()} registered and logged in")
             login_user(flask_user, remember=form.remember_me.data)
             return jsonify(dict(redirect=url_for("user_bp.home")))

@@ -23,7 +23,7 @@ def profile():
 @login_required
 def profile_edit_login_security():
     form = UserProfileLoginSecurityForm()
-    id = current_user.get_id() # unicode to int
+    id = current_user.get_id()
     with app.app_context():
         db = get_db()
         user = db.get_entry_by_id("users", id)
@@ -36,7 +36,7 @@ def profile_edit_login_security():
 def profile_edit_login_security():
     form = UserProfileLoginSecurityForm()
     if form.validate_on_submit():
-        id = current_user.get_id() # unicode to int
+        id = current_user.get_id()
         with app.app_context():
             db = get_db()
             user = db.get_entry_by_id("users", id)
