@@ -36,11 +36,11 @@ def product_buy():
 @user_bp.route("/checkout", methods=["POST"])
 def cart_checkout():
     cart = get_user_cart()
-
+    print(f"CART ITEMS: {cart.to_list()}")
     with app.app_context():
         db = get_db()
         checkout_id = checkout_db.create_checkout(cart.to_list(), db, current_user.get_id())
-    
+    # x = checkout_db.get_checkout(checkout_id, db)
     return redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
 
 # handle checkout billing screen
@@ -59,6 +59,11 @@ def cart_checkout_billing(checkout_id):
     
     if checkout.user_id != current_user.get_id():
         abort(403)
+    
+    if checkout.is_completed:
+        return redirect(url_for("user_bp.order_page", id=checkout.order_id))
+    
+
 
     # # Check if customer specified quantity is <= current stock in database
     # products = checkout.get_products()
@@ -72,8 +77,7 @@ def cart_checkout_billing(checkout_id):
     #         error = True
     #         error_msg = f"Error, user specified quantity more than database stock for product id {product['id']}"
     #         print(error_msg)
-    if checkout.is_completed:
-        return redirect(url_for("user_bp.order_page", id=checkout.order_id))
+
 
     # TODO: Prefill with user details if available
     form = PaymentCardForm()
@@ -115,18 +119,19 @@ def cart_checkout_billing(checkout_id):
         return jsonify(res), 200
 
     # create order and redirect
-    payment = Payment(
-        form.cc_name.data, form.cc_number.data, 
-        form.cc_expiry.data, form.cc_cvc.data)
-    
-    billing = Billing(
-        form.country.data, form.address.data,
-        form.state.data, form.zip_code.data
-    )
+    payment = (form.cc_name.data, form.cc_number.data, form.cc_expiry.data, form.cc_cvc.data)
+    billing = (form.country.data, form.address.data, form.state.data, form.zip_code.data)
+    payment_past_id = db.add("payment_past", payment)
+    billing_past_id = db.add("billing_past", billing)
 
-    order = Order(current_user.get_id(), checkout.products, payment, billing)
-    order_id = order_db.add_order(order)
-    checkout.order_id = order_id
+    order = (current_user.get_id(), payment_past_id, billing_past_id, checkout.total_cost, checkout.total_items)
+    order_id = db.add("order2", order)
+    for product in checkout.get_products():
+        order_item = (order_id, product["id"])
+        db.add("order2_item", order_item)
+
+
+    checkout.order_id = order_id    # Automatically sets checkout.is_completed to true
 
     res =  dict(redirect=url_for("user_bp.order_page", id=order_id))
     
