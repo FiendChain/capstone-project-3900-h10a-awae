@@ -97,8 +97,8 @@ class Database(object):
         # print(query, params)
         self.cur.execute(query, params)
         self.conn.commit()
-        print(f"Entry {entry_no_id[0]} added")
-        return entry_no_id[0]
+        print(f"Entry {entry_no_id[0]} added with id {self.cur.lastrowid}")
+        return self.cur.lastrowid
         
     def delete(self, table_name, entry):
         query = f"DELETE FROM {table_name} WHERE rowid = ?"
@@ -115,6 +115,8 @@ class Database(object):
         self.conn.commit()
         print(f"Entry {id} deleted")
         return id
+    
+
 
     # Please put old id in new id
     def update(self, table_name, entry_old, entry_new):
