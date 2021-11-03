@@ -7,12 +7,14 @@ from flask_login import current_user
 
 from server import app, get_db
 from .endpoints import user_bp, api_bp
-from .forms import UserPurchaseForm, PaymentCardForm, serialize_form
+from .forms import UserPurchaseForm, PaymentCardForm, serialize_form, valid_states
 from .cart import  get_user_cart
 
 from classes.checkout import CheckoutExpired, CheckoutAlreadyCompleted
 from classes.order import Order, Payment, Billing
 from db.checkout_db import checkout_db, order_db
+
+import random
 
 # handle checkout on instant buy
 @api_bp.route('/transaction/buy', methods=['POST'])
@@ -75,13 +77,35 @@ def cart_checkout_billing(checkout_id):
     if checkout.is_completed:
         return redirect(url_for("user_bp.order_page", id=checkout.order_id))
 
+    # NOTE: Guest user placeholder for demonstration
+    if not current_user.is_authenticated:
+        default_billing_info = dict(
+            country="Australia",
+            address="Guest Address #1",
+            state=random.choice(valid_states),
+            zip_code="1234"
+        )
+
+        default_payment_info = dict(
+            cc_name="Guest Name #1",
+            cc_number="4242 4242 4242 4242",
+            cc_expiry="01 / 26",
+            cc_cvc="123" 
+        )
     # TODO: Prefill with user details if available
+    # TODO: Replace this with a more secure method of storage and loading
+    else:
+        default_billing_info = None
+        default_payment_info = None
+
     form = PaymentCardForm()
     data = dict(
         checkout=checkout,
         form=form,
         checkout_id=checkout_id,
-
+        default_billing_info=default_billing_info,
+        default_payment_info=default_payment_info,
+        valid_states=valid_states
     )
 
 
@@ -91,7 +115,6 @@ def cart_checkout_billing(checkout_id):
 @api_bp.route("/checkout_billing/<string:checkout_id>", methods=["POST"])
 def cart_checkout_billing(checkout_id):
     form = PaymentCardForm()
-    #TODO: Add additional payment validation here 
     if not form.validate_on_submit():
         return jsonify(serialize_form(form)), 400
 
@@ -123,6 +146,13 @@ def cart_checkout_billing(checkout_id):
         form.country.data, form.address.data,
         form.state.data, form.zip_code.data
     )
+
+    # TODO: Handle saving of user data for checkout
+    if current_user.is_authenticated:
+        if form.remember_billing.data:
+            print("TODO: Save billing information")
+        if form.remember_payment.data:
+            print("TODO: Save payment info")
 
     order = Order(current_user.get_id(), checkout.products, payment, billing)
     order_id = order_db.add_order(order)

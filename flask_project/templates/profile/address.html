@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Your Addresses</title>
+{% endblock %}
+
+{% block content %}
+{% include 'user_navbar.html' %}
+
+<!--Prefill card details for insecure testing-->
+<script src="/static/js/wtf_ajax_form.js"></script>
+
+<div class="container-fluid justify-content-md-center text-center border-bottom pb-0 mb-3">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb mb-2">
+      <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('user_bp.profile') }}">Profile</a></li>
+      <li class="breadcrumb-item active">Your Addresses</li>
+    </ol>
+  </nav>
+</div>
+
+<div class="container w-50">
+  <h3>Your Addresses</h3>
+  <form method="POST" action="{{ url_for('api_bp.profile_address') }}" id="user-address-form" class="wtf-ajax-form">
+    {{ form.csrf_token }}
+    <div class="row">
+      <div class="col input-group">
+        <select type="text" name="{{ form.country.id }}" id="{{ form.country.id }}" class="form-select" placeholder="Country" required>
+          <option value="Australia" selected>Australia</option>
+        </select>
+        <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.country.id }}"></div>
+      </div>
+    </div>
+    <div class="row">
+        <div class="col input-group">
+          <input type="text" name="{{ form.address.id }}" id="{{ form.address.id }}" class="form-control" placeholder="Address" value="{{ form.address.data or '' }}" required>
+          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.address.id }}"></div>
+        </div>
+    </div>
+    <div class="row">
+      <div class="col input-group">
+        <select type="text" name="{{ form.state.id }}" id="{{ form.state.id }}" class="form-select" placeholder="State" required>
+          {% for state in valid_states %}
+          <option value="{{ state }}" {{ 'selected' if state == form.state.value }}>{{ state }}</option>
+          {% endfor %}
+        </select>
+        <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.state.id }}"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col input-group">
+        <input type="text" name="{{ form.zip_code.id }}" id="{{ form.zip_code.id }}" class="form-control" placeholder="Zip Code" minlength="4" maxlength="4" value="{{ form.zip_code.value or '' }}" required>
+        <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.zip_code.id }}"></div>
+      </div>
+    </div>
+    <div class="form-row my-2">
+      <div class="col">
+        <button type="submit" class="btn btn-primary w-100">Submit Changes</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

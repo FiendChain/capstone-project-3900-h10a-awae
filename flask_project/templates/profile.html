@@ -47,8 +47,8 @@ $("document").ready(function() {
   <div class="row justify-content-center">
     {{ render_tile("Your Orders", "Track, return, or buy things again", url_for("user_bp.profile_orders")) }}
     {{ render_tile("Login & Security", "Edit login, name, and phone number", url_for("user_bp.profile_edit_login_security")) }}
-    {{ render_tile("Your Addresses", "Edit addresses for orders", url_for("user_bp.home")) }}
-    {{ render_tile("Your Payments", "Manage payment methods and settings", url_for("user_bp.home")) }}
+    {{ render_tile("Your Addresses", "Edit addresses for orders", url_for("user_bp.profile_address")) }}
+    {{ render_tile("Your Payments", "Manage payment methods and settings", url_for("user_bp.profile_payment")) }}
     {{ render_tile("Reviews", "View and manage your product reviews", url_for("user_bp.home")) }}
     {{ render_tile("Memberships", "View your membership benefits and status", url_for("user_bp.profile_membership")) }}
   </div>

@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block head %}
+<title>Your Payments</title>
+{% endblock %}
+
+{% block content %}
+{% include 'user_navbar.html' %}
+
+<!--Prefill card details for insecure testing-->
+<script src="/static/js/wtf_ajax_form.js"></script>
+<script src="/static/js/jquery.card.js"></script>
+<script>
+$("document").ready(function() {
+  let form = $("form#user-payment-form");
+
+  form.card({
+    container: '.card-wrapper', // *required*
+    formSelectors: {
+      numberInput: 'input#cc_number',
+      expiryInput: 'input#cc_expiry',
+      cvcInput: 'input#cc_cvc',
+      nameInput: 'input#cc_name',
+    },
+    width: 200,
+    formatting: true,
+    messages: {
+      validDate: 'valid\ndate',
+      monthYear: 'mm/yyyy',
+    },
+    placeholders: {
+      number: '•••• •••• •••• ••••',
+      name: 'Full Name',
+      expiry: '••/••',
+      cvc: '•••'
+    },
+    masks: {
+      cardNumber: '•' // optional - mask card number
+    },
+    debug: true
+  })
+});
+</script>
+
+<div class="container-fluid justify-content-md-center text-center border-bottom pb-0 mb-3">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb mb-2">
+      <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
+      <li class="breadcrumb-item"><a href="{{ url_for('user_bp.profile') }}">Profile</a></li>
+      <li class="breadcrumb-item active">Your Payments</li>
+    </ol>
+  </nav>
+</div>
+
+<div class="container w-50">
+  <h3>Your Payments</h3>
+  <form method="POST" action="{{ url_for('api_bp.profile_payment') }}" id="user-payment-form" class="wtf-ajax-form">
+    {{ form.csrf_token }}
+    <div class="card-wrapper"></div>
+    <div class="row my-1">
+      <div class="col">
+        <div class="form-floating">
+          <input type="text" name="{{ form.cc_name.id }}" id="{{ form.cc_name.id }}" class="form-control" placeholder="Full Name" value="{{ form.cc_name.data or '' }}" required>
+          <label for="{{ form.cc_name.id }}">Name</label>
+          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.cc_name.id }}"></div>
+        </div>
+      </div>
+    </div>
+    <div class="row my-1">
+      <div class="col">
+        <div class="col form-floating">
+          <input type="text" name="{{ form.cc_number.id }}" id="{{ form.cc_number.id }}" class="form-control" min="19" max="19" placeholder="•••• •••• •••• ••••" value="{{ form.cc_number.data or '' }}" required>
+          <label for="{{ form.cc_number.id }}">Credit Card Number</label>
+          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.cc_number.id }}"></div>
+        </div>
+      </div>
+    </div>
+    <div class="row my-1">
+      <div class="col pe-0 me-1">
+        <div class="form-floating">
+          <input type="text" name="{{ form.cc_expiry.id }}" id="{{ form.cc_expiry.id }}" class="form-control" min="" max="7" placeholder="••/••" value="{{ form.cc_expiry.data or '' }}" required>
+          <label for="{{ form.cc_expiry.id }}">Expiry</label>
+          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.cc_expiry.id }}"></div>
+        </div>
+      </div>
+      <div class="col ps-0 ms-1">
+        <div class="form-floating">
+          <input type="text" name="{{ form.cc_cvc.id }}" id="{{ form.cc_cvc.id }}" class="form-control" placeholder="•••" value="{{ form.cc_cvc.data or '' }}" required>
+          <label for="{{ form.cc_cvc.id }}">CVC</label>
+          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.cc_cvc.id }}"></div>
+        </div>
+      </div>
+    </div>
+    <div class="form-row my-2">
+      <div class="col">
+        <button type="submit" class="btn btn-primary w-100">Submit Changes</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+{% endblock %}

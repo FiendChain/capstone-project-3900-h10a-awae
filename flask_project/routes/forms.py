@@ -138,7 +138,7 @@ class ProductSearchParams(FlaskForm):
     sort_type = StringField(Optional(), default="price_low_to_high")
 
 # form for card validation
-class PaymentCardForm(FlaskForm):
+class CreditCardForm(FlaskForm):
     cc_name = StringField(
         validators=[
             Length(5, 50),
@@ -166,9 +166,19 @@ class PaymentCardForm(FlaskForm):
             InputRequired()]
     )
 
+class BillingAddressForm(FlaskForm):
     country = StringField(validators=[AnyOf(["Australia"]), InputRequired()])
     address = StringField(validators=[Length(min=5), InputRequired()])
     state = StringField(validators=[AnyOf(valid_states), InputRequired()])
     zip_code = StringField(validators=[
         Regexp(re.compile(r"(\d){4}"), message="Zip code must be 4 digits"), 
         InputRequired()])
+
+
+class PaymentCardForm(CreditCardForm, BillingAddressForm):
+    remember_billing = BooleanField(validators=[Optional()], default=False)
+    remember_payment = BooleanField(validators=[Optional()], default=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+

@@ -174,7 +174,6 @@ def validate_product_id(id):
 def get_user_cart():
     # cart = SessionCart(session)
     print("GETTING USER CART")
-    # TODO: Replace this with the cart in sql database when done
     # if not current_user.is_authenticated:
     #     # create a new cart for not logged in user
     #     cart = SessionCart(session)

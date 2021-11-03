@@ -77,7 +77,7 @@ def create_stripe_session(cart):
         id = current_user.get_id()
         with app.app_context():
             db = get_db()
-            user = db.get_entry_by_id("users", ord(id))
+            user = db.get_entry_by_id("users", id)
             config["customer_email"] = user["email"]
 
     session = stripe.checkout.Session.create(**config)

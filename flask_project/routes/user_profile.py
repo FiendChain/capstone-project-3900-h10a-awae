@@ -8,7 +8,9 @@ from flask_login.utils import login_required
 
 from server import app, get_db
 from .endpoints import user_bp, api_bp
-from .forms import UserProfileLoginSecurityForm, serialize_form
+from .forms import UserProfileLoginSecurityForm, BillingAddressForm, CreditCardForm
+from .forms import valid_states
+from .forms import serialize_form
 
 import datetime
 
@@ -21,7 +23,7 @@ def profile():
 @login_required
 def profile_edit_login_security():
     form = UserProfileLoginSecurityForm()
-    id = ord(current_user.get_id()) # unicode to int
+    id = current_user.get_id() # unicode to int
     with app.app_context():
         db = get_db()
         user = db.get_entry_by_id("users", id)
@@ -34,7 +36,7 @@ def profile_edit_login_security():
 def profile_edit_login_security():
     form = UserProfileLoginSecurityForm()
     if form.validate_on_submit():
-        id = ord(current_user.get_id()) # unicode to int
+        id = current_user.get_id() # unicode to int
         with app.app_context():
             db = get_db()
             user = db.get_entry_by_id("users", id)
@@ -49,8 +51,38 @@ def profile_edit_login_security():
                 user_old += (value, )
             user_new = (user["id"], user["username"], form.new_password.data, form.email.data, form.phone.data, user["is_admin"])
             db.update("users", user_old, user_new)
-        return jsonify(dict(redirect=url_for("user_bp.profile")))
+        return jsonify(dict(redirect=url_for("user_bp.profile"))), 200
     return jsonify(serialize_form(form)), 400
+
+# Address information
+@user_bp.route('/profile/address')
+@login_required
+def profile_address():
+    form = BillingAddressForm()
+    return render_template("profile/address.html", form=form, valid_states=valid_states)
+
+@api_bp.route("/profile/address", methods=["POST"])
+@login_required
+def profile_address():
+    form = BillingAddressForm()
+    if not form.validate_on_submit():
+        return jsonify(serialize_form(form)), 400
+    return jsonify(dict(redirect=url_for("user_bp.profile_address"))), 200
+
+# Payment information
+@user_bp.route('/profile/payment')
+@login_required
+def profile_payment():
+    form = CreditCardForm()
+    return render_template("profile/payment.html", form=form)
+
+@api_bp.route("/profile/payment", methods=["POST"])
+@login_required
+def profile_payment():
+    form = CreditCardForm()
+    if not form.validate_on_submit():
+        return jsonify(serialize_form(form)), 400
+    return jsonify(dict(redirect=url_for("user_bp.profile_payment"))), 200
 
 @user_bp.route('/profile/membership')
 @login_required
