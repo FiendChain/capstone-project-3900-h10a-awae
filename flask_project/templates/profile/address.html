@@ -24,34 +24,42 @@
   <h3>Your Addresses</h3>
   <form method="POST" action="{{ url_for('api_bp.profile_address') }}" id="user-address-form" class="wtf-ajax-form">
     {{ form.csrf_token }}
-    <div class="row">
-      <div class="col input-group">
-        <select type="text" name="{{ form.country.id }}" id="{{ form.country.id }}" class="form-select" placeholder="Country" required>
-          <option value="Australia" selected>Australia</option>
-        </select>
-        <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.country.id }}"></div>
-      </div>
-    </div>
-    <div class="row">
-        <div class="col input-group">
+    <div class="row my-2">
+      <div class="col">
+        <div class="form-floating">
           <input type="text" name="{{ form.address.id }}" id="{{ form.address.id }}" class="form-control" placeholder="Address" value="{{ form.address.data or '' }}" required>
+          <label for="{{ form.address.id }}">Address</label>
           <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.address.id }}"></div>
         </div>
-    </div>
-    <div class="row">
-      <div class="col input-group">
-        <select type="text" name="{{ form.state.id }}" id="{{ form.state.id }}" class="form-select" placeholder="State" required>
-          {% for state in valid_states %}
-          <option value="{{ state }}" {{ 'selected' if state == form.state.value }}>{{ state }}</option>
-          {% endfor %}
-        </select>
-        <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.state.id }}"></div>
       </div>
     </div>
-    <div class="row">
-      <div class="col input-group">
-        <input type="text" name="{{ form.zip_code.id }}" id="{{ form.zip_code.id }}" class="form-control" placeholder="Zip Code" minlength="4" maxlength="4" value="{{ form.zip_code.data or '' }}" required>
-        <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.zip_code.id }}"></div>
+    <div class="row my-2">
+      <div class="col pe-1">
+        <div class="form-floating">
+          <select type="text" name="{{ form.country.id }}" id="{{ form.country.id }}" class="form-select" placeholder="Country" required>
+            <option value="Australia" selected>Australia</option>
+          </select>
+          <label for="{{ form.country.id }}">Country</label>
+          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.country.id }}"></div>
+        </div>
+      </div>
+      <div class="col px-1">
+        <div class="form-floating">
+          <select type="text" name="{{ form.state.id }}" id="{{ form.state.id }}" class="form-select" placeholder="State" required>
+            {% for state in valid_states %}
+            <option value="{{ state }}" {{ 'selected' if state == form.state.value }}>{{ state }}</option>
+            {% endfor %}
+          </select>
+          <label for="{{ form.state.id }}">State</label>
+          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.state.id }}"></div>
+        </div>
+      </div>
+      <div class="col ps-1">
+        <div class="form-floating">
+          <input type="text" name="{{ form.zip_code.id }}" id="{{ form.zip_code.id }}" class="form-control" placeholder="Zip Code" minlength="4" maxlength="4" value="{{ form.zip_code.data or '' }}" required>
+          <label for="{{ form.zip_code.id }}">Zip Code</label>
+          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.zip_code.id }}"></div>
+        </div>
       </div>
     </div>
     <div class="form-row my-2">
