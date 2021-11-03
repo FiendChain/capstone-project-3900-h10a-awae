@@ -127,7 +127,7 @@
         <!--Checkout summary-->
         <div class="row">
           <div class="col text-start">Subtotal:</div>
-          <div class="col text-end">{{ format_price(order.total_cost) }}</div>
+          <div class="col text-end">{{ format_price(order.subtotal) }}</div>
         </div>
         <div class="row">
           <div class="col text-start">Shipping:</div>
@@ -135,7 +135,11 @@
         </div>
         <div class="row">
           <div class="col text-start">Discount:</div>
-          <div class="col text-end">{{ format_price(0) }}</div>
+          <div class="col text-end">{{ format_price(order.discount) }}</div>
+        </div>
+        <div class="row">
+          <div class="col text-start">Total cost:</div>
+          <div class="col text-end">{{ format_price(order.total_cost) }}</div>
         </div>
         <div class="border-bottom my-2"></div>
         <!--Print our checkout summary-->

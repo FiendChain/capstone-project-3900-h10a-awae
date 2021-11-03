@@ -15,7 +15,7 @@ class CheckoutAlreadyCompleted(Exception):
 
 # Checkout contains the items and total cost and number of items
 class Checkout:
-    def __init__(self, products, user_id, is_cart=False):
+    def __init__(self, products, frac_discount, user_id, is_cart=False):
         assert user_id is not None
         # each checkout has a list of products, and a user id
         self.products = products 
@@ -25,15 +25,20 @@ class Checkout:
         # if a checkout was successful, then it is assigned an order id
         self._order_id = None
 
-        self.total_cost = 0
+
+        self.subtotal = 0
         self.total_items = 0
 
         for p in self.products:
             unit_price = p['unit_price']
             quantity = p['quantity']
 
-            self.total_cost += quantity*unit_price
+            self.subtotal += quantity*unit_price
             self.total_items += quantity
+        
+        self.discount = self.subtotal * frac_discount
+        self.total_cost = self.subtotal * (1-frac_discount)
+        self.frac_discount = frac_discount
     
     @property
     def order_id(self):
@@ -64,7 +69,7 @@ class CheckoutDatabase:
     def __init__(self):
         self.checkouts = {}
 
-    def create_checkout(self, data, db, user_id, checkout_id=None, is_cart=False):
+    def create_checkout(self, data, db, discount, user_id, checkout_id=None, is_cart=False):
         products = []
         for item in data:
             product_id, quantity = item["product_id"], item["quantity"]
@@ -73,7 +78,7 @@ class CheckoutDatabase:
                 continue
             products.append({**product, 'quantity': quantity})
         
-        checkout = Checkout(products, user_id, is_cart=is_cart)
+        checkout = Checkout(products, discount, user_id, is_cart=is_cart)
         if checkout_id is None:
             checkout_id = self.gen_id()
         

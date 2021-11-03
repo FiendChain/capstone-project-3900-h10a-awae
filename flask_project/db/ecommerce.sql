@@ -76,6 +76,8 @@ CREATE TABLE IF NOT EXISTS "order2" (
   "user_id" int NOT NULL,
   "payment_past_id" int NOT NULL,
   "billing_past_id" int NOT NULL,
+  "subtotal" real,
+  "discount" real,
   "total_cost" real,
   "total_items" int,
   FOREIGN KEY ("payment_past_id") REFERENCES Paymemt_past("id"),

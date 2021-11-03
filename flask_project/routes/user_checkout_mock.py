@@ -12,7 +12,7 @@ from .cart import  get_user_cart
 
 from classes.checkout import CheckoutExpired, CheckoutAlreadyCompleted
 from classes.order import Order, Payment, Billing
-from classes.cafepass import refresh_cafepass_level, get_cafepass
+from classes.cafepass import refresh_cafepass_level, get_cafepass, CafepassInfo
 from db.checkout_db import checkout_db, order_db
 
 import random
@@ -32,7 +32,14 @@ def product_buy():
 
     with app.app_context():
         db = get_db()
-        checkout_id = checkout_db.create_checkout([data], db, current_user.get_id(), is_cart=False)
+
+        cafepass = get_cafepass()
+        if cafepass:
+            discount = CafepassInfo(cafepass, db).frac_discount
+        else:
+            discount = 0
+
+        checkout_id = checkout_db.create_checkout([data], db, discount, current_user.get_id(), is_cart=False)
 
     return redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
 
@@ -41,9 +48,17 @@ def product_buy():
 def cart_checkout():
     cart = get_user_cart()
     print(f"CART ITEMS: {cart.to_list()}")
+
+
     with app.app_context():
         db = get_db()
-        checkout_id = checkout_db.create_checkout(cart.to_list(), db, current_user.get_id(), is_cart=True)
+        cafepass = get_cafepass()
+        if cafepass:
+            discount = CafepassInfo(cafepass, db).frac_discount
+        else:
+            discount = 0
+
+        checkout_id = checkout_db.create_checkout(cart.to_list(), db, discount, current_user.get_id(), is_cart=True)
     # x = checkout_db.get_checkout(checkout_id, db)
     return redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
 
@@ -160,7 +175,7 @@ def cart_checkout_billing(checkout_id):
     payment_past_id = db.add("payment_past", payment)
     billing_past_id = db.add("billing_past", billing)
 
-    order = (current_user.get_id(), payment_past_id, billing_past_id, checkout.total_cost, checkout.total_items)
+    order = (current_user.get_id(), payment_past_id, billing_past_id, checkout.subtotal, checkout.discount, checkout.total_cost, checkout.total_items)
     order_id = db.add("order2", order)
     for product in checkout.get_products():
         order_item = (order_id, product["id"], product["quantity"])
