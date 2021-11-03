@@ -66,7 +66,6 @@ class CheckoutDatabase:
     def create_checkout(self, data, db, user_id, checkout_id=None):
         products = []
         for item in data:
-            print(item)
             product_id, quantity = item["product_id"], item["quantity"]
             product = db.get_entry_by_id("products", product_id)
             if product is None:
