@@ -83,10 +83,8 @@ def cart_checkout_billing(checkout_id):
         try:
             checkout = checkout_db.get_checkout(checkout_id, db)
         except KeyError as ex:
-            print(ex)
             abort(404)
         except CheckoutExpired as ex:
-            print(ex)
             abort(404)
     
     if checkout.user_id != current_user.get_id():
@@ -146,10 +144,8 @@ def cart_checkout_billing(checkout_id):
         try:
             checkout = checkout_db.get_checkout(checkout_id, db)
         except KeyError as ex:
-            print(ex)
             abort(404)
         except CheckoutExpired as ex:
-            print(ex)
             abort(404)
 
     if checkout.user_id != current_user.get_id():
@@ -170,7 +166,6 @@ def cart_checkout_billing(checkout_id):
     order_id = db.add("order2", order)
     for product in checkout.get_products():
         order_item = (order_id, product["id"], product["quantity"])
-        print(order_item)
         db.add("order2_item", order_item)
 
 

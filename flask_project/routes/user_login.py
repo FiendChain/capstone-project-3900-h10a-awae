@@ -9,10 +9,10 @@ from flask_login.utils import login_required
 from server import login_manager, app, get_db
 from .endpoints import user_bp, api_bp
 from .forms import LoginForm, RegisterForm, serialize_form
-from classes.flaskuser import FlaskUser
 
-import uuid
-
+from classes.account import get_login_user, create_registered_user
+from classes.account import get_guest_account, create_guest_account
+from classes.account import get_flask_user_from_db, UsernameTaken
 
 # Signin endpoints
 @user_bp.route('/login', methods=['GET'])
@@ -38,53 +38,39 @@ def login():
 
     if not form.validate_on_submit():
         return jsonify(serialize_form(form)), 400
+    
+    flask_user = get_login_user(form.name.data, form.password.data)
 
-    if form.validate_on_submit():
-        username = form.name.data
-        password = form.password.data
-        with app.app_context():
-            db = get_db()
-            valid = db.validate_user(username, password)
+    if not flask_user:
+        form.name.errors.append("Invalid credentials")
+        form.password.errors.append("Invalid credentials")
+        return jsonify(serialize_form(form)), 400
 
-            # invalid credentials
-            if valid == True:
-                user = db.get_entries_by_heading("users", "username", username)[0]
-                flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, user["id"], user["is_admin"])    # user id must be unicode
-                print(f"User {flask_user.get_username()}logged in: {serialize_form(form)}")
-                login_user(flask_user, remember=form.remember_me.data)
-                return jsonify(dict(redirect=url_for("user_bp.home")))
-            else:
-                form.name.errors.append("Invalid credentials")
-                form.password.errors.append("Invalid credentials")
-                return jsonify(serialize_form(form)), 400
+    login_user(flask_user, remember=form.remember_me.data)
+    return jsonify(dict(redirect=url_for("user_bp.home")))
 
 # Perform registration validation
 @api_bp.route("/register", methods=["POST"])
 def register():
     form = RegisterForm()
-    if form.validate_on_submit():
-        with app.app_context():
-            db = get_db()
-            user_data = (form.username.data, form.password.data, form.email.data, form.phone.data, 0, 1)   # 0 = user, 1 = admin
-            try:
-                db.add("users", user_data)
-            except Exception as e:
-                form.username.errors.append("Username already taken")
-                return jsonify(serialize_form(form)), 400
-
-            print(f"User registered: {serialize_form(form)}")
-
-            user = db.get_entries_by_heading("users", "username", user_data[0])[0]
-            flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, user["id"], user["is_admin"])    # user id must be unicode
-            print(f"User {flask_user.get_username()} registered and logged in")
-            login_user(flask_user, remember=form.remember_me.data)
-            return jsonify(dict(redirect=url_for("user_bp.home")))
+    if not form.validate_on_submit():
+        return jsonify(serialize_form(form)), 400
     
-    return jsonify(serialize_form(form)), 400
+    try:
+        flask_user = create_registered_user(
+            form.username.data, form.password.data,
+            form.email.data, form.phone.data)
+    except UsernameTaken:
+        form.username.errors.append("Username already taken")
+        return jsonify(serialize_form(form)), 400
+
+    login_user(flask_user, remember=form.remember_me.data)
+    return jsonify(dict(redirect=url_for("user_bp.home")))
+    
 
 # Make sure a user is either given a guest account or is already logged in
 @app.before_request
-def create_guest_account():
+def default_guest_login():
     # if already logged in
     if current_user and current_user.get_id() is not None:
         return
@@ -100,51 +86,29 @@ def create_guest_account():
 
     # attempt to login a guest user if their id is available
     if guest_id is not None:
-        with app.app_context():
-            db = get_db()
-            user = db.get_entry_by_id("users", guest_id)
-            # login the guest account
-            if user is not None and not user["is_authenticated"]:
-                print(f"Logging in already created guest user id={guest_id}")
-                flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, user["id"], user["is_admin"])
-                login_user(flask_user, True)
-                return
-
-    # create guest account if not logged 
-    print("Creating a guest account")
-    with app.app_context():
-        db = get_db()
-        while True:
-            id = str(uuid.uuid4())
-            username = f"Guest#{id}"
-            user_data = (username, "", "", "", 0, 0)
-            try:
-                db.add("users", user_data)
-            except Exception as ex:
-                continue
-            break
-    
-    user = db.get_entries_by_heading("users", "username", username)[0]
-    guest_id = user["id"]
-    flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, guest_id, user["is_admin"])    # user id must be unicode
+        flask_user = get_guest_account(guest_id)
+        if flask_user:
+            login_user(flask_user, remember=True)
+            return
+        
+    flask_user = create_guest_account()
     login_user(flask_user, remember=True)
-    session["guest_id"] = guest_id
+    session["guest_id"] = flask_user.get_id()
     session.modified = True
-
 
 # Loads and returns the User object for current session
 @login_manager.user_loader
 def load_user(id):
-    # print(f"Loading user with id={id}")
     with app.app_context():
         db = get_db()
-        try:
-            user = db.get_entry_by_id("users", id) # convert unicode id back to int
-        except:
-            user = None
-        
-        if user is None:
-            return None
 
-        flask_user = FlaskUser(user["username"], user["is_authenticated"], True, False, user["id"], user["is_admin"])
-        return flask_user
+    try:
+        user = db.get_entry_by_id("users", id)
+    except:
+        user = None
+        
+    if user is None:
+        return None
+
+    flask_user = get_flask_user_from_db(user)
+    return flask_user
