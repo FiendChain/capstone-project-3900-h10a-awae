@@ -23,6 +23,12 @@ def cart():
 
     return render_template('cart.html', **data)
 
+# Send cart as json 
+@api_bp.route("/cart", methods=['GET'])
+def cart_data():
+    cart = get_user_cart()
+    return jsonify(dict(cart_items=cart.items)), 200
+
 # Add product to cart from product page when user clicks "Add to cart"
 @api_bp.route('/transaction/add', methods=['POST'])
 def product_add():
@@ -43,7 +49,7 @@ def product_add():
     return jsonify(serialize_form(form)), 200
 
 # Update the quantity of a product in the cart on cart page
-@api_bp.route('/transactions/update', methods=['POST'])
+@api_bp.route('/transaction/update', methods=['POST'])
 def product_update():
     form = UserPurchaseForm(meta=dict(csrf=False))
 

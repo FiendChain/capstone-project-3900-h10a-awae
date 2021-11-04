@@ -38,7 +38,7 @@ def product_buy():
         abort(404)
     
     if quantity > product['stock']:
-        abort(400)
+        return jsonify(dict(error="Out of stock")), 400
 
     cart_item = {"product_id": product_id, "quantity": quantity}
 
@@ -59,7 +59,7 @@ def product_buy():
     return redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
 
 # handle checkout on cart checkout
-@user_bp.route("/checkout", methods=["POST"])
+@user_bp.route("/checkout", methods=["POST", "GET"])
 def cart_checkout():
 
     with app.app_context():

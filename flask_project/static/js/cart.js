@@ -1,12 +1,91 @@
-$('document').ready(() => {
-    let el_total_cost = $("#cart-summary-total-cost");
-    let el_total_items = $("#cart-summary-total-items");
-    let el_cart_count = $("#navbar-cart-count");
+// Api for cart actions
+const cart_api = {
+  async fetch_cart() {
+    let res = await fetch("/api_v1/cart");
+    return res.json();
+  },
 
+  async add_product(id, quantity) {
+    let data = new FormData();
+    data.append('id', id);
+    data.append('quantity', quantity);
+
+    const res = await fetch("/api_v1/transaction/add", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      redirect: 'follow',
+      body: new URLSearchParams(data),
+    });
+
+    return res;
+  },
+  
+  async update_product(id, quantity) {
+    let data = new FormData();
+    data.append('id', id);
+    data.append('quantity', quantity);
+
+    const res = await fetch("/api_v1/transaction/update", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      redirect: 'follow',
+      body: new URLSearchParams(data),
+    });
+
+    return res;
+  },
+
+  async delete_product(id) {
+    return this.update_product(id, 0);
+  }
+}
+
+// Vue store for cart
+const store = Vuex.createStore({
+  state: {
+    cart_items: [],
+  },
+  actions: {
+    async get_cart(context) {
+      let data = await cart_api.fetch_cart();
+      context.commit('set_products', data.cart_items);
+    },
+    async delete_item(context, product_id) {
+      let res = await cart_api.delete_product(product_id);
+      await context.dispatch('get_cart');
+      return res;
+    },
+    async set_quantity(context, { product_id, quantity }) {
+      let res = await cart_api.update_product(product_id, quantity);
+      await context.dispatch('get_cart');
+      return res;
+    },
+    async add_item(context, { product_id, quantity }) {
+        let res = await cart_api.add_product(product_id, quantity);
+        await context.dispatch('get_cart');
+        return res;
+    },
+  },
+  mutations: {
+    set_products(state, cart_items) {
+      state.cart_items = cart_items;
+    }
+  }
+})
+
+store.dispatch("get_cart");
+
+// Jquery handles cart deletion modal
+$('document').ready(() => {
     // handle modal when confirming product deletion
     $("#cart-product-delete-modal").on('show.bs.modal', function (ev) {
         // we pass in a callback to continue form submission
         let button = $(ev.relatedTarget);
+        let product_id = button.attr("data-bs-product-id");
         let product_name = button.attr("data-bs-product-name");
 
         let description = $(this).find("#product-name");
@@ -14,73 +93,25 @@ $('document').ready(() => {
 
         description.html(product_name);
         confirm_btn.on("click", () => {
-            // find form and edit value and submit
-            let form = button.parents("#cart-controls:first").find("form");
-            let quantity = form.find("input[name='quantity']");
-            quantity.val(0)
-            form.submit();
+            store.dispatch('delete_item', product_id);
         });
     });
-    
-    // on quantity change, submit changes
-    $('.quantity_form').find('input[id="quantity"]').change(function(ev) {
-        let input = $(this);
-        let form = input.parents('form:first');
-        form.submit();
-    });
+});
 
-    $('.quantity_form').submit(ev => {
-        ev.preventDefault();
-        let form = $(ev.currentTarget);
-        let url = form.attr('action');
-        let data = form.serializeArray();
-
-        let quantity_field = form.find('input[id="quantity"]');
-
-        // response from server is the correct quantity
-        let update_quantity_from_res = (res) => {
-            if (res.quantity === undefined) {
-                return;
-            } 
-
-            // update the summary from the response
-            if (res.summary !== undefined) {
-                let total_cost = res.summary.total_cost;
-                let total_items = res.summary.total_items;
-                
-                let cost_str = `${total_cost.toFixed(2)}`;
-                const cost_parts = cost_str.split(".");
-                let i = cost_parts[0];
-                let d = cost_parts[1];
-
-                el_total_cost.html(`$${i}.<small>${d}</small>`);
-                el_total_items.html(`${total_items}`);
-                el_cart_count.html(`${total_items}`);
-            }
-
-            let quantity = Number(res.quantity);
-            if (!isFinite(quantity)) {
-                return;
-            }
-
-
-            // if item was deleted, then remove entry
-            if (quantity == 0) {
-                let product_entry = form.parents(".cart-product:first");
-                product_entry.remove();
-            // update entry quantity
-            } else {
-                if (quantity.val != quantity) {
-                    quantity_field.val(quantity);
-                }
-            }
-        }
-        
-        $.ajax({
-            url, data, type: 'POST',
-            // success: data => update_quantity_from_res(data),
-            success: xhr => location.reload(),
-            error: xhr => location.reload(),
-        });
-    })
-})
+// Render price tag in vue
+const vue_price_item = {
+  props: {
+    'price': Number,
+    'currency': { 
+      type: String, 
+      default: '$'
+    }
+  },
+  computed: {
+    price_parts() {
+      return String(this.price.toFixed(2)).split('.');
+    }
+  },
+  delimiters: ['[[', ']]'],
+  template: `[[ currency ]][[ price_parts[0] ]].<small>[[ price_parts[1] ]]</small>`,
+};

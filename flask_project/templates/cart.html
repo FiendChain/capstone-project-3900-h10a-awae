@@ -7,7 +7,6 @@
 
 {% block content %}
 {% include 'user_navbar.html' %}
-<script src="/static/js/cart.js"></script>
 
 <!--Breadcrumb-->
 <div class="container-fluid justify-content-md-center text-center border-bottom pb-0 mb-3">
@@ -20,63 +19,16 @@
 </div>
 
 <!--Cart-->
-<div class="container">
+<div class="container" id="main-cart">
   <div class="row mx-4 justify-content-center">
     <!--Cart items-->
     <div class="col-7">
-      {% if not products %}
-      <div class="row justify-content-center text-center py-3 rounded border">
+      <div v-if="cart_items.length == 0" class="row justify-content-center text-center py-3 rounded border">
         <h5>Cart is empty</h5>
       </div>
-      {% endif %}
-      {% for p in products %}
-      <div class="row cart-product w-100 {{ 'border-bottom' if not loop.last }} pb-2 mb-2" id="{{ p.id }}">
-        <div class="col-auto ps-0">
-          <div>
-            <img src="{{ p.image_url }}" class="product-img rounded">
-          </div>
-        </div>
-        <!--Product info-->
-        <div class="col py-3 me-auto">
-          <h5 class="mb-1"><a href="{{ url_for('user_bp.product_page', id=p.id) }}" class="text-dark text-link">{{ p.name }}</a></h5>
-          <!--Stock status-->
-          <small>
-            <div>Brand: <strong>{{ p.brand }}</strong></div>
-            <div>Est. Delivery: <strong>{{ p.delivery_days }} days</strong></div>
-          </small>
-          <div class="mt-1">
-            <h5 class="text-primary align-bottom">{{ format_price(p.unit_price) }}</h5>
-          </div>
-        </div>
-        <!--Product cost and quantity control-->
-        <div class="col-md-3 py-3 me-3 text-end" id="cart-controls">
-          <!--Quantity editing form-->
-          <div class="row">
-            <div class="text-end px-0 pb-2">Quantity</div>
-            <form class='quantity_form' id="{{ p.id }}" method='POST' action="{{ url_for('api_bp.product_update') }}">
-              <input type="hidden" id="product_id" name="id" value="{{ p.id }}">
-              <div class="form-group row justify-content-end">
-                <div class="col-auto px-0 text-end">
-                  <div class="input-group">
-                    <input class="form-control form-control-sm" type="number" min="1" max="{{ p.quantity + p.stock }}" id="quantity" name="quantity" value={{ p.quantity }}> 
-                    <div class="invalid-tooltip d-none"></div>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-          <!--Product deletion link-->
-          <div class="row align-end justify-content-end text-end">
-            <div 
-              class="col-auto btn btn-link text-danger text-decoration-none pe-0" 
-              data-bs-toggle="modal" data-bs-target="#cart-product-delete-modal"
-              data-bs-product-id="{{ p.id }}" data-bs-product-name="{{ p.name }}">
-              <small><i class="bi bi-x-circle me-1"></i>Remove</small>
-            </div>
-          </div>
-        </div>
+      <div class="overflow-auto" style="max-height: 75vh" v-else>
+        <cart-item v-for="item in cart_items" :item="item"></cart-item>
       </div>
-      {% endfor %}
     </div>
     <!--Cart sidebar-->
     <div class="col-4">
@@ -85,7 +37,7 @@
         <div class="text-center">
           <h6>Subtotal</h6>
           <h4>
-            <span id="cart-summary-total-cost">{{ format_price(summary.total_cost) }}</span>
+            <price-item :price="total_cost"></price-item>
           </h4>
         </div>
         <!--<form class="wtf-ajax-form text-start">
@@ -98,7 +50,7 @@
         <!--Buy now button-->
         <div>
           <form action="{{ url_for("user_bp.cart_checkout") }}" method="POST">
-            <button type="submit" class="btn btn-success w-100" {{ "disabled" if not products }}>Proceed to checkout</a>
+            <button type="submit" class="btn btn-success w-100" :disabled="cart_items.length == 0">Proceed to checkout</a>
           </form>
         </div>
       </div>
@@ -125,5 +77,96 @@
     </div>
   </div>
 </div>
+
+<!--Cart item template-->
+<template id="cart-item-template">
+  <div class="row cart-product w-100 border-bottom  pb-2 mb-2" :id="item.id">
+    <div class="col-auto ps-0">
+      <div>
+        <img :src="item.image_url" class="product-img rounded">
+      </div>
+    </div>
+    <!--Product info-->
+    <div class="col py-3 me-auto">
+      <h5 class="mb-1"><a :href="'/products/'+item.id" class="text-dark text-link">[[ item.name ]]</a></h5>
+      <!--Stock status-->
+      <small>
+        <div>Brand: <strong>[[ item.brand ]]</strong></div>
+        <div>Est. Delivery: <strong>[[ item.delivery_days ]] days</strong></div>
+      </small>
+      <div class="mt-1">
+        <h5 class="text-primary align-bottom"><price-item :price="item.unit_price"></price-item></h5>
+      </div>
+    </div>
+    <!--Product cost and quantity control-->
+    <div class="col-md-3 py-3 me-3 text-end" id="cart-controls">
+      <!--Quantity editing form-->
+      <div class="row">
+        <div class="text-end px-0 pb-2">Quantity</div>
+        <div class="col-auto ms-auto me-0 pe-0">
+          <input 
+            class="form-control form-control-sm" type="number" 
+            id="quantity" name="quantity" 
+            min="1" :max="item.quantity + item.stock" :value="item.quantity"
+            @input="change_quantity($event.target.value)"> 
+        </div>
+      </div>
+      <!--Product deletion link-->
+      <div class="row align-end justify-content-end text-end">
+        <div 
+          class="col-auto btn btn-link text-danger text-decoration-none pe-0" 
+          data-bs-toggle="modal" data-bs-target="#cart-product-delete-modal"
+          :data-bs-product-id="item.id" :data-bs-product-name="item.name">
+          <small><i class="bi bi-x-circle me-1"></i>Remove</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!--Create vue app for the cart-->
+<script type="text/javascript">
+let vm_cart = Vue.createApp({
+  delimiters: ['[[', ']]'],
+  computed: {
+    cart_items() {
+      return store.state.cart_items;
+    },
+    total_cost() {
+      let reducer = (v, item) => v += item.unit_price*item.quantity;
+      return store.state.cart_items.reduce(reducer, 0);
+    },
+    total_items() {
+      let reducer = (v, item) => v += item.quantity;
+      return store.state.cart_items.reduce(reducer, 0);
+    }
+  },
+  methods: {
+    refresh() {
+      store.dispatch("get_cart");
+    },
+  },
+})
+
+vm_cart.component('price-item', vue_price_item);
+
+vm_cart.component('cart-item', {
+  props: ['item'],
+  delimiters: ['[[', ']]'],
+  methods: {
+    change_quantity: _.debounce(function(quantity) {
+      store.dispatch("set_quantity", {
+        product_id: this.item.id, 
+        quantity
+      });
+    }, 200),
+  },
+  template: $("template#cart-item-template").html(),
+})
+
+vm_cart.use(store);
+vm_cart.mount("#main-cart");
+
+</script>
 
 {% endblock %}
