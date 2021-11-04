@@ -120,7 +120,7 @@ class RegisterForm(FlaskForm):
 
 # form for adding or removing products from the cart
 class UserPurchaseForm(FlaskForm):
-    id = StringField(Length(2,100), validators=[InputRequired(message="Product id required")])
+    id = StringField(Length(1,100), validators=[InputRequired(message="Product id required")])
     quantity = IntegerField(validators=[NumberRange(min=0, max=1000), InputRequired()])
 
 # form for editing the user's details
