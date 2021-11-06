@@ -1,4 +1,4 @@
-from flask import json, redirect, request, render_template, url_for, abort, jsonify
+from flask import json, redirect, request, render_template, url_for, abort, jsonify, flash
 
 from server import app, get_db
 from .endpoints import admin_bp, admin_api_bp
@@ -99,6 +99,7 @@ def edit_product(id):
 
         db.update("products", product, product)
 
+    flash("Successfully updated product details")
     return redirect(url_for("admin_bp.edit_product", id=id))
 
 @admin_api_bp.route("/products/<string:id>/delete", methods=["POST"])

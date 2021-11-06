@@ -56,7 +56,7 @@ $("document").ready(function() {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      redirect: 'follow',
+      redirect: 'manual',
       body: new URLSearchParams(data),
     }).then(res => {
       if (res.redirected) {

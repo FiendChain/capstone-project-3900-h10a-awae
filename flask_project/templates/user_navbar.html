@@ -253,7 +253,7 @@ vm_nav_cart.component('cart-item', {
   methods: {
     delete_item(ev) {
       ev.preventDefault();
-      store.dispatch("delete_item", this.item.id)
+      store.dispatch("delete_item", this.item.product.id)
     },
   },
   template: $("template#nav-cart-item-template").html(),

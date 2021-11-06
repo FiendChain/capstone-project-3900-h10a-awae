@@ -20,7 +20,7 @@ const cart_api = {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      redirect: 'follow',
+      redirect: 'manual',
       body: new URLSearchParams(data),
     });
 
@@ -41,7 +41,7 @@ const cart_api = {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      redirect: 'follow',
+      redirect: 'manual',
       body: new URLSearchParams(data),
     });
 
@@ -132,7 +132,7 @@ $('document').ready(() => {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      redirect: 'follow',
+      redirect: 'manual',
       body: new URLSearchParams(data),
     });
     

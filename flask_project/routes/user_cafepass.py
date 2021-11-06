@@ -2,7 +2,7 @@
 Routes for a user's profile specific information
 """
 
-from flask import json, redirect, request, render_template, url_for, jsonify, abort, session
+from flask import json, redirect, request, render_template, url_for, jsonify, abort, session, flash, get_flashed_messages
 from flask_login import current_user
 from flask_login.utils import login_required
 
@@ -53,6 +53,8 @@ def profile_cafepass():
         default_payment_info=default_payment_info,
         valid_states=valid_states
     )
+
+    print(list(get_flashed_messages(with_categories=True)))
     return render_template("profile/cafepass.html", **data)
 
 @api_bp.route('/profile/cafepass', methods=["POST"])
@@ -81,7 +83,8 @@ def profile_cafepass():
     with app.app_context():
         db = get_db()
         db.update("cafepass", cafepass_old, cafepass_new)
-    
+
+    flash("Successfully upgraded cafepass to paid membership") 
     return redirect(url_for("user_bp.profile_cafepass"))
 
 @app.context_processor

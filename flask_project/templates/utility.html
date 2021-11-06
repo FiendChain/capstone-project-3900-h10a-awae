@@ -63,6 +63,7 @@
 </div>
 {% endmacro %}
 
+<!--Render image carousel-->
 {% macro render_carousel(products, id, N=4, img_class="product-img") %}
 {% set rows = chunk(N, products) %}
 <div id="{{ id }}" class="carousel carousel-dark slide" data-bs-ride="carousel">
@@ -86,4 +87,18 @@
     <span class="visually-hidden">Next</span>
   </button>
 </div>
+{% endmacro %}
+
+<!--Render flashed messages-->
+{% macro render_flash() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% set lut = {"message": "alert-success", "error": "alert-danger", "success": "alert-success", "warning": "alert-warning"} %}
+  {% for category, message in messages %}
+  {% set cls = lut.get(category, "alert-danger") %}
+  <div class="alert {{ cls }} alert-dismissible text-center shadow-sm" role="alert">
+    {{ message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+  {% endfor %}
+{% endwith %}
 {% endmacro %}

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from "utility.html" import render_flash %}
 
 {% block head %}
 <title>Your Addresses</title>
@@ -22,6 +23,7 @@
   <div class="row justify-content-center">
     <div class="col-auto">
       <h3>Your Addresses</h3>
+      {{ render_flash() }}
       <form method="POST" action="{{ url_for('api_bp.profile_address') }}" id="user-address-form" class="wtf-ajax-form">
         {{ form.csrf_token }}
         <div class="row my-2">

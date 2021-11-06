@@ -1,4 +1,5 @@
 {% extends 'admin/admin_base.html' %}
+{% from "utility.html" import render_flash %}
 
 {% block head %}
 {{ super() }}
@@ -25,6 +26,9 @@
     <div class="col-auto text-end">
       <a href="{{ url_for("user_bp.product_page", id=form.id.data) }}" class="btn btn-outline-secondary"><i class="bi bi-eye fs-6 me-2"></i>View Page</a>
     </div>
+  </div>
+  <div class="row w-100">
+    {{ render_flash() }}
   </div>
   <form class="wtf-ajax-form" id="edit-product" method="POST" action="{{ url_for("admin_api_bp.edit_product", id=id) }}" enctype="multipart/form-data">
     {{ form.csrf_token }}

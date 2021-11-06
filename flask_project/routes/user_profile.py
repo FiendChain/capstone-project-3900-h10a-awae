@@ -3,7 +3,7 @@ Routes for a user's profile specific information
 """
 
 from re import S
-from flask import redirect, request, render_template, url_for, jsonify, abort, session
+from flask import redirect, request, render_template, url_for, jsonify, abort, session, flash
 from flask_login import current_user
 from flask_login.utils import login_required
 
@@ -57,6 +57,7 @@ def profile_edit_login_security():
     user_new = list(user.values())
     db.update("users", user_old, user_new)
 
+    flash("Successfully updated login details")
     return redirect(url_for("user_bp.profile"))
 
 # Address information
@@ -77,12 +78,14 @@ def profile_address():
         form.address.data, form.country.data, 
         form.state.data, form.zip_code.data)
 
+    flash("Successfully updated billing details")
     return redirect(url_for("user_bp.profile_address"))
 
 @api_bp.route("/profile/clear_address", methods=["POST"])
 @login_required
 def clear_profile_address():
     clear_default_billing_info()
+    flash("Successfully cleared billing details")
     return redirect(url_for('user_bp.profile_address'))
 
 # Payment information
@@ -111,10 +114,12 @@ def profile_payment():
         form.cc_name.data, form.cc_number.data,
         form.cc_expiry.data, form.cc_cvc.data)
 
+    flash("Successfully updated payment details")
     return redirect(url_for("user_bp.profile_payment"))
 
 @api_bp.route("/profile/clear_payment", methods=["POST"])
 @login_required
 def clear_profile_payment():
     clear_default_payment_info()
+    flash("Successfully cleared payment details")
     return redirect(url_for('user_bp.profile_payment'))
