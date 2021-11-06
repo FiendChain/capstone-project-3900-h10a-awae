@@ -14,31 +14,25 @@ $("document").ready(function() {
     let url = $(this).attr("action");
     let method = $(this).attr("method");
 
-    console.log({url, method, data, status_code});
-
     let req = fetch(url, {
       method: method,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      redirect: 'manual',
       body: new URLSearchParams(data),
     });
 
     req
       .then(res => {
-        if (res.redirected) {
-          window.location.href = res.url;
-          return Promise.reject();
+        if (res.status === 302) {
+          res.json().then(data => {
+            window.location.href = data.location;
+          })
         } else if (res.status == status_code) {
           location.reload();
-          return Promise.reject();
         } else {
-          return res.text();
+          location.reload();
         }
-      })
-      .then(text => {
-        document.write(text);
       })
   });
 

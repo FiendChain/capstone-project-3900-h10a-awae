@@ -8,7 +8,7 @@ from flask_login.utils import login_required
 
 from server import app, get_db
 from .endpoints import user_bp, api_bp
-from .forms import CafePassForm, serialize_form, PaymentCardForm, valid_states
+from .forms import CafePassForm, serialize_form, PaymentCardForm, valid_states, api_redirect
 
 import datetime
 
@@ -54,7 +54,6 @@ def profile_cafepass():
         valid_states=valid_states
     )
 
-    print(list(get_flashed_messages(with_categories=True)))
     return render_template("profile/cafepass.html", **data)
 
 @api_bp.route('/profile/cafepass', methods=["POST"])
@@ -85,7 +84,7 @@ def profile_cafepass():
         db.update("cafepass", cafepass_old, cafepass_new)
 
     flash("Successfully upgraded cafepass to paid membership") 
-    return redirect(url_for("user_bp.profile_cafepass"))
+    return api_redirect(url_for("user_bp.profile_cafepass"))
 
 @app.context_processor
 def battlepass_injector():

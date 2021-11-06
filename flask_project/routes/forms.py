@@ -33,6 +33,10 @@ def serialize_form(form):
 
     return data
 
+# redirect response for api call
+def api_redirect(location, code=302):
+    return dict(location=location), code
+
 # TODO: Find a better place to put this
 # valid_product_sort = ["price_low_to_high", "price_high_to_low"]
 valid_delivery_units = ["days", "weeks", "months", "years"]

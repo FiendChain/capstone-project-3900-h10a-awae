@@ -3,7 +3,7 @@ from flask import json, redirect, request, render_template, url_for, abort, json
 from server import app, get_db
 from .endpoints import admin_bp, admin_api_bp
 
-from .forms import ProductForm, serialize_form
+from .forms import ProductForm, serialize_form, api_redirect
 from .roles import admin_required
 
 @admin_bp.route('/', methods=['GET'])
@@ -54,7 +54,7 @@ def add_product():
         )
         id = db.add("products", product)
 
-    return redirect(url_for("admin_bp.products"))
+    return api_redirect(url_for("admin_bp.products"))
 
 @admin_bp.route("/products/<string:id>/edit", methods=["GET"])
 @admin_required
@@ -100,7 +100,7 @@ def edit_product(id):
         db.update("products", product, product)
 
     flash("Successfully updated product details")
-    return redirect(url_for("admin_bp.edit_product", id=id))
+    return api_redirect(url_for("admin_bp.edit_product", id=id))
 
 @admin_api_bp.route("/products/<string:id>/delete", methods=["POST"])
 @admin_required

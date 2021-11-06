@@ -8,6 +8,7 @@ from flask_login import current_user
 
 from server import app, get_db
 from .endpoints import user_bp, api_bp
+from .forms import api_redirect
 
 from classes.order import Order
 from classes.cart import TempCart, InvalidProduct, OutOfStock, DelistedProduct
@@ -79,7 +80,7 @@ def create_checkout_from_order(id):
         discount = 0
 
     checkout_id = checkout_db.create_checkout(cart.items, db, discount, current_user.get_id(), is_cart=False)
-    return redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
+    return api_redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
     
 
     

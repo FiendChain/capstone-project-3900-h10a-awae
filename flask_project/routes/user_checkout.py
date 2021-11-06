@@ -7,7 +7,7 @@ from flask_login import current_user
 
 from server import app, get_db
 from .endpoints import user_bp, api_bp
-from .forms import UserPurchaseForm, PaymentCardForm, serialize_form, valid_states
+from .forms import UserPurchaseForm, PaymentCardForm, serialize_form, valid_states, api_redirect
 
 from classes.cart import  get_user_cart, TempCart, InvalidProduct, OutOfStock, DelistedProduct
 from classes.cafepass import refresh_cafepass_level, get_cafepass, CafepassInfo

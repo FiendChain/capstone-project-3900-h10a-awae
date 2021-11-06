@@ -11,7 +11,7 @@ from server import app, get_db
 from .endpoints import user_bp, api_bp
 from .forms import UserProfileLoginSecurityForm, BillingAddressForm, CreditCardForm
 from .forms import valid_states
-from .forms import serialize_form
+from .forms import serialize_form, api_redirect
 
 from classes.profile_payment import get_default_payment_info, get_default_billing_info
 from classes.profile_payment import set_default_payment_info, set_default_billing_payment_info
@@ -58,7 +58,7 @@ def profile_edit_login_security():
     db.update("users", user_old, user_new)
 
     flash("Successfully updated login details")
-    return redirect(url_for("user_bp.profile"))
+    return api_redirect(url_for("user_bp.profile"))
 
 # Address information
 @user_bp.route('/profile/address')
@@ -79,7 +79,7 @@ def profile_address():
         form.state.data, form.zip_code.data)
 
     flash("Successfully updated billing details")
-    return redirect(url_for("user_bp.profile_address"))
+    return api_redirect(url_for("user_bp.profile_address"))
 
 @api_bp.route("/profile/clear_address", methods=["POST"])
 @login_required
@@ -115,7 +115,7 @@ def profile_payment():
         form.cc_expiry.data, form.cc_cvc.data)
 
     flash("Successfully updated payment details")
-    return redirect(url_for("user_bp.profile_payment"))
+    return api_redirect(url_for("user_bp.profile_payment"))
 
 @api_bp.route("/profile/clear_payment", methods=["POST"])
 @login_required

@@ -20,12 +20,12 @@ const cart_api = {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      redirect: 'manual',
       body: new URLSearchParams(data),
     });
 
-    if (res.redirected) {
-      window.location.href = res.url;
+    if (res.status === 302) {
+      let data = await res.json();
+      window.location.href = data.location;
     }
 
     return res;
@@ -41,9 +41,13 @@ const cart_api = {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      redirect: 'manual',
       body: new URLSearchParams(data),
     });
+
+    if (res.status === 302) {
+      let data = await res.json();
+      window.location.href = data.location;
+    }
 
     return res;
   },
@@ -111,7 +115,11 @@ $('document').ready(() => {
     // if adding item failed, then reload page
     // this is probably due to out of stock error
     req.then(res => {
-      if (!res.ok) {
+      if (res.status === 302) {
+        res.json().then(data => {
+          window.location.href = data.location;
+        })
+      } else if (!res.ok) {
         location.reload();
       }
     })
@@ -132,13 +140,14 @@ $('document').ready(() => {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      redirect: 'manual',
       body: new URLSearchParams(data),
     });
     
     req.then(res => {
-      if (res.redirected) {
-        window.location.href = res.url;
+      if (res.status === 302) {
+        res.json().then(data => {
+          window.location.href = data.location;
+        })
       } else if (!res.ok) {
         location.reload();
       }

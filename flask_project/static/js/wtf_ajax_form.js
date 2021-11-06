@@ -35,8 +35,6 @@ $("document").ready(function() {
         let el_input = form.find(el_sel);
         let el_error = form.find(`.wtf-ajax-error[id='${name}']`);
 
-        // TODO: update input field value with wtform value
-        
         // show validation errors
         if (errors && errors.length && errors.length > 0) {
           el_input.addClass("is-invalid");
@@ -50,26 +48,25 @@ $("document").ready(function() {
         }
       }
     }
-
+    
     fetch(url, {
       method: method,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
       },
-      redirect: 'manual',
       body: new URLSearchParams(data),
     }).then(res => {
-      if (res.redirected) {
-        window.location.href = res.url;
-        return Promise.reject();
-      } else if (res.status === 400) {
-        return res.json();
+      if (res.status === 400) {
+        res.json().then(data => {
+          update_from_json(data);
+        });
+      } else if (res.status === 302) {
+        res.json().then(data => {
+          window.location.href = data.location;
+        });
       } else {
         location.reload();
-        return Promise.reject();
       }
-    }).then(data => {
-      update_from_json(data);
-    });
+    })
   });
 });
