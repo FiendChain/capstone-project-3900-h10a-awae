@@ -47,7 +47,7 @@ def login():
         return jsonify(serialize_form(form)), 400
 
     login_user(flask_user, remember=form.remember_me.data)
-    return jsonify(dict(redirect=url_for("user_bp.home")))
+    return redirect(url_for("user_bp.home"))
 
 # Perform registration validation
 @api_bp.route("/register", methods=["POST"])
@@ -65,7 +65,7 @@ def register():
         return jsonify(serialize_form(form)), 400
 
     login_user(flask_user, remember=form.remember_me.data)
-    return jsonify(dict(redirect=url_for("user_bp.home")))
+    return redirect(url_for("user_bp.home"))
     
 
 # Make sure a user is either given a guest account or is already logged in

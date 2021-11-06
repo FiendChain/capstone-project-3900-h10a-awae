@@ -23,10 +23,9 @@ $("document").ready(function() {
     let data = new FormData(this);
     let url = $(this).attr("action");
     let method = $(this).attr("method") || "POST";
-    let enctype = $(this).attr("enctype") || "multipart/form";
 
     // if we recieved a wtform response
-    function update_from_ajax(data) {
+    function update_from_json(data) {
       for (let field of data) {
         let name = field.name;
         let value = field.value;
@@ -52,32 +51,25 @@ $("document").ready(function() {
       }
     }
 
-    // if we successfully sent the form we can redirect or reload
-    function on_success(data) {
-      if (data.redirect) {
-        window.location = data.redirect;
+    fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      redirect: 'follow',
+      body: new URLSearchParams(data),
+    }).then(res => {
+      if (res.redirected) {
+        window.location.href = res.url;
+        return Promise.reject();
+      } else if (res.status === 400) {
+        return res.json();
       } else {
         location.reload();
+        return Promise.reject();
       }
-    }
-
-    // if we got an error, check to see if it is a form error
-    function on_error(xhr, options, error) {
-      if (xhr.status == 400) {
-        update_from_ajax(xhr.responseJSON);
-      } else {
-        location.reload();
-      }
-    }
-
-    // TODO: Allow for custom submit handlers
-    $.ajax({
-      url, data, type: method, enctype,
-      cache: false,
-      processData: false,
-      contentType: false,
-      success: on_success,
-      error: on_error,
+    }).then(data => {
+      update_from_json(data);
     });
   });
 });

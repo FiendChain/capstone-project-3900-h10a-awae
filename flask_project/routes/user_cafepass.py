@@ -82,7 +82,7 @@ def profile_cafepass():
         db = get_db()
         db.update("cafepass", cafepass_old, cafepass_new)
     
-    return jsonify(dict(redirect=url_for("user_bp.profile_cafepass"))), 200
+    return redirect(url_for("user_bp.profile_cafepass"))
 
 @app.context_processor
 def battlepass_injector():

@@ -51,8 +51,6 @@ $("document").ready(() => {
             return el_default_url.attr('default-src');
         }
 
-        console.log(el_default_url);
-
         // hide the drop zone and show the preview
         function show_image(src, filename) {
             preview_image.attr("src", src);

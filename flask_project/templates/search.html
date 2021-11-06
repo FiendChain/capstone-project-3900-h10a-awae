@@ -94,14 +94,9 @@ $("document").ready(function () {
                 </a>
                 <div class="d-flex flex-row flex-nowrap justify-content-between px-3 my-2">
                   <div class="text-primary">{{ format_price(p.unit_price) }}</div>
-                  <!--Add to cart button-->
-                  <form class='product-buy-or-add-form' method='POST'>
-                    <input type="hidden" id="product_id" name="id" value="{{ p.id }}">
-                    <input id="quantity" name="quantity" value="1" hidden>
-                    <button type="submit" id='cart_add' v-link="{{ url_for('api_bp.product_add') }}" class="btn btn-outline-primary btn-sm">
-                      +<i class="bi bi-cart"></i>
-                    </button>
-                  </form>
+                  <div data-bs-action='add-to-cart' data-bs-id="{{ p.id }}" data-bs-quantity="1" class="btn btn-outline-primary btn-sm">
+                    +<i class="bi bi-cart"></i>
+                  </div>
                 </div>
               </div>
             </div>

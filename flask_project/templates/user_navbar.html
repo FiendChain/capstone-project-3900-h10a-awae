@@ -70,17 +70,17 @@ $("document").ready(function () {
 {% endmacro %}
 
 <template id="nav-cart-item-template">
-  <div class="d-flex cart-product py-1 my-1 border-bottom" :id="item.id">
+  <div class="d-flex cart-product py-1 my-1 border-bottom" :id="item.product.id">
     <div class="col-auto">
       <div>
-        <img :src="item.image_url" class="product-img-sm rounded">
+        <img :src="item.product.image_url" class="product-img-sm rounded">
       </div>
     </div>
     <!--Product info-->
     <div class="col py-1 mx-3">
-      <h6 class="mb-1"><a :href="'/products/'+item.id" class="text-dark text-link">[[ item.name ]]</a></h6>
+      <h6 class="mb-1"><a :href="'/products/'+item.product.id" class="text-dark text-link">[[ item.product.name ]]</a></h6>
       <div class="mt-1 d-flex">
-        <h6 class="text-primary"><price-item :price="item.unit_price"></price-item></h6>
+        <h6 class="text-primary"><price-item :price="item.product.unit_price"></price-item></h6>
         <h6 class="text-dark mx-2">x&nbsp;[[ item.quantity ]]</h6>
       </div>
     </div>
@@ -236,7 +236,7 @@ let vm_nav_cart = Vue.createApp({
       return store.state.cart_items;
     },
     total_cost() {
-      let reducer = (v, item) => v += item.unit_price*item.quantity;
+      let reducer = (v, item) => v += item.product.unit_price*item.quantity;
       return store.state.cart_items.reduce(reducer, 0);
     },
     total_items() {

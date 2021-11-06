@@ -57,7 +57,7 @@ def profile_edit_login_security():
     user_new = list(user.values())
     db.update("users", user_old, user_new)
 
-    return jsonify(dict(redirect=url_for("user_bp.profile"))), 200
+    return redirect(url_for("user_bp.profile"))
 
 # Address information
 @user_bp.route('/profile/address')
@@ -77,7 +77,7 @@ def profile_address():
         form.address.data, form.country.data, 
         form.state.data, form.zip_code.data)
 
-    return jsonify(dict(redirect=url_for("user_bp.profile_address"))), 200
+    return redirect(url_for("user_bp.profile_address"))
 
 @api_bp.route("/profile/clear_address", methods=["POST"])
 @login_required
@@ -111,7 +111,7 @@ def profile_payment():
         form.cc_name.data, form.cc_number.data,
         form.cc_expiry.data, form.cc_cvc.data)
 
-    return jsonify(dict(redirect=url_for("user_bp.profile_payment"))), 200
+    return redirect(url_for("user_bp.profile_payment"))
 
 @api_bp.route("/profile/clear_payment", methods=["POST"])
 @login_required

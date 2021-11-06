@@ -1,4 +1,7 @@
-/* Code taken from: https://bootstrapious.com/p/circular-progress-bar */
+/* 
+ * Code taken from: https://bootstrapious.com/p/circular-progress-bar
+ * Used to create the circular progress bar used in battlepass
+ */
 $("document").ready(function() {
   $(".battlepass-progress").each(function() {
     var value = $(this).attr('data-value');
