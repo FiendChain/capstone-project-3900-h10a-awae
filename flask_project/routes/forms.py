@@ -73,14 +73,15 @@ class ProductForm(FlaskForm):
     image_changed = BooleanField(validators=[InputRequired()], default=False)
     image = FileField(validators=[Optional(), FileAllowed(valid_images, message="Images allowed only")])
 
-    name = StringField(validators=[Length(5, 40), InputRequired(message="Product name is required")])
+    name = StringField(validators=[Length(4, 250), InputRequired(message="Product name is required")])
     unit_price = FloatField(validators=[NumberRange(min=0, max=1000), InputRequired()])
     category = StringField(validators=[InputRequired()])
     brand = StringField(validators=[Length(0, 250)])
-    description = StringField(validators=[Length(0, 250)])
+    description = StringField(validators=[Length(0, 1000)])
     stock = IntegerField(validators=[NumberRange(min=0, max=10000), InputRequired()])
     delivery_days = IntegerField(validators=[NumberRange(min=1, max=1000), InputRequired()])
     warranty_days = IntegerField(validators=[NumberRange(min=1, max=1000), InputRequired()])
+    is_deleted = BooleanField(validators=[Optional()], default=False)
 
     submit_button = SubmitField('Submit Form')
 
