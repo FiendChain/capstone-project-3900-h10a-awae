@@ -82,7 +82,7 @@
                   <p class="text-start my-0"><strong>{{ p.name }}</strong> in {{ p.category }}</p>
                 </a>
                 <!--Stock status-->
-                <div class="d-flex flex-row flex-nowrap mb-1">
+                <div class="d-flex flex-row flex-nowrap">
                   {% if p.stock > 0 %}
                   <p class="text-start my-0 text-success">In stock</p>
                   {% else %}
@@ -91,14 +91,20 @@
                 </div>
                 <!--Product description tags-->
                 <div class="d-flex flex-row">
-                  <form class="product-buy-or-add-form" method="POST">
-                    <input type="text" name="id" value="{{ p.id }}" hidden>
-                    <input type="number" name="quantity" value="1" hidden>
-                    <button type="submit" id="buy_now" v-link="{{ url_for("api_bp.product_buy") }}" class="me-2 btn btn-sm btn-primary">
-                      <i class="bi bi-bag-check fs-7 me-2"></i>Buy again
-                    </button>
-                    <button type="submit" id="cart_add" v-link="{{ url_for("api_bp.product_add") }}" class="me-2 btn btn-sm btn-outline-primary">Add to cart</button>
-                  </form>
+                  {% if not p.is_deleted and p.stock > 0 %}
+                  <button data-bs-action="buy-now" data-bs-id="{{ p.id }}" data-bs-quantity="1" class="me-2 btn btn-sm btn-primary">
+                    <i class="bi bi-bag-check fs-7 me-2"></i>Buy again
+                  </button>
+                  <button data-bs-action="add-to-cart" data-bs-id="{{ p.id }}" data-bs-quantity="1" class="me-2 btn btn-sm btn-outline-primary">Add to cart</button>
+                  {% elif p.is_deleted %}
+                  <div class="text-danger">
+                    <small><i class="bi bi-exclamation-octagon-fill me-1"></i>Item has been delisted</small>
+                  </div>
+                  {% else %}
+                  <div class="text-danger">
+                    <small><i class="bi bi-exclamation-octagon-fill me-1">Out of stock</i></small>
+                  </div>
+                  {% endif %}
                 </div>
               </div>
               <!--Product pricing information-->

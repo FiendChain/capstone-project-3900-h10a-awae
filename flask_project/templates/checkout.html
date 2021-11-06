@@ -8,9 +8,6 @@
 {% block content %}
 {% include 'user_navbar.html' %}
 
-<script src="/static/js/wtf_ajax_form.js"></script>
-<script src="/static/js/jquery.card.js"></script>
-
 <!--Prefill card details for insecure testing-->
 <script>
 $("document").ready(function() {
@@ -77,6 +74,11 @@ $("document").ready(function() {
   <div class="row mx-4 justify-content-center">
     <!--Checkout form-->
     <div class="col-7 mb-4 px-4">
+      {% if not checkout.is_valid %}
+      <div class="alert alert-danger text-center shadow-sm" role="alert">
+        <strong>There are issues with items in your checkout</strong>
+      </div>
+      {% endif %}
       <form role="form" class="wtf-ajax-form" id="payment-information" action="{{ url_for("api_bp.cart_checkout_billing", checkout_id=checkout_id) }}" method="POST">
         <!--Shipping form-->
         {{ form.csrf_token }}
@@ -185,21 +187,34 @@ $("document").ready(function() {
           <h5>Checkout Summary</h5>
         </div>
         <div class="overflow-auto" style="max-height: 50vh">
-          {% for p in checkout.products %}
-          <div class="d-flex cart-product mb-2 border-bottom" id="{{ p.id }}">
+          {% for item in checkout.items %}
+          <div class="d-flex cart-product mb-2 border-bottom" id="{{ item.product.id }}">
             <div class="col-auto">
               <div>
-                <img src="{{ p.image_url }}" class="product-img-sm rounded">
+                <img src="{{ item.product.image_url }}" class="product-img-sm rounded">
               </div>
             </div>
             <!--Product info-->
             <div class="col py-1 mx-3">
-              <h6 class="mb-1"><a href="{{ url_for('user_bp.product_page', id=p.id) }}" class="text-dark text-link">{{ p.name }}</a></h6>
+              <h6 class="mb-1"><a href="{{ url_for('user_bp.product_page', id=item.product.id) }}" class="text-dark text-link">{{ item.product.name }}</a></h6>
               <div class="mt-1 d-flex">
-                <h6 class="text-primary">{{ format_price(p.unit_price) }}</h6>
-                <h6 class="text-dark mx-2">x&nbsp;{{ p.quantity }}</h6>
+                <h6 class="text-primary">{{ format_price(item.product.unit_price) }}</h6>
+                <h6 class="text-dark mx-2">x&nbsp;{{ item.quantity }}</h6>
               </div>
             </div>
+            <!--Show errors about checkout item if they exist-->
+            {% if item.errors %}
+            <div class="col-auto">
+              <div class="dropdown" data-bs-toggle="dropdown" style="cursor: pointer;">
+                <i class="text-danger bi bi-exclamation-octagon-fill mx-1"></i>
+              </div>
+              <div class="dropdown-menu dropdown-menu-end px-3">
+                {% for error in item.errors %}
+                <div class="text-danger"><small>{{ error }}</small></div>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
           </div>
           {% endfor %}
         </div>
@@ -223,7 +238,7 @@ $("document").ready(function() {
         <div class="border-bottom my-2"></div>
         <!--Pay now button-->
         <div class="mt-3">
-          <button type="submit" class="btn btn-success w-100" form="payment-information">
+          <button type="submit" class="btn btn-success w-100" form="payment-information" {{ 'disabled' if not checkout.is_valid }}>
             <strong>Pay {{ format_price(checkout.total_cost) }}</strong>
           </button>
         </div>
