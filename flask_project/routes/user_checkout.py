@@ -51,7 +51,7 @@ def product_buy():
         discount = 0
 
     checkout_id = checkout_db.create_checkout(cart.items, db, discount, current_user.get_id(), is_cart=False)
-    return redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
+    return api_redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
 
 # handle checkout on cart checkout
 @user_bp.route("/checkout", methods=["POST", "GET"])
