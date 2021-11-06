@@ -104,7 +104,7 @@ class Cart:
             item = CartItem(product, cart_item['quantity'])
             item.clear_errors()
             if product['is_deleted']:
-                item.add_error("Product is no longer available")
+                item.add_error("Product has been delisted")
             items.append(item)
 
         return items

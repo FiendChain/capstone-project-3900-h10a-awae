@@ -73,10 +73,6 @@ class Checkout:
     def get_products(self):
         return self.items
 
-class CheckoutExpired(Exception):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
 # Global checkout database
 # Use the sql database to validate checkout sessions
 class CheckoutDatabase:

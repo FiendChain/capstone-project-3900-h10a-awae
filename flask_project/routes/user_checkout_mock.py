@@ -10,7 +10,6 @@ from .endpoints import user_bp, api_bp
 from .forms import UserPurchaseForm, PaymentCardForm, serialize_form, valid_states
 
 from classes.cart import  get_user_cart, TempCart, InvalidProduct, OutOfStock, DelistedProduct
-from classes.checkout import CheckoutExpired, CheckoutAlreadyCompleted
 from classes.cafepass import refresh_cafepass_level, get_cafepass, CafepassInfo
 from classes.profile_payment import get_default_payment_info, get_default_billing_info
 from classes.profile_payment import set_default_billing_payment_info, set_default_payment_info
@@ -84,8 +83,6 @@ def cart_checkout_billing(checkout_id):
             checkout = checkout_db.get_checkout(checkout_id, db)
         except KeyError:
             abort(404)
-        except CheckoutExpired:
-            abort(404)
     
     if checkout.user_id != current_user.get_id():
         abort(403)
@@ -143,9 +140,7 @@ def cart_checkout_billing(checkout_id):
         db = get_db()
         try:
             checkout = checkout_db.get_checkout(checkout_id, db)
-        except KeyError as ex:
-            abort(404)
-        except CheckoutExpired as ex:
+        except KeyError:
             abort(404)
 
     if checkout.user_id != current_user.get_id():
@@ -157,7 +152,7 @@ def cart_checkout_billing(checkout_id):
     
     # if there are errors in the checkout, then dont proceed
     if not checkout.is_valid:
-        return redirect(url_for("api_bp.cart_checkout_billing", checkout_id=checkout_id))
+        return redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
 
     # create order and redirect
     payment = (form.cc_name.data, form.cc_number.data, form.cc_expiry.data, form.cc_cvc.data)
