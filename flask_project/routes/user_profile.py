@@ -15,6 +15,7 @@ from .forms import serialize_form
 
 from classes.profile_payment import get_default_payment_info, get_default_billing_info
 from classes.profile_payment import set_default_payment_info, set_default_billing_payment_info
+from classes.profile_payment import clear_default_payment_info, clear_default_billing_info
 
 @user_bp.route('/profile', methods=["GET"])
 def profile():
@@ -78,6 +79,12 @@ def profile_address():
 
     return jsonify(dict(redirect=url_for("user_bp.profile_address"))), 200
 
+@api_bp.route("/profile/clear_address", methods=["POST"])
+@login_required
+def clear_profile_address():
+    clear_default_billing_info()
+    return redirect(url_for('user_bp.profile_address'))
+
 # Payment information
 @user_bp.route('/profile/payment')
 @login_required
@@ -106,3 +113,8 @@ def profile_payment():
 
     return jsonify(dict(redirect=url_for("user_bp.profile_payment"))), 200
 
+@api_bp.route("/profile/clear_payment", methods=["POST"])
+@login_required
+def clear_profile_payment():
+    clear_default_payment_info()
+    return redirect(url_for('user_bp.profile_payment'))

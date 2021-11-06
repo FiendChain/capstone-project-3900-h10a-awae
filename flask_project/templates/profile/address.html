@@ -20,54 +20,87 @@
   </nav>
 </div>
 
-<div class="container w-50">
-  <h3>Your Addresses</h3>
-  <form method="POST" action="{{ url_for('api_bp.profile_address') }}" id="user-address-form" class="wtf-ajax-form">
-    {{ form.csrf_token }}
-    <div class="row my-2">
-      <div class="col">
-        <div class="form-floating">
-          <input type="text" name="{{ form.address.id }}" id="{{ form.address.id }}" class="form-control" placeholder="Address" value="{{ form.address.data or '' }}" required>
-          <label for="{{ form.address.id }}">Address</label>
-          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.address.id }}"></div>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-auto">
+      <h3>Your Addresses</h3>
+      <form method="POST" action="{{ url_for('api_bp.profile_address') }}" id="user-address-form" class="wtf-ajax-form">
+        {{ form.csrf_token }}
+        <div class="row my-2">
+          <div class="col">
+            <div class="form-floating">
+              <input type="text" name="{{ form.address.id }}" id="{{ form.address.id }}" class="form-control" placeholder="Address" value="{{ form.address.data or '' }}" required>
+              <label for="{{ form.address.id }}">Address</label>
+              <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.address.id }}"></div>
+            </div>
+          </div>
+        </div>
+        <div class="row my-2">
+          <div class="col pe-1">
+            <div class="form-floating">
+              <select type="text" name="{{ form.country.id }}" id="{{ form.country.id }}" class="form-select" placeholder="Country" required>
+                <option value="Australia" selected>Australia</option>
+              </select>
+              <label for="{{ form.country.id }}">Country</label>
+              <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.country.id }}"></div>
+            </div>
+          </div>
+          <div class="col px-1">
+            <div class="form-floating">
+              <select type="text" name="{{ form.state.id }}" id="{{ form.state.id }}" class="form-select" placeholder="State" required>
+                {% for state in valid_states %}
+                <option value="{{ state }}" {{ 'selected' if state == form.state.value }}>{{ state }}</option>
+                {% endfor %}
+              </select>
+              <label for="{{ form.state.id }}">State</label>
+              <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.state.id }}"></div>
+            </div>
+          </div>
+          <div class="col ps-1">
+            <div class="form-floating">
+              <input type="text" name="{{ form.zip_code.id }}" id="{{ form.zip_code.id }}" class="form-control" placeholder="Zip Code" minlength="4" maxlength="4" value="{{ form.zip_code.data or '' }}" required>
+              <label for="{{ form.zip_code.id }}">Zip Code</label>
+              <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.zip_code.id }}"></div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="row justify-content-end my-2">
+        <div class="col-auto">
+          <div class="btn-group">
+            <button type="submit" form="user-address-form" class="btn btn-outline-primary">Submit Changes</button>
+            <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#clear-address-info">Delete</button></li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-    <div class="row my-2">
-      <div class="col pe-1">
-        <div class="form-floating">
-          <select type="text" name="{{ form.country.id }}" id="{{ form.country.id }}" class="form-select" placeholder="Country" required>
-            <option value="Australia" selected>Australia</option>
-          </select>
-          <label for="{{ form.country.id }}">Country</label>
-          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.country.id }}"></div>
-        </div>
+  </div>
+</div>
+
+<!--Delete address information modal-->
+<div class="modal fade" id="clear-address-info" tabindex="-1" aria-labelledby="clear-address-info" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="clear-address-info">Delete Address Information</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="col px-1">
-        <div class="form-floating">
-          <select type="text" name="{{ form.state.id }}" id="{{ form.state.id }}" class="form-select" placeholder="State" required>
-            {% for state in valid_states %}
-            <option value="{{ state }}" {{ 'selected' if state == form.state.value }}>{{ state }}</option>
-            {% endfor %}
-          </select>
-          <label for="{{ form.state.id }}">State</label>
-          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.state.id }}"></div>
-        </div>
+      <div class="modal-body">
+        Are you sure you want to delete your billing address information?
       </div>
-      <div class="col ps-1">
-        <div class="form-floating">
-          <input type="text" name="{{ form.zip_code.id }}" id="{{ form.zip_code.id }}" class="form-control" placeholder="Zip Code" minlength="4" maxlength="4" value="{{ form.zip_code.data or '' }}" required>
-          <label for="{{ form.zip_code.id }}">Zip Code</label>
-          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.zip_code.id }}"></div>
-        </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+        <form action="{{ url_for("api_bp.clear_profile_address") }}" method="POST">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
       </div>
     </div>
-    <div class="form-row my-2">
-      <div class="col">
-        <button type="submit" class="btn btn-primary w-100">Submit Changes</button>
-      </div>
-    </div>
-  </form>
+  </div>
 </div>
 
 {% endblock %}

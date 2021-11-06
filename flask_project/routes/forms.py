@@ -127,7 +127,9 @@ class UserPurchaseForm(FlaskForm):
 class UserProfileLoginSecurityForm(FlaskForm):
     password = StringField(validators=[Length(5, 40), InputRequired(message="Original password is required")])
     new_password = StringField("new_password", validators=[Length(5, 40), InputRequired(message="Password is required")])
-    confirm_password = StringField(validators=[Length(5, 40), InputRequired(message="You must confirm your new password"), EqualTo("new_password")])
+    confirm_password = StringField(validators=[
+        Length(5, 40), InputRequired(message="You must confirm your new password"), 
+        EqualTo("new_password", message="Passwords do not match")])
     email = EmailField(validators=[Email(), InputRequired(message="Email is required")])
     phone = StringField(validators=[PhoneValidator(), InputRequired()])
 
