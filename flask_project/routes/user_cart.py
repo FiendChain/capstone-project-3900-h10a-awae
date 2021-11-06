@@ -27,6 +27,9 @@ def cart():
 @api_bp.route("/cart", methods=['GET'])
 def cart_data():
     cart = get_user_cart()
+    cart_items = cart.items
+    # remove the description to reduce lag when sending cart data
+    cart_items = [item.pop('description', True) and item for item in cart_items]
     return jsonify(dict(cart_items=cart.items)), 200
 
 # Add product to cart from product page when user clicks "Add to cart"

@@ -71,18 +71,17 @@ $("document").ready(function() {
 });
 </script>
 
+{% macro render_text(name, description) %}
+<div class="d-flex flex-row justify-content-between">
+  <div class="me-5 text-muted">{{ name }}</div>
+  <div>{{ description }}</div>
+</div>
+{% endmacro %}
+
 <div class="container mb-5">
   <div class="row justify-content-center">
     <div class="col-auto">
       <h3>Cafepass</h3>
-
-      {% macro render_text(name, description) %}
-      <div class="d-flex flex-row justify-content-between">
-        <div class="me-5 text-muted">{{ name }}</div>
-        <div>{{ description }}</div>
-      </div>
-      {% endmacro %}
-
       <div class="row">
         <div class="col-auto">
           <div class="rounded p-4 shadow-sm border">
@@ -94,7 +93,7 @@ $("document").ready(function() {
                 <span class="progress-bar border-warning"></span>
               </span>
               <div class="progress-value w-100 h-100 rounded-circle d-flex align-items-center justify-content-center">
-                <div class="fs-6">{{ current_cafepass.level }}</div>
+                <div class="fs-1">{{ current_cafepass.level }}</div>
               </div>
             </div>
           </div>
@@ -154,9 +153,9 @@ $("document").ready(function() {
         </div>
       </div>
 
-      <br>
       <!--Payment information-->
       {% if not current_cafepass.paid %}
+      <br>
       <h3>Purchase Cafepass</h3>
       <div class="d-flex flex-row flex-nowrap">
         <!--Checkout form-->

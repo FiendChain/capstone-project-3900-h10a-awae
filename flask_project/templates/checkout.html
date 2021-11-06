@@ -22,7 +22,7 @@ $("document").ready(function() {
     form.find("#state").val("{{ default_billing_info.state }}");
     form.find("#address").val("{{ default_billing_info.address }}");
     form.find("#zip_code").val("{{ default_billing_info.zip_code }}");
-  }).trigger("click");
+  });
   {% endif %}
 
   {% if default_payment_info %}
@@ -31,7 +31,7 @@ $("document").ready(function() {
     form.find("#cc_number").val("{{ default_payment_info.cc_number }}");
     form.find("#cc_expiry").val("{{ default_payment_info.cc_expiry }}");
     form.find("#cc_cvc").val("{{ default_payment_info.cc_cvc }}");
-  }).trigger("click");
+  });
   {% endif %}
 
   form.card({
