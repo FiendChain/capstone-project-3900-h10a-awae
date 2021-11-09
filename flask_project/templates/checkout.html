@@ -184,23 +184,25 @@ $("document").ready(function() {
         <div class="text-center">
           <h5>Checkout Summary</h5>
         </div>
-        {% for p in checkout.products %}
-        <div class="d-flex cart-product mb-2 border-bottom" id="{{ p.id }}">
-          <div class="col-auto">
-            <div>
-              <img src="{{ p.image_url }}" class="product-img-sm rounded">
+        <div class="overflow-auto" style="max-height: 50vh">
+          {% for p in checkout.products %}
+          <div class="d-flex cart-product mb-2 border-bottom" id="{{ p.id }}">
+            <div class="col-auto">
+              <div>
+                <img src="{{ p.image_url }}" class="product-img-sm rounded">
+              </div>
+            </div>
+            <!--Product info-->
+            <div class="col py-1 mx-3">
+              <h6 class="mb-1"><a href="{{ url_for('user_bp.product_page', id=p.id) }}" class="text-dark text-link">{{ p.name }}</a></h6>
+              <div class="mt-1 d-flex">
+                <h6 class="text-primary">{{ format_price(p.unit_price) }}</h6>
+                <h6 class="text-dark mx-2">x&nbsp;{{ p.quantity }}</h6>
+              </div>
             </div>
           </div>
-          <!--Product info-->
-          <div class="col py-1 mx-3">
-            <h6 class="mb-1"><a href="{{ url_for('user_bp.product_page', id=p.id) }}" class="text-dark text-link">{{ p.name }}</a></h6>
-            <div class="mt-1 d-flex">
-              <h6 class="text-primary">{{ format_price(p.unit_price) }}</h6>
-              <h6 class="text-dark mx-2">x&nbsp;{{ p.quantity }}</h6>
-            </div>
-          </div>
+          {% endfor %}
         </div>
-        {% endfor %}
         <!--Checkout summary-->
         <div class="row">
           <div class="col text-start">Subtotal:</div>

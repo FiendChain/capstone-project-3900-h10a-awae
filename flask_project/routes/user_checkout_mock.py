@@ -8,8 +8,8 @@ from flask_login import current_user
 from server import app, get_db
 from .endpoints import user_bp, api_bp
 from .forms import UserPurchaseForm, PaymentCardForm, serialize_form, valid_states
-from .cart import  get_user_cart
 
+from classes.cart import  get_user_cart
 from classes.checkout import CheckoutExpired, CheckoutAlreadyCompleted
 from classes.cafepass import refresh_cafepass_level, get_cafepass, CafepassInfo
 from classes.profile_payment import get_default_payment_info, get_default_billing_info
@@ -23,44 +23,56 @@ import math
 @api_bp.route('/transaction/buy', methods=['POST'])
 def product_buy():
     form = UserPurchaseForm(meta=dict(csrf=False))
+
     if not form.validate_on_submit():
         return jsonify(serialize_form(form)), 400
     
-    id = form.id.data
+    product_id = form.id.data
     quantity = form.quantity.data
-
-    data = {"product_id": id, "quantity": quantity}
 
     with app.app_context():
         db = get_db()
+    product = db.get_entry_by_id("products", product_id)
 
-        cafepass = get_cafepass()
-        if cafepass:
-            discount = CafepassInfo(cafepass, db).frac_discount
-        else:
-            discount = 0
+    if not product_id:
+        abort(404)
+    
+    if quantity > product['stock']:
+        return jsonify(dict(error="Out of stock")), 400
 
-        checkout_id = checkout_db.create_checkout([data], db, discount, current_user.get_id(), is_cart=False)
+    cart_item = {"product_id": product_id, "quantity": quantity}
 
+    # update product stock
+    product_old = list(product.values())
+    product['stock'] -= quantity
+    product_new = list(product.values())
+    db.update("products", product_old, product_new)
+
+    # get cafepass discount
+    cafepass = get_cafepass()
+    if cafepass:
+        discount = CafepassInfo(cafepass, db).frac_discount
+    else:
+        discount = 0
+
+    checkout_id = checkout_db.create_checkout([cart_item], db, discount, current_user.get_id(), is_cart=False)
     return redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
 
 # handle checkout on cart checkout
-@user_bp.route("/checkout", methods=["POST"])
+@user_bp.route("/checkout", methods=["POST", "GET"])
 def cart_checkout():
-    cart = get_user_cart()
-    print(f"CART ITEMS: {cart.to_list()}")
-
 
     with app.app_context():
         db = get_db()
-        cafepass = get_cafepass()
-        if cafepass:
-            discount = CafepassInfo(cafepass, db).frac_discount
-        else:
-            discount = 0
 
-        checkout_id = checkout_db.create_checkout(cart.to_list(), db, discount, current_user.get_id(), is_cart=True)
-    # x = checkout_db.get_checkout(checkout_id, db)
+    cafepass = get_cafepass()
+    if cafepass:
+        discount = CafepassInfo(cafepass, db).frac_discount
+    else:
+        discount = 0
+
+    cart = get_user_cart()
+    checkout_id = checkout_db.create_checkout(cart.db_items, db, discount, current_user.get_id(), is_cart=True)
     return redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
 
 # handle checkout billing screen
@@ -71,10 +83,8 @@ def cart_checkout_billing(checkout_id):
         try:
             checkout = checkout_db.get_checkout(checkout_id, db)
         except KeyError as ex:
-            print(ex)
             abort(404)
         except CheckoutExpired as ex:
-            print(ex)
             abort(404)
     
     if checkout.user_id != current_user.get_id():
@@ -83,20 +93,6 @@ def cart_checkout_billing(checkout_id):
     if checkout.is_completed:
         return redirect(url_for("user_bp.order_page", id=checkout.order_id))
     
-    # # Check if customer specified quantity is <= current stock in database
-    # products = checkout.get_products()
-    # error = False
-    # error_msg = None
-    # for product in products:
-    #     customer_quantity = product["quantity"]
-    #     db_quantity = db.get_entry_by_id("products", product["id"])
-    #     print(f"cq {customer_quantity} dq {db_quantity}")
-    #     if customer_quantity > db_quantity:
-    #         error = True
-    #         error_msg = f"Error, user specified quantity more than database stock for product id {product['id']}"
-    #         print(error_msg)
-
-
     # NOTE: Guest user placeholder for demonstration
     if not current_user.is_authenticated:
         default_billing_info = dict(
@@ -112,6 +108,7 @@ def cart_checkout_billing(checkout_id):
             cc_expiry="01 / 26",
             cc_cvc="123" 
         )
+    # get registered user default info
     else:
         default_billing_info = get_default_billing_info()
         info = get_default_payment_info()
@@ -147,10 +144,8 @@ def cart_checkout_billing(checkout_id):
         try:
             checkout = checkout_db.get_checkout(checkout_id, db)
         except KeyError as ex:
-            print(ex)
             abort(404)
         except CheckoutExpired as ex:
-            print(ex)
             abort(404)
 
     if checkout.user_id != current_user.get_id():
@@ -171,7 +166,6 @@ def cart_checkout_billing(checkout_id):
     order_id = db.add("order2", order)
     for product in checkout.get_products():
         order_item = (order_id, product["id"], product["quantity"])
-        print(order_item)
         db.add("order2_item", order_item)
 
 
@@ -192,7 +186,6 @@ def cart_checkout_billing(checkout_id):
     # increase battlepass here at checkout completion
     cafepass = get_cafepass(current_user.get_id())
     if cafepass:
-        print("Updating cafepass")
         with app.app_context():
             db = get_db()
             cafepass_old = list(cafepass.values())
@@ -203,11 +196,8 @@ def cart_checkout_billing(checkout_id):
     
     # empty cart if checkout originated from cart
     if checkout.is_cart:
-        with app.app_context():
-            db = get_db()
-            cart_items = db.get_entries_by_heading("cart_item", "user_id", current_user.get_id())
-            for cart_item in cart_items:
-                db.delete_by_id("cart_item", cart_item["id"])
+        cart = get_user_cart()
+        cart.empty()
 
     res =  dict(redirect=url_for("user_bp.order_page", id=order_id))
     

@@ -14,26 +14,34 @@ $("document").ready(function() {
     let btn = $(ev.originalEvent.submitter)
     let action = btn.attr('id');
     let url = btn.attr('v-link');
-    let data = form.serializeArray();
+
+    let data = new FormData(this);
+    let json_data = Array.from(data).reduce((m, [k,v]) => { 
+      m[k] = v; 
+      return m; 
+    }, {});
 
     switch (action) 
     {
+    // Use vue store to dispatch cart item add
     case 'cart_add':
-      $.ajax({
-        url, data, type: 'POST',
-        success: () => location.reload(),
-        error: () => location.reload(),
+      let req = store.dispatch('add_item', {
+        product_id: json_data.id, 
+        quantity: json_data.quantity
+      });
+
+      // if adding item failed, then reload page
+      // this is probably due to out of stock error
+      req.then(res => {
+        if (!res.ok) {
+          location.reload();
+        }
       })
       break;
 
     // Buying now lets the browser redirect us to stripe page
-    // For $.redirect, we need to flatten form data into a json
     case 'buy_now':
-      let json = data.reduce((m, o) => {  
-        m[o.name] = o.value; 
-        return m;
-      }, {});
-      $.redirect(url, json, "POST")
+      $.redirect(url, json_data, "POST");
       break;
     }
   });

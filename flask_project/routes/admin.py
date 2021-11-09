@@ -39,8 +39,6 @@ def add_product():
     if not form.validate_on_submit():
         return jsonify(serialize_form(form)), 400
 
-    print(f"Adding product: {form}")
-
     with app.app_context():
         db = get_db()
         if form.image.data and form.image_changed.data:
@@ -83,7 +81,6 @@ def edit_product(id):
     if not form.validate_on_submit():
         return jsonify(serialize_form(form)), 400
 
-    print(f"Editing product: {form}")
     with app.app_context():
         db = get_db()
         if form.image_changed.data and form.image.data:
@@ -99,7 +96,7 @@ def edit_product(id):
             image_url
         )
 
-        db.update("products", product, product) # also pass in new product as old product, as we only need the id of the old product to update table
+        db.update("products", product, product)
 
     return jsonify(dict(redirect=url_for("admin_bp.products")))
 

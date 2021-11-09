@@ -110,7 +110,7 @@
             <div class="col-md-5 ps-0">
               <div class="row form-group text-start">
                 <label class="col-auto me-3 text-start" for="quantity">Quantity</label>
-                <input class="col form-control" type="number" min="1" max="99" id="quantity" name="quantity" value=1> 
+                <input class="col form-control" type="number" min="1" max="{{ product.stock }}" id="quantity" name="quantity" value=1> 
               </div>
             </div>
             <div class="col-auto btn-group pe-0 align-self-end text-end">

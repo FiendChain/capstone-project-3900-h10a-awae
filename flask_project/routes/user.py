@@ -33,12 +33,10 @@ def product_page(id):
 
 @user_bp.route('/search', methods=['GET', 'POST'])
 def search():
-
     with app.app_context():
         db = get_db()
         valid_categories = db.get_unique_values("products", "category")
         form = ProductSearchParams()
-        print(serialize_form(form))
         dict_sort_by = {
             "price_low_to_high": "unit_price ASC",
             "price_high_to_low": "unit_price DESC"

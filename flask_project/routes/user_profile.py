@@ -16,9 +16,6 @@ from .forms import serialize_form
 from classes.profile_payment import get_default_payment_info, get_default_billing_info
 from classes.profile_payment import set_default_payment_info, set_default_billing_payment_info
 
-import datetime
-
-# User account
 @user_bp.route('/profile', methods=["GET"])
 def profile():
     return render_template("profile.html")
@@ -39,24 +36,27 @@ def profile_edit_login_security():
 @login_required
 def profile_edit_login_security():
     form = UserProfileLoginSecurityForm()
-    if form.validate_on_submit():
-        id = current_user.get_id()
-        with app.app_context():
-            db = get_db()
-            user = db.get_entry_by_id("users", id)
-            if not db.validate_user(user["username"], form.password.data): # If entered password does not match password in database, return error
-                form.password.errors.append("Incorrect password")
-                return jsonify(serialize_form(form)), 400
+    if not form.validate_on_submit():
+        return jsonify(serialize_form(form)), 400
 
-            # Create new user tuple and update old entry in db
-            print("new password: ", form.new_password.data)
-            user_old = ()
-            for value in user:
-                user_old += (value, )
-            user_new = (user["id"], user["username"], form.new_password.data, form.email.data, form.phone.data, user["is_admin"])
-            db.update("users", user_old, user_new)
-        return jsonify(dict(redirect=url_for("user_bp.profile"))), 200
-    return jsonify(serialize_form(form)), 400
+    with app.app_context():
+        db = get_db()
+
+    user_id = current_user.get_id()
+    user = db.get_entry_by_id("users", user_id)
+
+    if not db.validate_user(user["username"], form.password.data): # If entered password does not match password in database, return error
+        form.password.errors.append("Incorrect password")
+        return jsonify(serialize_form(form)), 400
+
+    user_old = list(user.values())
+    user['password'] = form.new_password.data
+    user['email'] = form.email.data
+    user['phone'] = form.phone.data
+    user_new = list(user.values())
+    db.update("users", user_old, user_new)
+
+    return jsonify(dict(redirect=url_for("user_bp.profile"))), 200
 
 # Address information
 @user_bp.route('/profile/address')

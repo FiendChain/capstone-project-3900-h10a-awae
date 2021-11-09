@@ -26,7 +26,6 @@ def create_cafepass():
     if cafepass is not None:
         return
     
-    print(f"Creating cafepass for user: {user_id}")
     with app.app_context():
         db = get_db()
         db.add("cafepass", (user_id, 0, 0, 1))
@@ -59,7 +58,6 @@ def profile_cafepass():
 @api_bp.route('/profile/cafepass', methods=["POST"])
 @login_required
 def profile_cafepass():
-    print("BATTLEP[ASS BOUGHT")
     form = PaymentCardForm()
     if not form.validate_on_submit():
         return jsonify(serialize_form(form)), 400
@@ -77,7 +75,6 @@ def profile_cafepass():
     user_id = current_user.get_id()
     cafepass = get_cafepass(user_id)
     cafepass_old = list(cafepass.values())
-    # cafepass['paid'] = int(form.paid.data)
     cafepass['paid'] = 1
     cafepass_new = list(cafepass.values())
 
