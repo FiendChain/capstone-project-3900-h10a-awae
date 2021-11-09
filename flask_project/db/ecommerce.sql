@@ -23,7 +23,10 @@ CREATE TABLE IF NOT EXISTS "products" (
   "warranty_days" int,
   "stock" int,
   "image_url" text
+  "is_deleted" int
 );
+
+
 
 CREATE TABLE IF NOT EXISTS "cart_item" (
   "id" integer PRIMARY KEY NOT NULL,
