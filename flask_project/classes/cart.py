@@ -1,7 +1,7 @@
 """
 Api for accessing and modifying a user's cart information
 """
-from typing import final
+
 from server import app, get_db
 from flask import session
 from flask_login import current_user
