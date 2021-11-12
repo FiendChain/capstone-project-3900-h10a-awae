@@ -15,7 +15,15 @@ from .forms import ProductSearchParams, serialize_form
 def home():
     with app.app_context():
         db = get_db()
-        recommended_products = db.get_random_entries("products", 16)
+        recommended_products = db.get_random_entries("products", 4)
+        # If user has bought at least 10 products
+            # Gets last 10 products a user bought
+        # Else if user has bought 0-9 products
+            # Gets last 0-9 products a user bought
+            # Randomly fill in remaining products
+        # Randomly pick 4 products and get their categories
+        # Randomly select a product from each category chosen (unique products)
+        # Display the 4 products on home page
         popular_items = db.get_random_entries("products", 12)
     
     data = dict(recommended_products=recommended_products, popular_items=popular_items)

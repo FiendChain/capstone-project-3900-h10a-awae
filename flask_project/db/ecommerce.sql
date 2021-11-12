@@ -26,6 +26,8 @@ CREATE TABLE IF NOT EXISTS "products" (
   "is_deleted" int
 );
 
+
+
 CREATE TABLE IF NOT EXISTS "cart_item" (
   "id" integer PRIMARY KEY NOT NULL,
   "product_id" int NOT NULL,
