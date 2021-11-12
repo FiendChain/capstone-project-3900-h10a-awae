@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from "utility.html" import format_price %}
+{% from "utility.html" import format_price, render_product %}
 
 {% block head %}
 <title>Cafe AWAE Products</title>
@@ -83,22 +83,7 @@ $("document").ready(function () {
           <div class="row justify-content-start">
             {% for p in products %}
             <div class="col-xl-2 col-lg-3 col-md-4 col-sm-4 px-0 my-1">
-              <div class="shadow-sm rounded border mx-1">
-                <a class="text-dark text-link" href="{{ url_for("user_bp.product_page", id=p.id) }}">
-                  <div class="text-center">
-                    <img src="{{ p.image_url }}" class="product-img-md rounded">
-                  </div>
-                  <div class="px-3 my-2 text-center">
-                    <h6 class="text-truncate">{{ p.name }}</h6>
-                  </div>
-                </a>
-                <div class="d-flex flex-row flex-nowrap justify-content-between px-3 my-2">
-                  <div class="text-primary">{{ format_price(p.unit_price) }}</div>
-                  <div data-bs-action='add-to-cart' data-bs-id="{{ p.id }}" data-bs-quantity="1" class="btn btn-outline-primary btn-sm">
-                    +<i class="bi bi-cart"></i>
-                  </div>
-                </div>
-              </div>
+              {{ render_product(p, img_class="product-img") }}
             </div>
             {% endfor %}
           </div>

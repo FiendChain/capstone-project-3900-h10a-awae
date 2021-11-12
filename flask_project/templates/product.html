@@ -15,10 +15,10 @@
 <!--Breadcrumb-->
 <div class="container-fluid justify-content-md-center text-center border-bottom pb-0 mb-3">
   <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-    <ol class="breadcrumb mb-0">
+    <ol class="breadcrumb mb-2">
       <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
       <li class="breadcrumb-item"><a href="{{ url_for('user_bp.search') }}">Products</a></li>
-      <li class="breadcrumb-item"><button class="btn btn-link pt-0 px-0" type="submit" form="breadcrumb-category-search">{{ product.category }}</button></li>
+      <li class="breadcrumb-item"><a href="#" onclick="$('#breadcrumb-category-search').submit()">{{ product.category }}</a></li>
       <li class="breadcrumb-item active">Product details</li>
     </ol>
   </nav>
@@ -41,17 +41,17 @@
       <div class="carousel carousel-dark slide" data-bs-ride="carousel" id="product-image-carousel">
         <!--Carousel images-->
         <div class="carousel-inner rounded shadow-sm border">
-          <div class="carousel-item active" data-bs-interval="1000">
+          <div class="carousel-item active" data-bs-interval="3000">
             <div>
               <img src="{{ product.image_url }}" class="product-img-lg">
             </div>
           </div>
-          <div class="carousel-item" data-bs-interval="1000">
+          <div class="carousel-item" data-bs-interval="3000">
             <div>
               <img src="{{ product.image_url }}" class="product-img-lg">
             </div>
           </div>
-          <div class="carousel-item" data-bs-interval="1000">
+          <div class="carousel-item" data-bs-interval="3000">
             <div>
               <img src="{{ product.image_url }}" class="product-img-lg">
             </div>
@@ -97,6 +97,7 @@
           <div class="row">
             <div class="col-auto">
               <strong>
+                <div class="flex-nowrap">Category</div>
                 <div class="flex-nowrap">Brand</div>
                 <div class="flex-nowrap">Warranty days</div>
                 <div class="flex-nowrap">Delivery days</div>
@@ -104,6 +105,7 @@
               </strong>
             </div>
             <div class="col-auto ms-2">
+              <div class="flex-nowrap">{{ product.category }}</div>
               <div class="flex-nowrap">{{ product.brand }}</div>
               <div class="flex-nowrap">{{ product.warranty_days }}</div>
               <div class="flex-nowrap">{{ product.delivery_days }}</div>
