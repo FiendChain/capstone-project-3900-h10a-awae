@@ -8,21 +8,24 @@
       </div>
       <div class="mx-1 d-block">
         <small>
-          <div class="align-top">[[ total_items ]] item[[ total_items > 0 ? 's' : '' ]]</div>
+          <div class="align-top">
+            <span v-if="total_items > 0">[[ total_items ]] item[[ total_items > 0 ? 's' : '' ]]</span>
+            <span v-else>Empty</span>
+          </div>
           <div class="align-bottom text-primary"><price-item :price="total_cost"></price-item></div>
         </small>
       </div>
     </a>
   </div>
 
-  <a 
+  <a v-if="total_items > 0"
     class="dropdown-toggle text-dark text-link mx-1 my-auto" href="#"
     id="nav-cart-dropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside">
   </a>
 
   <!--Dropdown containing the cart list-->
-  <div class="dropdown-menu dropdown-menu-end align-self-end shadow-sm p-4" aria-labelledby="nav-cart-dropdown" id="nav-cart-dropdown">
-    <div v-if="cart_items.length == 0">
+  <div v-if="total_items > 0" class="dropdown-menu dropdown-menu-end align-self-end shadow-sm p-4" aria-labelledby="nav-cart-dropdown" id="nav-cart-dropdown">
+    <div v-if="total_items == 0">
       <h6 class="text-muted text-center my-0">Cart is empty</h6>
     </div>
     <div v-else>
