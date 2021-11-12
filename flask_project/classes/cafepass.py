@@ -17,8 +17,21 @@ def refresh_cafepass_level(db, info):
             break
     
     return curr_level
-    
 
+# get all levels for cafepass
+def get_cafepass_levels():    
+    with app.app_context():
+        db = get_db()
+    
+    levels = []
+    for i in range(1, 20):
+        level = db.get_entries_by_heading("level", "level", i)
+        if not level:
+            break
+        levels.append(level[0])
+    return levels
+
+# user cafepass class with methods to get higher level information
 class CafepassInfo:
     def __init__(self, info, db):
         self.level = info['level']

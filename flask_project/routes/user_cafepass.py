@@ -12,7 +12,7 @@ from .forms import CafePassForm, serialize_form, PaymentCardForm, valid_states, 
 
 import datetime
 
-from classes.cafepass import get_cafepass, CafepassInfo
+from classes.cafepass import get_cafepass, CafepassInfo, get_cafepass_levels
 from classes.profile_payment import get_default_billing_info, get_default_payment_info
 from classes.profile_payment import set_default_payment_info, set_default_billing_payment_info
 
@@ -33,11 +33,9 @@ def create_cafepass():
 @user_bp.route('/profile/cafepass')
 @login_required
 def profile_cafepass():
-    user_id = current_user.get_id()
-    cafepass = get_cafepass(user_id)
+    cafepass_levels = get_cafepass_levels()
 
     form = PaymentCardForm()
-
     default_billing_info = get_default_billing_info()
     info = get_default_payment_info()
     default_payment_info = info and dict(
@@ -48,6 +46,7 @@ def profile_cafepass():
     )
 
     data = dict(
+        cafepass_levels=cafepass_levels,
         form=form,  # payment and billing form
         default_billing_info=default_billing_info,
         default_payment_info=default_payment_info,
@@ -55,6 +54,21 @@ def profile_cafepass():
     )
 
     return render_template("profile/cafepass.html", **data)
+
+# in development call this to cancel cafepass
+@api_bp.route('/profile/cancel_cafepass', methods=["POST", "GET"])
+@login_required
+def cancel_cafepass():
+    user_id = current_user.get_id()
+    cafepass = get_cafepass(user_id)
+    cafepass_old = list(cafepass.values())
+    cafepass['paid'] = 0
+    cafepass_new = list(cafepass.values())
+    with app.app_context():
+        db = get_db()
+        db.update("cafepass", cafepass_old, cafepass_new)
+    return api_redirect(url_for("user_bp.profile_cafepass"))
+
 
 @api_bp.route('/profile/cafepass', methods=["POST"])
 @login_required

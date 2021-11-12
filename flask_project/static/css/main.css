@@ -72,6 +72,17 @@ div .product-img-sm {
     color: #b34418 !important;
 }
 
+/* Overwrite default link appearance for breadcrumb */
+.breadcrumb-item > a {
+    transition: color .25s ease-in-out;
+    text-decoration: none;
+}
+
+.breadcrumb-item > a:hover {
+    color: #b34418 !important;
+    text-decoration: none;
+}
+
 body {
   font-family: 'Roboto', sans-serif !important;
 }
@@ -84,7 +95,6 @@ body {
   height: 35px;
   background: none;
   position: relative;
-  cursor: pointer;
 }
 
 .battlepass-progress.large {
@@ -152,6 +162,69 @@ body {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+
+/* Battlepass levels */
+.cafepass-levels-info {
+  position: relative;
+  font-size:12px;
+  margin-top: 30px;
+  margin-bottom: 30px;
+  z-index: 1;
+}
+
+.cafepass-levels-info .tick-marks .tick-mark {
+  position: absolute;
+  left: calc(0px);
+  right: calc(0px);
+}
+
+.cafepass-levels-info .tick-marks .tick-mark .text-top {
+  position: absolute;
+  float: center;
+  text-align: center;
+  margin-top:-20px;
+  width: 200px;
+  margin-left: -100px;
+  z-index: 1;
+}
+
+.cafepass-levels-info .tick-marks .tick-mark .level-dropdown {
+  width: 30px;
+  height: 30px;
+  padding: 4px 0px;
+  border-radius: 15px;
+  border-color: #7f7f7f !important;
+  background: white;
+  cursor: pointer;
+}
+
+.cafepass-levels-info .tick-marks .tick-mark .level-dropdown-info {
+  position: absolute;
+  opacity: 0;
+  transition: opacity .15s linear
+}
+
+.cafepass-levels-info .tick-marks .tick-mark .level-dropdown:hover + .level-dropdown-info {
+  opacity: 1;
+}
+
+.cafepass-levels-info .tick-marks .tick-mark .tick {
+  position: absolute;
+  float: left;
+  background: #7f7f7f;
+  height:16px;
+  width:2px;
+}
+
+.cafepass-levels-info .tick-marks .tick-mark .text-bottom {
+    position: absolute;
+    float: left;
+    text-align: center;
+    margin-top: 20px;
+    width: 100px;
+    margin-left: -50px;
 }
 
 /* Dropdown animation */
