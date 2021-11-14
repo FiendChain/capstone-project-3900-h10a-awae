@@ -33,6 +33,10 @@ def serialize_form(form):
 
     return data
 
+# redirect response for api call
+def api_redirect(location, code=302):
+    return dict(location=location), code
+
 # TODO: Find a better place to put this
 # valid_product_sort = ["price_low_to_high", "price_high_to_low"]
 valid_delivery_units = ["days", "weeks", "months", "years"]
@@ -73,14 +77,15 @@ class ProductForm(FlaskForm):
     image_changed = BooleanField(validators=[InputRequired()], default=False)
     image = FileField(validators=[Optional(), FileAllowed(valid_images, message="Images allowed only")])
 
-    name = StringField(validators=[Length(5, 40), InputRequired(message="Product name is required")])
+    name = StringField(validators=[Length(4, 250), InputRequired(message="Product name is required")])
     unit_price = FloatField(validators=[NumberRange(min=0, max=1000), InputRequired()])
     category = StringField(validators=[InputRequired()])
     brand = StringField(validators=[Length(0, 250)])
-    description = StringField(validators=[Length(0, 250)])
+    description = StringField(validators=[Length(0, 1000)])
     stock = IntegerField(validators=[NumberRange(min=0, max=10000), InputRequired()])
     delivery_days = IntegerField(validators=[NumberRange(min=1, max=1000), InputRequired()])
     warranty_days = IntegerField(validators=[NumberRange(min=1, max=1000), InputRequired()])
+    is_deleted = BooleanField(validators=[Optional()], default=False)
 
     submit_button = SubmitField('Submit Form')
 
@@ -127,7 +132,9 @@ class UserPurchaseForm(FlaskForm):
 class UserProfileLoginSecurityForm(FlaskForm):
     password = StringField(validators=[Length(5, 40), InputRequired(message="Original password is required")])
     new_password = StringField("new_password", validators=[Length(5, 40), InputRequired(message="Password is required")])
-    confirm_password = StringField(validators=[Length(5, 40), InputRequired(message="You must confirm your new password"), EqualTo("new_password")])
+    confirm_password = StringField(validators=[
+        Length(5, 40), InputRequired(message="You must confirm your new password"), 
+        EqualTo("new_password", message="Passwords do not match")])
     email = EmailField(validators=[Email(), InputRequired(message="Email is required")])
     phone = StringField(validators=[PhoneValidator(), InputRequired()])
 

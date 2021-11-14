@@ -1,14 +1,15 @@
-from flask import json, redirect, request, render_template, url_for, abort, jsonify
+from flask import json, redirect, request, render_template, url_for, abort, jsonify, flash
 
 from server import app, get_db
 from .endpoints import admin_bp, admin_api_bp
 
-from .forms import ProductForm, serialize_form
+from .forms import ProductForm, serialize_form, api_redirect
 from .roles import admin_required
 
 @admin_bp.route('/', methods=['GET'])
 @admin_required
 def home():
+    return redirect(url_for("admin_bp.products"))
     return render_template("admin/home.html")
 
 @admin_bp.route("/products", methods=['GET'])
@@ -49,11 +50,11 @@ def add_product():
         product = (
             form.name.data, form.unit_price.data, form.brand.data, form.category.data, 
             form.description.data, form.delivery_days.data, form.warranty_days.data, form.stock.data, 
-            image_url
+            image_url, form.is_deleted.data
         )
         id = db.add("products", product)
 
-    return jsonify(dict(redirect=url_for("admin_bp.products")))
+    return api_redirect(url_for("admin_bp.products"))
 
 @admin_bp.route("/products/<string:id>/edit", methods=["GET"])
 @admin_required
@@ -93,20 +94,44 @@ def edit_product(id):
         product = (
             id, form.name.data, form.unit_price.data, form.brand.data, form.category.data, 
             form.description.data, form.delivery_days.data, form.warranty_days.data, form.stock.data, 
-            image_url
+            image_url, form.is_deleted.data
         )
 
         db.update("products", product, product)
 
-    return jsonify(dict(redirect=url_for("admin_bp.products")))
+    flash("Successfully updated product details")
+    return api_redirect(url_for("admin_bp.edit_product", id=id))
 
 @admin_api_bp.route("/products/<string:id>/delete", methods=["POST"])
 @admin_required
 def delete_product(id):
     with app.app_context():
         db = get_db()
-        if db.get_entry_by_id("products", id) is not []:
-            db.delete_by_id("products", id)
-            return jsonify({'success': True})
-        else:
-            abort(404)
+
+    product = db.get_entry_by_id("products", id)
+    if not product:
+        abort(404)
+    
+    product_old = list(product.values())
+    product["is_deleted"] = 1 
+    product_new = list(product.values())
+    db.update("products", product_old, product_new)
+
+    return redirect(url_for("admin_bp.products"))
+
+@admin_api_bp.route("/products/<string:id>/relist", methods=["POST"])
+@admin_required
+def relist_product(id):
+    with app.app_context():
+        db = get_db()
+
+    product = db.get_entry_by_id("products", id)
+    if not product:
+        abort(404)
+    
+    product_old = list(product.values())
+    product["is_deleted"] = 0 
+    product_new = list(product.values())
+    db.update("products", product_old, product_new)
+
+    return redirect(url_for("admin_bp.products"))

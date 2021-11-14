@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from "utility.html" import format_price %}
+{% from "utility.html" import format_price, render_flash %}
 
 {% block head %}
 <title>Orders</title>
@@ -56,18 +56,23 @@
     </li>
   </ul>
 
+
+  <!--Flash error messages-->
+  {{ render_flash() }}
+
   <!--Render an order-->
-  {% for d in data %}
+  {% for order in orders %}
   <div class="d-block mb-3 justify-content-center">
     <div class="card shadow-sm mx-0 px-0">
       <div class="card-header">
-        <div>Order placed: {{ date }}</div>
+        <div>Order placed: {{ order.time_placed.strftime("%d %b %y") }}</div>
       </div>
       <div class="card-body">
         <div class="d-flex flex-row flex-nowrap">
           <!--Product list-->
           <div class="col border mb-auto">
-            {% for p in d.products %}
+            {% for item in order.items %}
+            {% set p = item.product %}
             <!--Product entry-->
             <div class="d-flex flex-row flex-nowrap py-0 {{ "border-bottom" if not loop.last }}"> 
               <!--Product image-->
@@ -82,7 +87,7 @@
                   <p class="text-start my-0"><strong>{{ p.name }}</strong> in {{ p.category }}</p>
                 </a>
                 <!--Stock status-->
-                <div class="d-flex flex-row flex-nowrap mb-1">
+                <div class="d-flex flex-row flex-nowrap">
                   {% if p.stock > 0 %}
                   <p class="text-start my-0 text-success">In stock</p>
                   {% else %}
@@ -91,14 +96,16 @@
                 </div>
                 <!--Product description tags-->
                 <div class="d-flex flex-row">
-                  <form class="product-buy-or-add-form" method="POST">
-                    <input type="text" name="id" value="{{ p.id }}" hidden>
-                    <input type="number" name="quantity" value="1" hidden>
-                    <button type="submit" id="buy_now" v-link="{{ url_for("api_bp.product_buy") }}" class="me-2 btn btn-sm btn-primary">
-                      <i class="bi bi-bag-check fs-7 me-2"></i>Buy again
-                    </button>
-                    <button type="submit" id="cart_add" v-link="{{ url_for("api_bp.product_add") }}" class="me-2 btn btn-sm btn-outline-primary">Add to cart</button>
-                  </form>
+                  {% if not p.is_deleted and p.stock > 0 %}
+                  <button data-bs-action="buy-now" data-bs-id="{{ p.id }}" data-bs-quantity="1" class="me-2 btn btn-sm btn-primary">
+                    <i class="bi bi-bag-check fs-7 me-2"></i>Buy again
+                  </button>
+                  <button data-bs-action="add-to-cart" data-bs-id="{{ p.id }}" data-bs-quantity="1" class="me-2 btn btn-sm btn-outline-primary">Add to cart</button>
+                  {% elif p.is_deleted %}
+                  <div class="text-danger">
+                    <small><i class="bi bi-exclamation-octagon-fill me-1"></i>Item has been delisted</small>
+                  </div>
+                  {% endif %}
                 </div>
               </div>
               <!--Product pricing information-->
@@ -108,7 +115,7 @@
                   <h5 class="text-primary">{{ format_price(p.unit_price) }}</h5>
                 </div>
                 <!--Quantity-->
-                <div class="mt-1">x{{ p.quantity }}</div>
+                <div class="mt-1">x{{ item.quantity }}</div>
               </div>
             </div>
             {% endfor %}
@@ -127,15 +134,17 @@
 
                 </strong>
               </div>
-              {{ text_item("Total cost", format_price(d.order.total_cost)) }}
-              {{ text_item("Total items", d.order.total_items) }}
+              {{ text_item("Total cost", format_price(order.total_cost)) }}
+              {{ text_item("Total items", order.total_items) }}
 
               <div class="border-bottom mb-3 pb-2"></div>
 
               <!--Order controls-->
               <div class="d-block text-center">
-                <div class="btn btn-primary w-100 mb-1">Buy again</div>
-                <a class="btn btn-outline-primary w-100 mb-1" href="{{ url_for("user_bp.order_page", id=d.order.id) }}">View order details</a>
+                <form action="{{ url_for("api_bp.create_checkout_from_order", id=order.id) }}" method="POST" data-bs-form-reload="400">
+                  <button class="btn btn-primary w-100 mb-1" type="submit">Buy again</button>
+                </form>
+                <a class="btn btn-outline-primary w-100 mb-1" href="{{ url_for("user_bp.order_page", id=order.id) }}">View order details</a>
               </div>
             </div>
           </div>

@@ -7,10 +7,9 @@ from flask_login import current_user
 
 from server import app, get_db
 from .endpoints import user_bp, api_bp
-from .forms import UserPurchaseForm, PaymentCardForm, serialize_form, valid_states
+from .forms import UserPurchaseForm, PaymentCardForm, serialize_form, valid_states, api_redirect
 
-from classes.cart import  get_user_cart
-from classes.checkout import CheckoutExpired, CheckoutAlreadyCompleted
+from classes.cart import  get_user_cart, TempCart, InvalidProduct, OutOfStock, DelistedProduct
 from classes.cafepass import refresh_cafepass_level, get_cafepass, CafepassInfo
 from classes.profile_payment import get_default_payment_info, get_default_billing_info
 from classes.profile_payment import set_default_billing_payment_info, set_default_payment_info
@@ -30,23 +29,19 @@ def product_buy():
     product_id = form.id.data
     quantity = form.quantity.data
 
+    cart = TempCart()
+
+    try:
+        cart.add_product(product_id, quantity)
+    except InvalidProduct:
+        abort(404)
+    except OutOfStock:
+        return jsonify(dict(error="Out of stock")), 400
+    except DelistedProduct:
+        return jsonify(dict(error="Delisted product")), 400
+    
     with app.app_context():
         db = get_db()
-    product = db.get_entry_by_id("products", product_id)
-
-    if not product_id:
-        abort(404)
-    
-    if quantity > product['stock']:
-        return jsonify(dict(error="Out of stock")), 400
-
-    cart_item = {"product_id": product_id, "quantity": quantity}
-
-    # update product stock
-    product_old = list(product.values())
-    product['stock'] -= quantity
-    product_new = list(product.values())
-    db.update("products", product_old, product_new)
 
     # get cafepass discount
     cafepass = get_cafepass()
@@ -55,15 +50,20 @@ def product_buy():
     else:
         discount = 0
 
-    checkout_id = checkout_db.create_checkout([cart_item], db, discount, current_user.get_id(), is_cart=False)
-    return redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
+    checkout_id = checkout_db.create_checkout(cart.items, db, discount, current_user.get_id(), is_cart=False)
+    return api_redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
 
 # handle checkout on cart checkout
 @user_bp.route("/checkout", methods=["POST", "GET"])
 def cart_checkout():
-
     with app.app_context():
         db = get_db()
+
+    cart = get_user_cart()
+    cart_summary = cart.summary
+
+    if not cart_summary['is_valid']:
+        return redirect(url_for("user_bp.cart"))
 
     cafepass = get_cafepass()
     if cafepass:
@@ -71,8 +71,7 @@ def cart_checkout():
     else:
         discount = 0
 
-    cart = get_user_cart()
-    checkout_id = checkout_db.create_checkout(cart.db_items, db, discount, current_user.get_id(), is_cart=True)
+    checkout_id = checkout_db.create_checkout(cart.items, db, discount, current_user.get_id(), is_cart=True)
     return redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
 
 # handle checkout billing screen
@@ -82,9 +81,7 @@ def cart_checkout_billing(checkout_id):
         db = get_db()
         try:
             checkout = checkout_db.get_checkout(checkout_id, db)
-        except KeyError as ex:
-            abort(404)
-        except CheckoutExpired as ex:
+        except KeyError:
             abort(404)
     
     if checkout.user_id != current_user.get_id():
@@ -143,9 +140,7 @@ def cart_checkout_billing(checkout_id):
         db = get_db()
         try:
             checkout = checkout_db.get_checkout(checkout_id, db)
-        except KeyError as ex:
-            abort(404)
-        except CheckoutExpired as ex:
+        except KeyError:
             abort(404)
 
     if checkout.user_id != current_user.get_id():
@@ -153,8 +148,11 @@ def cart_checkout_billing(checkout_id):
 
     # if order already exists
     if checkout.is_completed:
-        res =  dict(redirect=url_for("user_bp.order_page", id=checkout.order_id))
-        return jsonify(res), 200
+        return redirect(url_for("user_bp.order_page", id=checkout.order_id))
+    
+    # if there are errors in the checkout, then dont proceed
+    if not checkout.is_valid:
+        return redirect(url_for("user_bp.cart_checkout_billing", checkout_id=checkout_id))
 
     # create order and redirect
     payment = (form.cc_name.data, form.cc_number.data, form.cc_expiry.data, form.cc_cvc.data)
@@ -164,8 +162,8 @@ def cart_checkout_billing(checkout_id):
 
     order = (current_user.get_id(), payment_past_id, billing_past_id, checkout.subtotal, checkout.discount, checkout.total_cost, checkout.total_items)
     order_id = db.add("order2", order)
-    for product in checkout.get_products():
-        order_item = (order_id, product["id"], product["quantity"])
+    for item in checkout.items:
+        order_item = (order_id, item.product["id"], item.quantity)
         db.add("order2_item", order_item)
 
 
@@ -199,7 +197,5 @@ def cart_checkout_billing(checkout_id):
         cart = get_user_cart()
         cart.empty()
 
-    res =  dict(redirect=url_for("user_bp.order_page", id=order_id))
-    
-    return jsonify(res), 200
+    return redirect(url_for("user_bp.order_page", id=order_id))
 

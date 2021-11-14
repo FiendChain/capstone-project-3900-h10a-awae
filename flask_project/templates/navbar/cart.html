@@ -1,0 +1,106 @@
+<!--Render the navbar cart-->
+<div class="d-flex flex-row flex-nowrap" id="nav-cart">
+  <div>
+    <a href="{{ url_for('user_bp.cart') }}" class="d-flex flex-no-wrap text-dark text-link">
+      <div class="fs-3 mx-1 my-0 py-0">
+        <i class="bi bi-cart-check-fill" v-if="total_items > 0"></i>
+        <i class="bi bi-cart" v-else></i>
+      </div>
+      <div class="mx-1 d-block">
+        <small>
+          <div class="align-top">
+            <span v-if="total_items > 0">[[ total_items ]] item[[ total_items > 0 ? 's' : '' ]]</span>
+            <span v-else>Empty</span>
+          </div>
+          <div class="align-bottom text-primary"><price-item :price="total_cost"></price-item></div>
+        </small>
+      </div>
+    </a>
+  </div>
+
+  <a v-if="total_items > 0"
+    class="dropdown-toggle text-dark text-link mx-1 my-auto" href="#"
+    id="nav-cart-dropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+  </a>
+
+  <!--Dropdown containing the cart list-->
+  <div v-if="total_items > 0" class="dropdown-menu dropdown-menu-end align-self-end shadow-sm p-4" aria-labelledby="nav-cart-dropdown" id="nav-cart-dropdown">
+    <div v-if="total_items == 0">
+      <h6 class="text-muted text-center my-0">Cart is empty</h6>
+    </div>
+    <div v-else>
+      <div class="overflow-auto" style="max-height: 50vh">
+        <cart-item v-for="item in cart_items" :item="item"></cart-item>
+      </div>
+      <div class="d-flex flex-row flex-nowrap justify-content-between mt-1 pt-1">
+        <div class="me-5">
+          <span class="my-auto py-0"><span class="text-primary h6 me-1">Subtotal:</span><price-item :price="total_cost"></price-item></span>
+        </div>
+        <div>
+          <a class="btn btn-sm btn-success" href="{{ url_for('user_bp.cart_checkout') }}">Checkout</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Render cart items using vue-->
+<template id="nav-cart-item-template">
+  <div class="d-flex cart-product py-1 my-1 border-bottom" :id="item.product.id">
+    <div class="col-auto">
+      <div>
+        <img :src="item.product.image_url" class="product-img-sm rounded">
+      </div>
+    </div>
+    <!--Product info-->
+    <div class="col py-1 mx-3">
+      <h6 class="mb-1"><a :href="'/products/'+item.product.id" class="text-dark text-link">[[ item.product.name ]]</a></h6>
+      <div class="mt-1 d-flex">
+        <h6 class="text-primary"><price-item :price="item.product.unit_price"></price-item></h6>
+        <h6 class="text-dark mx-2">x&nbsp;[[ item.quantity ]]</h6>
+      </div>
+    </div>
+    <!--Delete product-->
+    <div class="col-auto">
+      <div class="col-auto btn btn-link text-danger text-decoration-none pe-0">
+        <small><i class="bi bi-x-circle me-1" v-on:click="delete_item"></i></small>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!--Render cart in navigation bar-->
+<script>
+let vm_nav_cart = Vue.createApp({
+  delimiters: ['[[', ']]'],
+  computed: {
+    cart_items() {
+      return store.state.cart_items;
+    },
+    total_cost() {
+      let reducer = (v, item) => v += item.product.unit_price*item.quantity;
+      return store.state.cart_items.reduce(reducer, 0);
+    },
+    total_items() {
+      let reducer = (v, item) => v += item.quantity;
+      return store.state.cart_items.reduce(reducer, 0);
+    }
+  },
+});
+
+vm_nav_cart.component('price-item', vue_price_item);
+vm_nav_cart.component('cart-item', {
+  props: ['item'],
+  delimiters: ['[[', ']]'],
+  methods: {
+    delete_item(ev) {
+      ev.preventDefault();
+      store.dispatch("delete_item", this.item.product.id)
+    },
+  },
+  template: $("template#nav-cart-item-template").html(),
+})
+
+vm_nav_cart.use(store);
+vm_nav_cart.mount("#nav-cart");
+</script>

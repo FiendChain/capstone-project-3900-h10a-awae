@@ -18,25 +18,7 @@ $('document').ready(function () {
     ],
   });
 
-  // remove product entry
-  $("[id='product-remove']").click(function(ev) {
-    ev.preventDefault();
-
-    let btn = $(this);
-    let url = btn.attr("data-bs-product-url");
-    let row_id = btn.attr("data-bs-product-id");
-
-    $.ajax({
-      url, type: 'POST',
-      success: (data) => {
-        product_list.row(`#${row_id}`).remove()
-        product_list.draw("page");
-      },
-    })
-  });
-
   // Update delete product modal dynamically
-  // The confirm button should contain information to delete product via ajax
   $("#product-delete-modal").on('show.bs.modal', function (ev) {
     let button = $(ev.relatedTarget);
 
@@ -44,10 +26,21 @@ $('document').ready(function () {
     let product_name = button.attr("data-bs-product-name");
     let product_url = button.attr("data-bs-product-url");
 
-    let confirm_button = $(this).find("#product-remove");
-    confirm_button.attr("data-bs-product-id", product_id);
-    confirm_button.attr("data-bs-product-url", product_url);
+    let form = $(this).find("#product-remove-form");
+    form.attr("action", product_url);
+    $(this).find("#product-name").html(product_name);
+  });
 
+  // Update relist product modal
+  $("#product-relist-modal").on('show.bs.modal', function (ev) {
+    let button = $(ev.relatedTarget);
+
+    let product_id = button.attr("data-bs-product-id");
+    let product_name = button.attr("data-bs-product-name");
+    let product_url = button.attr("data-bs-product-url");
+
+    let form = $(this).find("#product-relist-form");
+    form.attr("action", product_url);
     $(this).find("#product-name").html(product_name);
   });
 });
@@ -92,7 +85,7 @@ $('document').ready(function () {
       {% for p in products %}
       <tr id="{{ p.id }}">
         <th scope="row">{{ p.id }}</th>
-        <td>{{ p.name }}</td>
+        <td><a class="text-dark text-link" href="{{ url_for("admin_bp.edit_product", id=p.id) }}">{{ p.name }}</a></td>
         <td>{{ "$%.2f"|format(p.unit_price) }}</td>
         <td>{{ p.category }}</td>
         <td>{{ p.brand }}</td>
@@ -103,11 +96,19 @@ $('document').ready(function () {
           <div class="d-flex flex-row justify-content-end">
             <a class="mx-1 btn btn-sm btn-outline-primary" href="{{ url_for("user_bp.product_page", id=p.id) }}">Details</a>
             <a class="mx-1 btn btn-sm btn-outline-primary" href="{{ url_for("admin_bp.edit_product", id=p.id) }}">Edit</a>
+            {% if not p.is_deleted %}
             <div 
-              class="ms-1 btn btn-sm btn-danger" 
+              class="ms-1 btn btn-sm btn-danger col-5" 
               data-bs-toggle="modal" data-bs-target="#product-delete-modal"
               data-bs-product-id="{{ p.id }}" data-bs-product-name="{{ p.name }}" 
               data-bs-product-url="{{ url_for("admin_api_bp.delete_product", id=p.id) }}">Remove</div>
+            {% else %}
+            <div 
+              class="ms-1 btn btn-sm btn-success col-5" 
+              data-bs-toggle="modal" data-bs-target="#product-relist-modal"
+              data-bs-product-id="{{ p.id }}" data-bs-product-name="{{ p.name }}" 
+              data-bs-product-url="{{ url_for("admin_api_bp.relist_product", id=p.id) }}">Relist</div>
+            {% endif %}
           </div>
         </td>
       </tr>
@@ -129,7 +130,30 @@ $('document').ready(function () {
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
-        <button type="button" class="btn btn-danger" id="product-remove" data-bs-dismiss="modal">Yes</button>
+        <form action="" method="POST" id="product-remove-form">
+          <button type="submit" class="btn btn-danger">Yes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Relist product confirmation modal-->
+<div class="modal fade" id="product-relist-modal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Product Relisting</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center">
+        Are you sure you want to relist <strong>"<span id="product-name"></span>"</strong>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">No</button>
+        <form action="" method="POST" id="product-relist-form">
+          <button type="submit" class="btn btn-success">Yes</button>
+        </form>
       </div>
     </div>
   </div>

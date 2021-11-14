@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from "utility.html" import render_flash %}
 
 {% block head %}
 <title>Edit login & security</title>
@@ -21,46 +22,42 @@
 
 <div class="container">
   <div class="row justify-content-center">
-    <div class="col-md-5 my-auto">
-      <div class="card">
-        <div class="card-header">
-          <h6>Edit login & security</h6>
-        </div>
-        <div class="card-body">
-          <form method="POST" action="{{ url_for('api_bp.profile_edit_login_security') }}" id="user-login-security-form" class="wtf-ajax-form">
-            {{ form.csrf_token }}
-            <div class="form-floating mb-3">
-              <input type="password" class="form-control" id="{{ form.password.id }}" name="{{ form.password.id }}" value="{{ form.password.data or '' }}" placeholder="Password" required>
-              <label for="{{ form.password.id }}">Password</label>
-              <div class="invalid-feedback wtf-ajax-error d-none" id="{{ form.password.id }}"></div>
+    <div class="col-5">
+        <h3>Edit login & security</h3>
+        {{ render_flash() }}
+        <form method="POST" action="{{ url_for('api_bp.profile_edit_login_security') }}" id="user-login-security-form" class="wtf-ajax-form">
+          {{ form.csrf_token }}
+          <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="{{ form.password.id }}" name="{{ form.password.id }}" value="{{ form.password.data or '' }}" placeholder="Password" required>
+            <label for="{{ form.password.id }}">Password</label>
+            <div class="invalid-feedback wtf-ajax-error d-none" id="{{ form.password.id }}"></div>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="{{ form.new_password.id }}" name="{{ form.new_password.id }}" value="{{ form.new_password.data or '' }}" placeholder="New password" required>
+            <label for="{{ form.new_password.id }}">New password</label>
+            <div class="invalid-feedback wtf-ajax-error d-none" id="{{ form.new_password.id }}"></div>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="password" class="form-control" id="{{ form.confirm_password.id }}" name="{{ form.confirm_password.id }}" value="{{ form.confirm_password.data or '' }}" placeholder="Re-enter new password" required>
+            <label for="{{ form.confirm_password.id }}">Confirm new password</label>
+            <div class="invalid-feedback wtf-ajax-error d-none" id="{{ form.confirm_password.id }}"></div>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="email" class="form-control" id="{{ form.email.id }}" name="{{ form.email.id }}" value="{{ form.email.data or '' }}" placeholder="Enter email" required>
+            <label for="{{ form.email.id }}">Email</label>
+            <div class="invalid-feedback wtf-ajax-error d-none" id="{{ form.email.id }}"></div>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="phone" class="form-control" id="{{ form.phone.id }}" name="{{ form.phone.id }}" value="{{ form.phone.data or '' }}" placeholder="Enter phone number" required>
+            <label for="{{ form.phone.id }}">Phone</label>
+            <div class="invalid-feedback wtf-ajax-error d-none" id="{{ form.phone.id }}"></div>
+          </div>
+          <div class="form-row my-2">
+            <div class="col">
+              <button type="submit" class="btn btn-primary w-100">Submit Changes</button>
             </div>
-            <div class="form-floating mb-3">
-              <input type="password" class="form-control" id="{{ form.new_password.id }}" name="{{ form.new_password.id }}" value="{{ form.new_password.data or '' }}" placeholder="New password" required>
-              <label for="{{ form.new_password.id }}">New password</label>
-              <div class="invalid-feedback wtf-ajax-error d-none" id="{{ form.new_password.id }}"></div>
-            </div>
-            <div class="form-floating mb-3">
-              <input type="password" class="form-control" id="{{ form.confirm_password.id }}" name="{{ form.confirm_password.id }}" value="{{ form.confirm_password.data or '' }}" placeholder="Re-enter new password" required>
-              <label for="{{ form.confirm_password.id }}">Confirm new password</label>
-              <div class="invalid-feedback wtf-ajax-error d-none" id="{{ form.confirm_password.id }}"></div>
-            </div>
-            <div class="form-floating mb-3">
-              <input type="email" class="form-control" id="{{ form.email.id }}" name="{{ form.email.id }}" value="{{ form.email.data or '' }}" placeholder="Enter email" required>
-              <label for="{{ form.email.id }}">Email</label>
-              <div class="invalid-feedback wtf-ajax-error d-none" id="{{ form.email.id }}"></div>
-            </div>
-            <div class="form-floating mb-3">
-              <input type="phone" class="form-control" id="{{ form.phone.id }}" name="{{ form.phone.id }}" value="{{ form.phone.data or '' }}" placeholder="Enter phone number" required>
-              <label for="{{ form.phone.id }}">Phone</label>
-              <div class="invalid-feedback wtf-ajax-error d-none" id="{{ form.phone.id }}"></div>
-            </div>
-            <div class="form-row my-2">
-              <div class="col">
-                <button type="submit" class="btn btn-primary w-100">Submit Changes</button>
-              </div>
-            </div>
-          </form>
-        </div>
+          </div>
+        </form>
       </div>
     </div>
   </div>

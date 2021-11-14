@@ -3,46 +3,37 @@ $("img").on("error", function() {
   $(this).attr("src", "/static/images/image_not_found.png");
 });
 
-
-// Script for adding product to cart, or immediate purchase
+// reload window on form submission if we get a particular status code
 $("document").ready(function() {
-  // add items to cart or buy them
-  $('.product-buy-or-add-form').submit(function(ev) {
+  $("[data-bs-form-reload]").submit(function(ev) {
     ev.preventDefault();
 
-    let form = $(this);
-    let btn = $(ev.originalEvent.submitter)
-    let action = btn.attr('id');
-    let url = btn.attr('v-link');
-
+    let status_code = $(this).attr("data-bs-form-reload");
     let data = new FormData(this);
-    let json_data = Array.from(data).reduce((m, [k,v]) => { 
-      m[k] = v; 
-      return m; 
-    }, {});
 
-    switch (action) 
-    {
-    // Use vue store to dispatch cart item add
-    case 'cart_add':
-      let req = store.dispatch('add_item', {
-        product_id: json_data.id, 
-        quantity: json_data.quantity
-      });
+    let url = $(this).attr("action");
+    let method = $(this).attr("method");
 
-      // if adding item failed, then reload page
-      // this is probably due to out of stock error
-      req.then(res => {
-        if (!res.ok) {
+    let req = fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams(data),
+    });
+
+    req
+      .then(res => {
+        if (res.status === 302) {
+          res.json().then(data => {
+            window.location.href = data.location;
+          })
+        } else if (res.status == status_code) {
+          location.reload();
+        } else {
           location.reload();
         }
       })
-      break;
-
-    // Buying now lets the browser redirect us to stripe page
-    case 'buy_now':
-      $.redirect(url, json_data, "POST");
-      break;
-    }
   });
+
 })

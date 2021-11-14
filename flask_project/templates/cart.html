@@ -26,7 +26,12 @@
       <div v-if="cart_items.length == 0" class="row justify-content-center text-center py-3 rounded border">
         <h5>Cart is empty</h5>
       </div>
-      <div class="overflow-auto" style="max-height: 75vh" v-else>
+      <div v-else class="overflow-auto" style="max-height: 75vh">
+        <div v-if="!is_valid">
+          <div class="alert alert-danger text-center shadow-sm" role="alert">
+            <strong>There are issues with your cart</strong>
+          </div>
+        </div>
         <cart-item v-for="item in cart_items" :item="item"></cart-item>
       </div>
     </div>
@@ -50,7 +55,7 @@
         <!--Buy now button-->
         <div>
           <form action="{{ url_for("user_bp.cart_checkout") }}" method="POST">
-            <button type="submit" class="btn btn-success w-100" :disabled="cart_items.length == 0">Proceed to checkout</a>
+            <button type="submit" class="btn btn-success w-100" :disabled="cart_items.length == 0 || !is_valid">Proceed to checkout</a>
           </form>
         </div>
       </div>
@@ -80,22 +85,27 @@
 
 <!--Cart item template-->
 <template id="cart-item-template">
-  <div class="row cart-product w-100 border-bottom  pb-2 mb-2" :id="item.id">
+  <div class="row cart-product w-100 border-bottom pb-2 mb-2" :id="item.product.id">
     <div class="col-auto ps-0">
       <div>
-        <img :src="item.image_url" class="product-img rounded">
+        <img :src="item.product.image_url" class="product-img rounded">
       </div>
     </div>
     <!--Product info-->
     <div class="col py-3 me-auto">
-      <h5 class="mb-1"><a :href="'/products/'+item.id" class="text-dark text-link">[[ item.name ]]</a></h5>
+      <h5 class="mb-1"><a :href="'/products/'+item.product.id" class="text-dark text-link">[[ item.product.name ]]</a></h5>
       <!--Stock status-->
       <small>
-        <div>Brand: <strong>[[ item.brand ]]</strong></div>
-        <div>Est. Delivery: <strong>[[ item.delivery_days ]] days</strong></div>
+        <div>Brand: <strong>[[ item.product.brand ]]</strong></div>
+        <div>Est. Delivery: <strong>[[ item.product.delivery_days ]] days</strong></div>
       </small>
       <div class="mt-1">
-        <h5 class="text-primary align-bottom"><price-item :price="item.unit_price"></price-item></h5>
+        <h5 class="text-primary align-bottom mb-0"><price-item :price="item.product.unit_price"></price-item></h5>
+      </div>
+      <div v-for="error in item.errors">
+        <div class="text-danger">
+          <small><i class="bi bi-exclamation-octagon-fill me-1"></i>[[ error ]]</small>
+        </div>
       </div>
     </div>
     <!--Product cost and quantity control-->
@@ -107,7 +117,7 @@
           <input 
             class="form-control form-control-sm" type="number" 
             id="quantity" name="quantity" 
-            min="1" :max="item.quantity + item.stock" :value="item.quantity"
+            min="1" :max="item.quantity + item.product.stock" :value="item.quantity"
             @input="change_quantity($event.target.value)"> 
         </div>
       </div>
@@ -116,7 +126,7 @@
         <div 
           class="col-auto btn btn-link text-danger text-decoration-none pe-0" 
           data-bs-toggle="modal" data-bs-target="#cart-product-delete-modal"
-          :data-bs-product-id="item.id" :data-bs-product-name="item.name">
+          :data-bs-product-id="item.product.id" :data-bs-product-name="item.product.name">
           <small><i class="bi bi-x-circle me-1"></i>Remove</small>
         </div>
       </div>
@@ -133,12 +143,16 @@ let vm_cart = Vue.createApp({
       return store.state.cart_items;
     },
     total_cost() {
-      let reducer = (v, item) => v += item.unit_price*item.quantity;
+      let reducer = (v, item) => v += item.product.unit_price*item.quantity;
       return store.state.cart_items.reduce(reducer, 0);
     },
     total_items() {
       let reducer = (v, item) => v += item.quantity;
       return store.state.cart_items.reduce(reducer, 0);
+    },
+    is_valid() {
+      let reducer = (v, item) => v && (item.errors.length == 0);
+      return store.state.cart_items.reduce(reducer, true);
     }
   },
   methods: {
@@ -156,7 +170,7 @@ vm_cart.component('cart-item', {
   methods: {
     change_quantity: _.debounce(function(quantity) {
       store.dispatch("set_quantity", {
-        product_id: this.item.id, 
+        product_id: this.item.product.id, 
         quantity
       });
     }, 200),

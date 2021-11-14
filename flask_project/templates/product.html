@@ -15,10 +15,10 @@
 <!--Breadcrumb-->
 <div class="container-fluid justify-content-md-center text-center border-bottom pb-0 mb-3">
   <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-    <ol class="breadcrumb mb-0">
+    <ol class="breadcrumb mb-2">
       <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
       <li class="breadcrumb-item"><a href="{{ url_for('user_bp.search') }}">Products</a></li>
-      <li class="breadcrumb-item"><button class="btn btn-link pt-0 px-0" type="submit" form="breadcrumb-category-search">{{ product.category }}</button></li>
+      <li class="breadcrumb-item"><a href="#" onclick="$('#breadcrumb-category-search').submit()">{{ product.category }}</a></li>
       <li class="breadcrumb-item active">Product details</li>
     </ol>
   </nav>
@@ -26,23 +26,32 @@
 
 <!--Product description-->
 <div class="container w-75">
+  {% if product.is_deleted %}
+  <div class="row">
+    <div class="col">
+      <div class="alert alert-danger text-center shadow-sm" role="alert">
+        <strong>This item has been delisted</strong>
+      </div>
+    </div>
+  </div>
+  {% endif %}
   <div class="row justify-content-between">
     <!--Image panel-->
-    <div class="col-md-4 text-center">
+    <div class="col-md-4 text-center mx-auto">
       <div class="carousel carousel-dark slide" data-bs-ride="carousel" id="product-image-carousel">
         <!--Carousel images-->
         <div class="carousel-inner rounded shadow-sm border">
-          <div class="carousel-item active" data-bs-interval="1000">
+          <div class="carousel-item active" data-bs-interval="3000">
             <div>
               <img src="{{ product.image_url }}" class="product-img-lg">
             </div>
           </div>
-          <div class="carousel-item" data-bs-interval="1000">
+          <div class="carousel-item" data-bs-interval="3000">
             <div>
               <img src="{{ product.image_url }}" class="product-img-lg">
             </div>
           </div>
-          <div class="carousel-item" data-bs-interval="1000">
+          <div class="carousel-item" data-bs-interval="3000">
             <div>
               <img src="{{ product.image_url }}" class="product-img-lg">
             </div>
@@ -88,6 +97,7 @@
           <div class="row">
             <div class="col-auto">
               <strong>
+                <div class="flex-nowrap">Category</div>
                 <div class="flex-nowrap">Brand</div>
                 <div class="flex-nowrap">Warranty days</div>
                 <div class="flex-nowrap">Delivery days</div>
@@ -95,6 +105,7 @@
               </strong>
             </div>
             <div class="col-auto ms-2">
+              <div class="flex-nowrap">{{ product.category }}</div>
               <div class="flex-nowrap">{{ product.brand }}</div>
               <div class="flex-nowrap">{{ product.warranty_days }}</div>
               <div class="flex-nowrap">{{ product.delivery_days }}</div>
@@ -104,21 +115,22 @@
         </div>
 
         <!--Purchasing form-->
-        <form class='product-buy-or-add-form mt-4' method='POST'>
-          <input type="hidden" id="product_id" name="id" value="{{ product.id }}">
-          <div class="row mx-0 px-0 w-100 justify-content-between">
-            <div class="col-md-5 ps-0">
-              <div class="row form-group text-start">
-                <label class="col-auto me-3 text-start" for="quantity">Quantity</label>
-                <input class="col form-control" type="number" min="1" max="{{ product.stock }}" id="quantity" name="quantity" value=1> 
-              </div>
-            </div>
-            <div class="col-auto btn-group pe-0 align-self-end text-end">
-              <button type="submit" id='cart_add' v-link="{{ url_for('api_bp.product_add') }}" class="btn btn-outline-primary mb-2">Add to Cart</button>
-              <button type="submit" id='buy_now' v-link="{{ url_for('api_bp.product_buy') }}" class="btn btn-primary mb-2">Buy Now</button>
+        {% if not product.is_deleted and product.stock > 0 %}
+        <div class="row mx-0 px-0 w-100 justify-content-between mt-3">
+          <div class="col-md-5 ps-0">
+            <div class="row form-group text-start">
+              <label class="col-auto me-3 text-start" for="quantity">Quantity</label>
+              <input 
+                class="col form-control" type="number" min="1" max="{{ product.stock }}" id="quantity" name="quantity" value="1"
+                data-bs-action="product-form" data-bs-product-form-target="product-form-{{ product.id }}"> 
             </div>
           </div>
-        </form>
+          <div class="col-auto btn-group pe-0 align-self-end text-end">
+            <button data-bs-product-form-id="product-form-{{ product.id }}" data-bs-action='add-to-cart' data-bs-id="{{ product.id }}" data-bs-quantity="1" class="btn btn-outline-primary mb-2">Add to Cart</button>
+            <button data-bs-product-form-id="product-form-{{ product.id }}" data-bs-action='buy-now' data-bs-id="{{ product.id }}" data-bs-quantity="1" class="btn btn-primary mb-2">Buy Now</button>
+          </div>
+        </div>
+        {% endif %}
       </div>
     </div>
   </div>
@@ -130,5 +142,4 @@
     </div>
   </div>
 </div>
-
 {% endblock %}

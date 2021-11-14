@@ -11,7 +11,7 @@ from server import  app
 from .forms import UserPurchaseForm, serialize_form
 
 from .endpoints import user_bp, api_bp
-from classes.cart import InvalidProduct, OutOfStock, get_user_cart, get_cart_summary
+from classes.cart import InvalidProduct, OutOfStock, DelistedProduct, get_user_cart, get_cart_summary
 
 # Render the cart page
 @user_bp.route('/cart', methods=['GET'])
@@ -27,7 +27,9 @@ def cart():
 @api_bp.route("/cart", methods=['GET'])
 def cart_data():
     cart = get_user_cart()
-    return jsonify(dict(cart_items=cart.items)), 200
+    cart_items = cart.items
+    cart_items = [item.to_json() for item in cart_items]
+    return jsonify(dict(cart_items=cart_items)), 200
 
 # Add product to cart from product page when user clicks "Add to cart"
 @api_bp.route('/transaction/add', methods=['POST'])
@@ -45,6 +47,8 @@ def product_add():
         return jsonify(serialize_form(form)), 400
     except OutOfStock:
         return jsonify(serialize_form(form)), 400
+    except DelistedProduct:
+        return jsonify(dict(error="Delisted product")), 400
 
     return jsonify(serialize_form(form)), 200
 

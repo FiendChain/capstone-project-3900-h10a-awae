@@ -8,7 +8,7 @@ from flask_login.utils import login_required
 
 from server import login_manager, app, get_db
 from .endpoints import user_bp, api_bp
-from .forms import LoginForm, RegisterForm, serialize_form
+from .forms import LoginForm, RegisterForm, api_redirect, serialize_form
 
 from classes.account import get_login_user, create_registered_user
 from classes.account import get_guest_account, create_guest_account
@@ -47,7 +47,7 @@ def login():
         return jsonify(serialize_form(form)), 400
 
     login_user(flask_user, remember=form.remember_me.data)
-    return jsonify(dict(redirect=url_for("user_bp.home")))
+    return api_redirect(url_for("user_bp.home"))
 
 # Perform registration validation
 @api_bp.route("/register", methods=["POST"])
@@ -65,7 +65,7 @@ def register():
         return jsonify(serialize_form(form)), 400
 
     login_user(flask_user, remember=form.remember_me.data)
-    return jsonify(dict(redirect=url_for("user_bp.home")))
+    return api_redirect(url_for("user_bp.home"))
     
 
 # Make sure a user is either given a guest account or is already logged in

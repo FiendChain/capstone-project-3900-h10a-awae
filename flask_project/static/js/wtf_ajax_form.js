@@ -23,10 +23,9 @@ $("document").ready(function() {
     let data = new FormData(this);
     let url = $(this).attr("action");
     let method = $(this).attr("method") || "POST";
-    let enctype = $(this).attr("enctype") || "multipart/form";
 
     // if we recieved a wtform response
-    function update_from_ajax(data) {
+    function update_from_json(data) {
       for (let field of data) {
         let name = field.name;
         let value = field.value;
@@ -36,8 +35,6 @@ $("document").ready(function() {
         let el_input = form.find(el_sel);
         let el_error = form.find(`.wtf-ajax-error[id='${name}']`);
 
-        // TODO: update input field value with wtform value
-        
         // show validation errors
         if (errors && errors.length && errors.length > 0) {
           el_input.addClass("is-invalid");
@@ -51,33 +48,25 @@ $("document").ready(function() {
         }
       }
     }
-
-    // if we successfully sent the form we can redirect or reload
-    function on_success(data) {
-      if (data.redirect) {
-        window.location = data.redirect;
+    
+    fetch(url, {
+      method: method,
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams(data),
+    }).then(res => {
+      if (res.status === 400) {
+        res.json().then(data => {
+          update_from_json(data);
+        });
+      } else if (res.status === 302) {
+        res.json().then(data => {
+          window.location.href = data.location;
+        });
       } else {
         location.reload();
       }
-    }
-
-    // if we got an error, check to see if it is a form error
-    function on_error(xhr, options, error) {
-      if (xhr.status == 400) {
-        update_from_ajax(xhr.responseJSON);
-      } else {
-        location.reload();
-      }
-    }
-
-    // TODO: Allow for custom submit handlers
-    $.ajax({
-      url, data, type: method, enctype,
-      cache: false,
-      processData: false,
-      contentType: false,
-      success: on_success,
-      error: on_error,
-    });
+    })
   });
 });

@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from "utility.html" import render_flash %}
 
 {% block head %}
 <title>Your Payments</title>
@@ -8,8 +9,6 @@
 {% include 'user_navbar.html' %}
 
 <!--Prefill card details for insecure testing-->
-<script src="/static/js/wtf_ajax_form.js"></script>
-<script src="/static/js/jquery.card.js"></script>
 <script>
 $("document").ready(function() {
   let form = $("form#user-payment-form");
@@ -52,51 +51,85 @@ $("document").ready(function() {
   </nav>
 </div>
 
-<div class="container w-50">
-  <h3>Your Payments</h3>
-  <form method="POST" action="{{ url_for('api_bp.profile_payment') }}" id="user-payment-form" class="wtf-ajax-form">
-    {{ form.csrf_token }}
-    <div class="card-wrapper"></div>
-    <div class="row my-1">
-      <div class="col">
-        <div class="form-floating">
-          <input type="text" name="{{ form.cc_name.id }}" id="{{ form.cc_name.id }}" class="form-control" placeholder="Full Name" value="{{ form.cc_name.data or '' }}" required>
-          <label for="{{ form.cc_name.id }}">Name</label>
-          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.cc_name.id }}"></div>
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="col-5">
+      <h3>Your Payments</h3>
+      {{ render_flash() }}
+      <form method="POST" action="{{ url_for('api_bp.profile_payment') }}" id="user-payment-form" class="wtf-ajax-form">
+        {{ form.csrf_token }}
+        <div class="card-wrapper"></div>
+        <div class="row my-1">
+          <div class="col">
+            <div class="form-floating">
+              <input type="text" name="{{ form.cc_name.id }}" id="{{ form.cc_name.id }}" class="form-control" placeholder="Full Name" value="{{ form.cc_name.data or '' }}" required>
+              <label for="{{ form.cc_name.id }}">Name</label>
+              <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.cc_name.id }}"></div>
+            </div>
+          </div>
+        </div>
+        <div class="row my-1">
+          <div class="col">
+            <div class="col form-floating">
+              <input type="text" name="{{ form.cc_number.id }}" id="{{ form.cc_number.id }}" class="form-control" min="19" max="19" placeholder="•••• •••• •••• ••••" value="{{ form.cc_number.data or '' }}" required>
+              <label for="{{ form.cc_number.id }}">Credit Card Number</label>
+              <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.cc_number.id }}"></div>
+            </div>
+          </div>
+        </div>
+        <div class="row my-1">
+          <div class="col pe-0 me-1">
+            <div class="form-floating">
+              <input type="text" name="{{ form.cc_expiry.id }}" id="{{ form.cc_expiry.id }}" class="form-control" min="" max="7" placeholder="••/••" value="{{ form.cc_expiry.data or '' }}" required>
+              <label for="{{ form.cc_expiry.id }}">Expiry</label>
+              <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.cc_expiry.id }}"></div>
+            </div>
+          </div>
+          <div class="col ps-0 ms-1">
+            <div class="form-floating">
+              <input type="text" name="{{ form.cc_cvc.id }}" id="{{ form.cc_cvc.id }}" class="form-control" placeholder="•••" value="{{ form.cc_cvc.data or '' }}" required>
+              <label for="{{ form.cc_cvc.id }}">CVC</label>
+              <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.cc_cvc.id }}"></div>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="row justify-content-end my-2">
+        <div class="col-auto">
+          <div class="btn-group">
+            <button type="submit" form="user-payment-form" class="btn btn-outline-primary">Submit Changes</button>
+            <button type="button" class="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+              <span class="visually-hidden">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><button class="dropdown-item" data-bs-toggle="modal" data-bs-target="#clear-payment-info">Delete</button></li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
-    <div class="row my-1">
-      <div class="col">
-        <div class="col form-floating">
-          <input type="text" name="{{ form.cc_number.id }}" id="{{ form.cc_number.id }}" class="form-control" min="19" max="19" placeholder="•••• •••• •••• ••••" value="{{ form.cc_number.data or '' }}" required>
-          <label for="{{ form.cc_number.id }}">Credit Card Number</label>
-          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.cc_number.id }}"></div>
-        </div>
+  </div>
+</div>
+
+<!--Delete address information modal-->
+<div class="modal fade" id="clear-payment-info" tabindex="-1" aria-labelledby="clear-payment-info" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="clear-payment-info">Delete Address Information</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete your payment information?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
+        <form action="{{ url_for("api_bp.clear_profile_payment") }}" method="POST">
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </form>
       </div>
     </div>
-    <div class="row my-1">
-      <div class="col pe-0 me-1">
-        <div class="form-floating">
-          <input type="text" name="{{ form.cc_expiry.id }}" id="{{ form.cc_expiry.id }}" class="form-control" min="" max="7" placeholder="••/••" value="{{ form.cc_expiry.data or '' }}" required>
-          <label for="{{ form.cc_expiry.id }}">Expiry</label>
-          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.cc_expiry.id }}"></div>
-        </div>
-      </div>
-      <div class="col ps-0 ms-1">
-        <div class="form-floating">
-          <input type="text" name="{{ form.cc_cvc.id }}" id="{{ form.cc_cvc.id }}" class="form-control" placeholder="•••" value="{{ form.cc_cvc.data or '' }}" required>
-          <label for="{{ form.cc_cvc.id }}">CVC</label>
-          <div class="invalid-tooltip wtf-ajax-error d-none" id="{{ form.cc_cvc.id }}"></div>
-        </div>
-      </div>
-    </div>
-    <div class="form-row my-2">
-      <div class="col">
-        <button type="submit" class="btn btn-primary w-100">Submit Changes</button>
-      </div>
-    </div>
-  </form>
+  </div>
 </div>
 
 {% endblock %}

@@ -5,16 +5,17 @@
 {% macro render_product_form(form, categories=[], submit_button="Submit changes") %}
 {% from "utility.html" import input_product_image %}
 
-<script src="/static/js/wtf_ajax_form.js"></script>
 <script src="/static/js/dragndrop_image.js"></script>
 <link rel="stylesheet" href="/static/css/dragndrop_image.css">
+
+{% set label_cls = "col-sm-4 col-md-4 col-lg-3 col-xl-3" %}
 
 <div class="row my-2 px-0">
   <div class="col-md-8">
     <!--Id if it exists-->
     {% if form.id.data %}
     <div class="form-group row mb-3">
-      <label for="{{ form.id.id }}" class="col-md-2 col-form-label">UUID</label>
+      <label for="{{ form.id.id }}" class="{{ label_cls }} col-form-label">UUID</label>
       <div class="col">
         <input 
           type="text" class="form-control" required readonly
@@ -24,7 +25,7 @@
     {% endif %}
     <!--Name-->
     <div class="form-group row mb-3">
-      <label for="{{ form.name.id }}" class="col-md-2 col-form-label">Name</label>
+      <label for="{{ form.name.id }}" class="{{ label_cls }} col-form-label">Name</label>
       <div class="col">
         <input 
           type="text" class="form-control" placeholder="Name"
@@ -34,7 +35,7 @@
     </div>
     <!--Unit price-->
     <div class="form-group row mb-3">
-      <label for="{{ form.unit_price.id }}" class="col-md-2 col-form-label">Unit Price</label>
+      <label for="{{ form.unit_price.id }}" class="{{ label_cls }} col-form-label">Unit Price</label>
       <div class="col input-group">
         <div class="input-group-prepend">
           <span class="input-group-text">$</span>
@@ -47,7 +48,7 @@
     </div>
     <!--Brand-->
     <div class="form-group row mb-3">
-      <label for="{{ form.brand.id }}" class="col-md-2 col-form-label">Brand</label>
+      <label for="{{ form.brand.id }}" class="{{ label_cls }} col-form-label">Brand</label>
       <div class="col">
         <input 
           type="text" class="form-control" placeholder="Brand"
@@ -57,7 +58,7 @@
     </div>
     <!--Category-->
     <div class="form-group row mb-3">
-      <label for="{{ form.category.id }}" class="col-md-2 col-form-label">Category</label>
+      <label for="{{ form.category.id }}" class="{{ label_cls }} col-form-label">Category</label>
       <div class="col input-group">
         <select class="form-select" id="{{ form.category.id }}" name="{{ form.category.id }}">
           {% for category in categories %}
@@ -69,7 +70,7 @@
     </div>
     <!--Description-->
     <div class="form-group row mb-3">
-      <label for="{{ form.description.id }}" class="col-md-2 col-form-label">Description</label>
+      <label for="{{ form.description.id }}" class="{{ label_cls }} col-form-label">Description</label>
       <div class="col">
         <textarea 
           type="text" class="form-control" placeholder="No description given" rows="3" maxlength="250"
@@ -79,7 +80,7 @@
     </div>
     <!--Total in stock-->
     <div class="form-group row mb-3">
-      <label for="{{ form.stock.id }}" class="col-md-2 col-form-label">In stock</label>
+      <label for="{{ form.stock.id }}" class="{{ label_cls }} col-form-label">In stock</label>
       <div class="col input-group">
         <input 
           type="number" class="form-control d-flex" placeholder="In stock" min="0" required
@@ -89,7 +90,7 @@
     </div>
     <!--Estimated delivery-->
     <div class="form-group row mb-3">
-      <label for="{{ form.delivery_days.id }}" class="col-md-2 col-form-label">Est. delivery in</label>
+      <label for="{{ form.delivery_days.id }}" class="{{ label_cls }} col-form-label">Est. delivery in</label>
       <div class="col input-group">
         <input 
           type="number" class="form-control d-flex" placeholder="Est. Delivery" min="1" required
@@ -102,16 +103,26 @@
     </div>
     <!--Warranty days-->
     <div class="form-group row mb-3">
-      <label for="{{ form.warranty_days.id }}" class="col-md-2 col-form-label">Warranty Period</label>
-      <div class="col input-group">
-        <input 
-          type="number" class="form-control d-flex" placeholder="Warranty Days" min="1" required
-          id="{{ form.warranty_days.id }}" name="{{ form.warranty_days.id }}" value="{{ form.warranty_days.data or 1 }}">
-        <div class="input-group-append">
-          <div class="input-group-text">Days</div>
+      <label for="{{ form.warranty_days.id }}" class="{{ label_cls }} col-form-label">Warranty Period</label>
+      <div class="col">
+        <div class="input-group">
+          <input 
+            type="number" class="form-control d-flex" placeholder="Warranty Days" min="1" required
+            id="{{ form.warranty_days.id }}" name="{{ form.warranty_days.id }}" value="{{ form.warranty_days.data or 1 }}">
+          <div class="input-group-append">
+            <div class="input-group-text">Days</div>
+          </div>
+          {{ render_form_error(form.warranty_days) }}
         </div>
-        {{ render_form_error(form.warranty_days) }}
       </div>
+    </div>
+    <!--Deleted status-->
+    <div class="form-check">
+      <input class="form-check-input" type="checkbox" {{ "checked" if form.is_deleted.data }} name="{{ form.is_deleted.id }}" id="{{ form.is_deleted.id }}">
+      <label class="form-check-label" for="{{ form.is_deleted.id }}">
+        Is item delisted?
+      </label>
+        {{ render_form_error(form.is_deleted) }}
     </div>
     <!--Submit button-->
     <div class="form-group row text-end">

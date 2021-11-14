@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% from "utility.html" import format_price %}
+{% from "utility.html" import format_price, render_flash %}
 
 {% block head %}
 <title>Order Information</title>
@@ -7,7 +7,6 @@
 
 {% block content %}
 {% include 'user_navbar.html' %}
-<script src="/static/js/cart.js"></script>
 
 {% macro text_item(name, description) %}
 <div class="row justify-content-between">
@@ -28,25 +27,56 @@
   </nav>
 </div>
 
+{% macro render_order_summary() %}
+<div class="row border-bottom pb-2 mb-2">
+  <h6>Checkout Details</h6>
+  <div><h4 class="text-primary">{{ format_price(order.total_cost) }}</h4></div>
+  <div>{{ order.total_items }} items</div>
+</div>
+<!--Checkout summary-->
+<div class="row">
+  <div class="col text-start">Subtotal:</div>
+  <div class="col text-end">{{ format_price(order.subtotal) }}</div>
+</div>
+<div class="row">
+  <div class="col text-start">Shipping:</div>
+  <div class="col text-end">{{ format_price(0) }}</div>
+</div>
+<div class="row">
+  <div class="col text-start">Discount:</div>
+  <div class="col text-end">{{ format_price(order.discount) }}</div>
+</div>
+<div class="row">
+  <div class="col text-start">Total cost:</div>
+  <div class="col text-end">{{ format_price(order.total_cost) }}</div>
+</div>
+{% endmacro %}
+
 <!--Cart-->
 <div class="container">
   <div class="row mx-4 justify-content-center">
     <!--Cart items-->
-    <div class="col-7">
+    <div class="col-1 d-print-none"></div>
+
+    <div class="col">
+      <!--Flash error messages-->
+      {{ render_flash() }}
+
       <!--Success header on successful checkout-->
       <div class="d-flex flex-row flex-nowrap py-0 border mb-3 py-3 justify-content-center text-center rounded"> 
         <h3 class="text-success">Order Successful <i class="bi bi-check-circle ms-2"></i></h3>
       </div>
 
       <!--If for some reason the checkout is empty-->
-      {% if not products %}
+      {% if not order.items %}
       <div class="row justify-content-center text-center py-3 border shadow-sm">
         <h5>Order is empty</h5>
       </div>
       {% endif %}
 
       <!--Our checkout items-->
-      {% for p in products %}
+      {% for item in order.items %}
+      {% set p = item.product %}
       <div class="d-flex flex-row flex-nowrap py-0 rounded border mb-3"> 
         <!--Product image-->
         <div class="col-auto ps-0">
@@ -60,7 +90,7 @@
             <p class="text-start my-0"><strong>{{ p.name }}</strong> in {{ p.category }}</p>
           </a>
           <!--Stock status-->
-          <div class="d-flex flex-row flex-nowrap d-print-none mb-1">
+          <div class="d-flex flex-row flex-nowrap d-print-none">
             {% if p.stock > 0 %}
             <p class="text-start my-0 text-success">In stock</p>
             {% else %}
@@ -69,31 +99,40 @@
           </div>
           <!--Product description tags-->
           <div class="d-flex flex-row d-print-none">
-            <form class="product-buy-or-add-form" method="POST">
-              <input type="text" name="id" value="{{ p.id }}" hidden>
-              <input type="number" name="quantity" value="1" hidden>
-              <button type="submit" id="buy_now" v-link="{{ url_for("api_bp.product_buy") }}" class="me-2 btn btn-sm btn-primary">
-                <i class="bi bi-bag-check fs-7 me-2"></i>Buy again
-              </button>
-              <button type="submit" id="cart_add" v-link="{{ url_for("api_bp.product_add") }}" class="me-2 btn btn-sm btn-outline-primary">Add to cart</button>
-            </form>
+            {% if not p.is_deleted and p.stock > 0 %}
+            <button data-bs-action="buy-now" data-bs-id="{{ p.id }}" data-bs-quantity="1" class="me-2 btn btn-sm btn-primary">
+              <i class="bi bi-bag-check fs-7 me-2"></i>Buy again
+            </button>
+            <button data-bs-action="add-to-cart" data-bs-id="{{ p.id }}" data-bs-quantity="1" class="me-2 btn btn-sm btn-outline-primary">Add to cart</button>
+            {% elif p.is_deleted %}
+            <div class="text-danger">
+              <small><i class="bi bi-exclamation-octagon-fill me-1"></i>Item has been delisted</small>
+            </div>
+            {% endif %}
           </div>
         </div>
         <!--Product pricing information-->
-        <div class="col-md-3 py-2 me-3 text-end">
+        <div class="col-3 py-2 me-3 text-end">
           <!--Product price-->
           <div class="row text-end">
             <h5 class="text-primary">{{ format_price(p.unit_price )}}</h5>
           </div>
           <!--Quantity-->
           <div class="mt-0 row justify-content-end text-end">
-            <div class="ms-auto">x{{ p.quantity }}</div>
+            <div class="ms-auto">x{{ item.quantity }}</div>
           </div>
         </div>
       </div>
       {% endfor %}
 
+      <!--Order summary only when printing summary-->
+      <div class="p-4 text-center rounded border mb-3 d-none d-print-block">
+        {{ render_order_summary() }}
+      </div>
+
       <!--Order details-->
+      {% set billing = order.billing %}
+      {% set payment = order.payment %}
       <div class="p-4 rounded border mb-3" style="background: #f7f7f7">
         <div class="row border-bottom pb-3 mb-3">
           <h6><strong>Billing Information</strong></h6>
@@ -115,39 +154,25 @@
         </div>
       </div>
     </div>
+
     <!--Cart sidebar-->
-    <div class="col-4">
+    <div class="col-4 d-print-none">
       <!--Details of cost-->
       <div class="p-4 text-center rounded shadow-sm mb-3">
-        <div class="row border-bottom pb-2 mb-2">
-          <h6>Checkout Details</h6>
-          <div><h4 class="text-primary">{{ format_price(order.total_cost) }}</h4></div>
-          <div>{{ order.total_items }} items</div>
-        </div>
-        <!--Checkout summary-->
-        <div class="row">
-          <div class="col text-start">Subtotal:</div>
-          <div class="col text-end">{{ format_price(order.subtotal) }}</div>
-        </div>
-        <div class="row">
-          <div class="col text-start">Shipping:</div>
-          <div class="col text-end">{{ format_price(0) }}</div>
-        </div>
-        <div class="row">
-          <div class="col text-start">Discount:</div>
-          <div class="col text-end">{{ format_price(order.discount) }}</div>
-        </div>
-        <div class="row">
-          <div class="col text-start">Total cost:</div>
-          <div class="col text-end">{{ format_price(order.total_cost) }}</div>
-        </div>
+        {{ render_order_summary() }}
         <div class="border-bottom my-2"></div>
         <!--Print our checkout summary-->
         <div class="mt-3">
-          <div class="btn btn-primary w-100" onclick="window.print(); return false;"><strong>Print Summary</strong></div>
+          <form action="{{ url_for("api_bp.create_checkout_from_order", id=order.id) }}" method="POST" data-bs-form-reload="400">
+            <button class="btn btn-primary w-100 mb-1" type="submit">Buy again</button>
+            <div class="invalid-tooltip wtf-ajax-error d-none" id="error"></div>
+          </form>
+          <div class="btn btn-outline-primary w-100" onclick="window.print(); return false;">Print Summary</div>
         </div>
       </div>
     </div>
+
+    <div class="col-1 d-print-none"></div>
   </div>
 </div>
 {% endblock %}
