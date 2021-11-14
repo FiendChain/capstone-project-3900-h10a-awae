@@ -4,7 +4,7 @@ from flask_login import current_user
 # update level after a purchase 
 def refresh_cafepass_level(db, info):
     net_xp = info['net_xp']
-    curr_level = 1
+    curr_level = 0
     for i in range(1, 20):
         level = db.get_entries_by_heading("level", "level", i)
         if not level:
@@ -12,9 +12,10 @@ def refresh_cafepass_level(db, info):
         level = level[0]
         level_xp = level['xp']
 
-        curr_level = i
         if level_xp > net_xp:
             break
+
+        curr_level = i
     
     return curr_level
 
@@ -40,19 +41,19 @@ class CafepassInfo:
         self.paid = info['paid']
         self.net_xp = info['net_xp']
 
-        assert self.level > 0
+        assert self.level >= 0
 
         curr_level = db.get_entries_by_heading("level", "level", self.level)
-        prev_level = db.get_entries_by_heading("level", "level", self.level-1)
+        next_level = db.get_entries_by_heading("level", "level", self.level+1)
 
         curr_level = curr_level[0] if curr_level else None
-        prev_level = prev_level[0] if prev_level else None
+        next_level = next_level[0] if next_level else curr_level
 
         assert curr_level
-        assert prev_level
+        assert next_level
 
         self.curr_level_info = curr_level
-        self.prev_level_info = prev_level
+        self.next_level_info = next_level
     
     @property
     def frac_complete(self):
@@ -60,8 +61,8 @@ class CafepassInfo:
         if remaining_xp == 0:
             return 1
 
-        delta = self.curr_level_info['xp']-self.prev_level_info['xp']
-        completed_level_xp = self.net_xp-self.prev_level_info['xp']
+        delta = self.next_level_info['xp']-self.curr_level_info['xp']
+        completed_level_xp = self.net_xp-self.curr_level_info['xp']
         return min(1, completed_level_xp / delta)
     
     @property
@@ -81,15 +82,15 @@ class CafepassInfo:
     # Calculate total xp till next level
     @property
     def remaining_xp(self):
-        return max(0, self.curr_level_info['xp']-self.net_xp)
+        return max(0, self.next_level_info['xp']-self.net_xp)
     
     @property
     def curr_milestone(self):
-        return self.curr_level_info['xp']
+        return self.next_level_info['xp']
     
     @property
     def prev_milestone(self):
-        return self.prev_level_info and self.prev_level_info['xp']
+        return self.curr_level_info and self.curr_level_info['xp']
     
 def get_cafepass(user_id=None):
     if user_id is None:
