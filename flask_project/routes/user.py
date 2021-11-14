@@ -19,12 +19,27 @@ def home():
         recommended_products = db.get_random_entries("products", 4)
         # If user has bought at least 10 products
             # Gets last 10 products a user bought
+        recent_categories = []
+        orders = db.get_entries_by_heading("order2", "user_id", current_user.get_id())
+        for order in orders:
+            order_item = db.get_entries_by_heading("order2_item", "order2_id", order["id"])
+            assert(len(order_item) == 1)
+            order_item = order_item[0]
+            product = db.get_entry_by_id("products", order_item["product_id"])
+            category = product["category"]
+            recent_categories.append(category)
+
         # Else if user has bought 0-9 products
             # Gets last 0-9 products a user bought
             # Randomly fill in remaining products
         # Randomly pick 4 products and get their categories
         # Randomly select a product from each category chosen (unique products)
         # Display the 4 products on home page
+
+
+        # Aggregate all products and quantity users have bought
+        # Display most popular products
+        # (potentially) display how much was sold
         popular_items = db.get_random_entries("products", 12)
     
     data = dict(recommended_products=recommended_products, popular_items=popular_items)
