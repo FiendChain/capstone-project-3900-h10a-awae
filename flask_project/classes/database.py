@@ -176,6 +176,14 @@ class Database(object):
         entries = self.cur.fetchall()
         entries = [self.make_dict(self.cur, entry) for entry in entries]
         return entries
+    
+    def get_random_entries_with_condition(self, table_name, heading, heading_condition, count):
+        query = f"SELECT * from {table_name} where {heading} = '{heading_condition}' ORDER BY RANDOM() LIMIT {count}"
+        print(query)
+        self.cur.execute(query)
+        entries = self.cur.fetchall()
+        entries = [self.make_dict(self.cur, entry) for entry in entries]
+        return entries
 
     def validate_user(self, username, password):
         query = f"SELECT * from users WHERE username = ? AND password = ?"
@@ -187,7 +195,6 @@ class Database(object):
             return True
         return False
     
-
 
 
     # Get unique values for a chosen table heading, eg: product categories

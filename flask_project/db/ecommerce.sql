@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS "order2" (
   "discount" real,
   "total_cost" real,
   "total_items" int,
-  FOREIGN KEY ("payment_past_id") REFERENCES Paymemt_past("id"),
+  FOREIGN KEY ("payment_past_id") REFERENCES Payment_past("id"),
   FOREIGN KEY ("billing_past_id") REFERENCES Billing_past("id")
 );
 
