@@ -54,13 +54,17 @@ def create_database():
         db.drop
         with app.open_resource('db/ecommerce.sql', mode='r') as f:
             db.tables_create(f)
-        # print(db.tables)
+        #print(db.tables)
 
         db.fill("products", "data/awae_products.xlsx")
         db.fill("users", "data/awae_accounts.xlsx")
         db.fill("level", "data/awae_levels.xlsx")
         db.fill("payment", "data/awae_default_payment.xlsx")
         db.fill("billing", "data/awae_default_billing.xlsx")
+        db.fill("payment_past", "data/awae_payment_past.xlsx")
+        db.fill("billing_past", "data/awae_billing_past.xlsx")
+        db.fill("order2", "data/awae_order2.xlsx")
+        db.fill("order2_item", "data/awae_order2_item.xlsx")
         # db.add("users", (
         #     "Arnold", "Schwar", "arnold@gmail.com", "0404123456", 0
         # ))

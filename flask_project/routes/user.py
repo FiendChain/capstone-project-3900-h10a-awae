@@ -9,38 +9,21 @@ from flask_login import current_user
 from server import app, get_db
 from .endpoints import user_bp, api_bp
 from .forms import ProductSearchParams, serialize_form
+import random
 
 # Product browsing
 @user_bp.route('/', methods=["GET", "POST"])
 def home():
     with app.app_context():
         db = get_db()
-        recommended_products = db.get_random_entries("products", 4)
-        # If user has bought at least 10 products
-            # Gets last 10 products a user bought
-        recent_categories = []
-        orders = db.get_entries_by_heading("order2", "user_id", current_user.get_id())
-        for order in orders:
-            order_item = db.get_entries_by_heading("order2_item", "order2_id", order["id"])
-            assert(len(order_item) == 1)
-            order_item = order_item[0]
-            product = db.get_entry_by_id("products", order_item["product_id"])
-            category = product["category"]
-            recent_categories.append(category)
-
-        # Else if user has bought 0-9 products
-            # Gets last 0-9 products a user bought
-            # Randomly fill in remaining products
-        # Randomly pick 4 products and get their categories
-        # Randomly select a product from each category chosen (unique products)
-        # Display the 4 products on home page
-
+        recommended_products = get_recommendations(db)
 
         # Aggregate all products and quantity users have bought
         # Display most popular products
         # (potentially) display how much was sold
         popular_items = db.get_random_entries("products", 12)
-    
+        print(len(recommended_products))
+        print(popular_items)
     data = dict(recommended_products=recommended_products, popular_items=popular_items)
     
     return render_template("homepage.html", **data)
@@ -66,3 +49,33 @@ def search():
         sort_by = dict_sort_by[form.sort_type.data]
         products = db.search_product_by_name(form.name.data, form.categories.data, sort_by)
     return render_template('search.html', products=products, categories=valid_categories, form=form)
+
+def get_recommendations(db):
+    recent_categories = []
+    recommended_products = []
+    window = 10 # Use last X product's categories bought for recommendation
+    # Get list of orders by user
+    num_recommendations = 4
+    orders = db.get_entries_by_heading("order2", "user_id", current_user.get_id())
+    for order in orders:
+        order_items = db.get_entries_by_heading("order2_item", "order2_id", order["id"])
+        for order_item in order_items:
+            # Get product matching to order item
+            product = db.get_entry_by_id("products", order_item["product_id"])
+            recent_categories.append(product["category"])
+            # Use only last 10 products bought
+            if len(recent_categories) > window:
+                break
+
+    # If user bought less than 4 products, change number of recommendations to the number of products user has bought (0-3 recommendations)
+    if len(recent_categories) < num_recommendations:
+        num_recommendations = len(recent_categories)
+    
+    sampled_categories = random.sample(recent_categories, num_recommendations)
+    sampled_categories = dict((x,sampled_categories.count(x)) for x in set(sampled_categories))
+
+    for category, count in sampled_categories.items():
+        products = db.get_random_entries_with_condition("products", "category", category, count)
+        for p in products:
+            recommended_products.append(p)
+    return recommended_products
