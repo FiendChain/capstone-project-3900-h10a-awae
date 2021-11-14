@@ -22,8 +22,6 @@ def home():
         # Display most popular products
         # (potentially) display how much was sold
         popular_items = db.get_random_entries("products", 12)
-        print(len(recommended_products))
-        print(popular_items)
     data = dict(recommended_products=recommended_products, popular_items=popular_items)
     
     return render_template("homepage.html", **data)

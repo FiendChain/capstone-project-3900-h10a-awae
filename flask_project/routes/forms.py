@@ -118,7 +118,7 @@ class PhoneValidator:
 class RegisterForm(FlaskForm):
     username = StringField(validators=[Length(5,40), InputRequired(message="Username is required")])
     password = StringField("password", validators=[Length(5, 40), InputRequired(message="Password is required")])
-    confirm_password = StringField(validators=[Length(5, 40), InputRequired(message="You must confirm your password"), EqualTo("password")])
+    confirm_password = StringField(validators=[Length(5, 40), InputRequired(message="You must confirm your password"), EqualTo("password", message="Passwords must match")])
     email = EmailField(validators=[Email(), InputRequired(message="Email is required")])
     phone = StringField(validators=[PhoneValidator(), InputRequired()])
     remember_me = BooleanField(validators=[Optional()], default=True)
