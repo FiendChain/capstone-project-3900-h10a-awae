@@ -153,6 +153,11 @@
     </div>
   </div>
   {% endfor %}
+  {% if not orders %}
+  <div class="d-block border rounded text-center p-4 fs-5">
+    No orders available
+  </div>
+  {% endif %}
 </div>
 
 {% endblock %}

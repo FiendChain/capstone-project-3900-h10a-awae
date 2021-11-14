@@ -179,7 +179,7 @@ $("document").ready(function() {
           </div>
           <div class="d-flex flex-row justify-content-between">
             <div class="me-5 text-muted">Discount</div>
-            <div class="text-success">{{ "%d"|format(current_cafepass.percent_discount) }}%</div>
+            <div>{{ "%d"|format(current_cafepass.percent_discount) }}%</div>
           </div>
           <div class="d-flex flex-row justify-content-between">
             <div class="me-5 text-muted">Amount to next level</div>
@@ -195,7 +195,7 @@ $("document").ready(function() {
         <small>
           {{ render_text("Level", current_cafepass.level) }}
           {{ render_text("Net XP",  current_cafepass.net_xp ) }}
-          {{ render_text("XP to next level",  current_cafepass.curr_level_info.xp ) }}
+          {{ render_text("Amount to next level",  format_price(current_cafepass.remaining_xp)) }}
           {{ render_text("Discount",  "%.2f%%"|format(current_cafepass.percent_discount) ) }}
           {{ render_text("Level progress",  "%.2f%%"|format(current_cafepass.percent_complete) ) }}
           {{ render_text("Previous milestone",  format_price(current_cafepass.prev_milestone) ) }}
