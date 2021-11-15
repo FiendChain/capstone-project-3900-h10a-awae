@@ -12,11 +12,14 @@ $("document").ready(function () {
 
   let render_discount = discount => `${(discount*100).toFixed(0)}%`;
 
-  let render_tick = level =>
+  let render_tick = (level, is_completed) =>
     `<div class="tick-mark">
-      <div class="text-bottom">$${level.xp}</div>
+      <div class="text-bottom ${is_completed ? 'fw-bold' : ''}">$${level.xp}</div>
       <div class="text-top">
-        <div class="shadow-sm level-dropdown border border-2 mx-auto my-auto">
+        <div class="
+          shadow level-dropdown border mx-auto my-auto 
+          ${is_completed ? 'border-warning border-3' : 'border-2'}
+          ${is_completed ? 'fw-bold' : ''}">
           ${level.level}
         </div>
         <div class="level-dropdown-info w-100">
@@ -62,7 +65,7 @@ $("document").ready(function () {
     // add in tick marks
     let ticks_parent = parent.find("#tick-marks");
     for (let level of levels) {
-      let tick_el = $(render_tick(level));
+      let tick_el = $(render_tick(level, net_xp >= level.xp));
       let position =  level.xp / (max_xp - min_xp);
       tick_el.css("left", `${position.toFixed(2)*100}%`);
       ticks_parent.append(tick_el);

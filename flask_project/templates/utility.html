@@ -43,17 +43,26 @@
 
 <!--Utility for rendering products or carousels-->
 {% macro render_product(p, img_class="product-img") %}
+{% set category_cls_lut = {
+  'Coffee': 'bg-category-coffee',
+  'Alt Milk': 'bg-category-alt-milk',
+  'Meal Kit': 'bg-category-meal-kit',
+  'Dessert Kit': 'bg-category-dessert-kit',
+  'Tools': 'bg-category-tools',
+} %}
+{% set category_cls = category_cls_lut.get(p.category, 'bg-primary') %}
+
 <div class="rounded border shadow-sm mx-1">
   <a class="text-dark text-link" href="{{ url_for("user_bp.product_page", id=p.id) }}">
     <div class="text-center">
       <img src="{{ p.image_url }}" class="{{ img_class }} rounded">
     </div>
     <div class="px-3 my-2 text-start">
-      <div class="text-truncate h6 mb-0">{{ p.name }}</div>
-      <div class="text-muted h6"><small>{{ p.category }}</small></div>
+      <div class="text-truncate fs-6 mb-0">{{ p.name }}</div>
+      <span class="badge {{ category_cls }} fs-7">{{ p.category }}</span>
     </div>
   </a>
-  <div class="d-flex flex-row flex-nowrap justify-content-between px-3 my-2">
+  <div class="d-flex flex-row flex-nowrap justify-content-between px-3 mt-2 mb-3">
     <div class="text-primary">{{ format_price(p.unit_price) }}</div>
     <div data-bs-action='add-to-cart' data-bs-id="{{ p.id }}" data-bs-quantity="1" class="btn btn-outline-primary btn-sm">
       +<i class="bi bi-cart"></i>

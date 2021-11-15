@@ -28,7 +28,7 @@ def create_cafepass():
     
     with app.app_context():
         db = get_db()
-        db.add("cafepass", (user_id, 0, 0, 1))
+        db.add("cafepass", (user_id, 0, 0, 0))
 
 @user_bp.route('/profile/cafepass')
 @login_required

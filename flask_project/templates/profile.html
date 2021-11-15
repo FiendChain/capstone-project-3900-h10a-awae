@@ -30,10 +30,14 @@ $("document").ready(function() {
 </script>
 
 <!--Render a profile link tile-->
-{% macro render_tile(heading, description, url) %}
-<div class="col-md-4 mx-2 my-2 border profile-tile" href="{{ url }}">
+{% macro render_tile(heading, description, url, icon) %}
+<div class="col-4 mx-2 my-2 border profile-tile" href="{{ url }}">
   <div class="row my-3 mx-2">
-    <div class="col-sm-1"></div>
+    <div class="col-2">
+      <div class="w-100 h-100 text-center">
+        <i class="bi {{ icon }} fs-2 my-auto"></i>
+      </div>
+    </div>
     <div class="col text-start">
       <div class="row"><h6>{{ heading }}</h6></div>
       <div class="row"><p>{{ description }}</p></div>
@@ -45,12 +49,43 @@ $("document").ready(function() {
 <!--TODO: Add iconography-->
 <div class="container">
   <div class="row justify-content-center">
-    {{ render_tile("Your Orders", "Track, return, or buy things again", url_for("user_bp.profile_orders")) }}
-    {{ render_tile("Login & Security", "Edit login, name, and phone number", url_for("user_bp.profile_edit_login_security")) }}
-    {{ render_tile("Your Addresses", "Edit addresses for orders", url_for("user_bp.profile_address")) }}
-    {{ render_tile("Your Payments", "Manage payment methods and settings", url_for("user_bp.profile_payment")) }}
-    {{ render_tile("Reviews", "View and manage your product reviews", url_for("user_bp.home")) }}
-    {{ render_tile("Cafepass", "View your cafepass benefits and status", url_for("user_bp.profile_cafepass")) }}
+    {{ render_tile(
+        "Your Orders", 
+        "Track, return, or buy things again", 
+        url_for("user_bp.profile_orders"),
+        'bi-receipt') }}
+
+    {% if current_user.is_authenticated %}
+    {{ render_tile(
+        "Login & Security", 
+        "Edit login, name, and phone number", 
+        url_for("user_bp.profile_edit_login_security"),
+        'bi-shield-check') }}
+
+    {{ render_tile(
+        "Your Addresses", 
+        "Edit addresses for orders", 
+        url_for("user_bp.profile_address"),
+        'bi-house') }}
+
+    {{ render_tile(
+        "Your Payments", 
+        "Manage payment methods and settings", 
+        url_for("user_bp.profile_payment"),
+        'bi-credit-card') }}
+
+    {{ render_tile(
+        "Reviews", 
+        "View and manage your product reviews", 
+        url_for("user_bp.home"),
+        'bi-star') }}
+
+    {{ render_tile(
+        "Cafepass", 
+        "View your cafepass benefits and status", 
+        url_for("user_bp.profile_cafepass"),
+        'bi-person-badge') }}
+    {% endif %}
   </div>
 </div>
 

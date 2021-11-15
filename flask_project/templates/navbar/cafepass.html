@@ -46,12 +46,12 @@
         <div>{{ current_cafepass.level }}</div>
       </div>
       <div class="d-flex flex-row justify-content-between">
-        <div class="me-5 {{ 'text-primary' if current_cafepass.paid else 'text-muted' }}">Tier</div>
-        <div>{{ 'Paid' if current_cafepass.paid else 'Free' }}</div>
+        <div class="me-5 {{ 'text-success fw-bold' if current_cafepass.paid else 'text-muted' }}">Tier</div>
+        <div class="{{ 'text-success fw-bold' if current_cafepass.paid else '' }}">{{ 'Paid' if current_cafepass.paid else 'Free' }}</div>
       </div>
       <div class="d-flex flex-row justify-content-between">
         <div class="me-5 text-muted">Discount</div>
-        <div class="text-success">{{ "%d"|format(current_cafepass.percent_discount) }}%</div>
+        <div>{{ "%d"|format(current_cafepass.percent_discount) }}%</div>
       </div>
       <div class="d-flex flex-row justify-content-between">
         <div class="me-5 text-muted">Amount to next level</div>

@@ -186,7 +186,7 @@ body {
   text-align: center;
   margin-top:-20px;
   width: 200px;
-  margin-left: -100px;
+  margin-left: -101px;
   z-index: 1;
 }
 
@@ -195,7 +195,6 @@ body {
   height: 30px;
   padding: 4px 0px;
   border-radius: 15px;
-  border-color: #7f7f7f !important;
   background: white;
   cursor: pointer;
 }
@@ -216,6 +215,7 @@ body {
   background: #7f7f7f;
   height:16px;
   width:2px;
+  margin-left: -1px;
 }
 
 .cafepass-levels-info .tick-marks .tick-mark .text-bottom {
@@ -224,7 +224,7 @@ body {
     text-align: center;
     margin-top: 20px;
     width: 100px;
-    margin-left: -50px;
+    margin-left: -51px;
 }
 
 /* Dropdown animation */
@@ -243,4 +243,29 @@ body {
   to {
     opacity: 1;
   }
+}
+
+/* Category badges */
+[class*="bg-category-"] {
+  color: rgb(43, 41, 41);
+}
+
+.bg-category-coffee {
+  background-color: rgb(221, 181, 163);
+}
+
+.bg-category-alt-milk {
+  background-color: rgb(198, 233, 216);
+}
+
+.bg-category-meal-kit {
+  background-color: rgb(236, 178, 178);
+}
+
+.bg-category-dessert-kit {
+  background-color: rgb(240, 240, 170);
+}
+
+.bg-category-tools {
+  background-color: rgb(220, 206, 228);
 }
