@@ -57,17 +57,18 @@ def get_recommendations(db):
     window = 10 # Use last X product's categories bought for recommendation
     # Get list of orders by user
     num_recommendations = 4
-    orders = db.get_entries_by_heading("order2", "user_id", current_user.get_id())
+    orders = db.get_entries_by_heading("order2", "user_id", current_user.get_id(), "id DESC")   # Get most recent entries
     for order in orders:
         order_items = db.get_entries_by_heading("order2_item", "order2_id", order["id"])
         for order_item in order_items:
             # Get product matching to order item
             product = db.get_entry_by_id("products", order_item["product_id"])
             if not product["is_deleted"]:
+                print(product["name"], product["category"])
                 recent_categories.append(product["category"])
-            # Use only last 10 products bought
-            if len(recent_categories) > window:
-                break
+        # Use minimum last 10 products bought
+        if len(recent_categories) >= window:
+            break
 
     # If user bought less than 4 products, change number of recommendations to the number of products user has bought (0-3 recommendations)
     if len(recent_categories) < num_recommendations:

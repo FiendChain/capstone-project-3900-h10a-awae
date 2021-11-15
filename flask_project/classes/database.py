@@ -97,7 +97,7 @@ class Database(object):
         # print(query, params)
         self.cur.execute(query, params)
         self.conn.commit()
-        print(f"Entry {entry_no_id[0]} added with id {self.cur.lastrowid}")
+        # print(f"Entry {entry_no_id[0]} added with id {self.cur.lastrowid}")
         return self.cur.lastrowid
         
     # Unused
@@ -161,8 +161,8 @@ class Database(object):
         return dict((cursor.description[idx][0], value) for idx, value in enumerate(row))
 
 
-    def get_entries_by_heading(self, table_name, heading, value):
-        query = f"SELECT * from {table_name} where {heading} = ?"
+    def get_entries_by_heading(self, table_name, heading, value, order_by="id ASC"):
+        query = f"SELECT * from {table_name} where {heading} = ? ORDER BY {order_by}"
         params = value,
         self.cur.execute(query, params)
         entries = self.cur.fetchall()
