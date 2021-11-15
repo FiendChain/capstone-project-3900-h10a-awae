@@ -48,6 +48,9 @@ def search():
         }
         sort_by = dict_sort_by[form.sort_type.data]
         products = db.search_product_by_name(form.name.data, form.categories.data, sort_by)
+        for p in products:
+            if p["is_deleted"]:
+                products.remove(p)
     return render_template('search.html', products=products, categories=valid_categories, form=form)
 
 def get_recommendations(db):
@@ -62,7 +65,8 @@ def get_recommendations(db):
         for order_item in order_items:
             # Get product matching to order item
             product = db.get_entry_by_id("products", order_item["product_id"])
-            recent_categories.append(product["category"])
+            if not product["is_deleted"]:
+                recent_categories.append(product["category"])
             # Use only last 10 products bought
             if len(recent_categories) > window:
                 break
