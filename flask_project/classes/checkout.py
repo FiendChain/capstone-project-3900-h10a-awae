@@ -84,7 +84,7 @@ class CheckoutDatabase:
         checkout_items = []
         for item in cart_items:
             product_id, quantity = item.product["id"], item.quantity
-            product = db.get_entry_by_id("products", product_id)
+            product = db.get_entry_by_id("product", product_id)
             if product is None:
                 continue
             checkout_items.append(CheckoutItem(product, quantity))
@@ -108,7 +108,7 @@ class CheckoutDatabase:
         for item in checkout.items:
             id = item.product["id"]
             item.errors = []
-            product = db.get_entry_by_id("products", id) 
+            product = db.get_entry_by_id("product", id) 
             if product['is_deleted']:
                 item.add_error("Product has been delisted")
     

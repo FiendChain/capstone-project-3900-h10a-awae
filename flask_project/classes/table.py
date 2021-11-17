@@ -31,7 +31,7 @@ class Table(object):
 
     # Case insensitive, substring search
     def search_by_name(self, name):
-        query = "SELECT * FROM products WHERE name LIKE ?"
+        query = "SELECT * FROM product WHERE name LIKE ?"
         params = f"%{name}%",   # comma is intentional
         self.cur.execute(query, params)
         return [row for row in self.cur]

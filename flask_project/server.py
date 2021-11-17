@@ -40,7 +40,7 @@ def create_database():
     # System setup
     print("System setup")
     # Create table
-    table_name = "products"
+    table_name = "product"
 
     def make_dicts(cursor, row):
         return dict((cursor.description[idx][0], value) for idx, value in enumerate(row))
@@ -56,8 +56,8 @@ def create_database():
             db.tables_create(f)
         #print(db.tables)
 
-        db.fill("products", "data/awae_products.xlsx")
-        db.fill("users", "data/awae_accounts.xlsx")
+        db.fill("product", "data/awae_products.xlsx")
+        db.fill("user", "data/awae_accounts.xlsx")
         db.fill("level", "data/awae_levels.xlsx")
         db.fill("payment", "data/awae_default_payment.xlsx")
         db.fill("billing", "data/awae_default_billing.xlsx")
@@ -65,14 +65,14 @@ def create_database():
         db.fill("billing_past", "data/awae_billing_past.xlsx")
         db.fill("order2", "data/awae_order2.xlsx")
         db.fill("order2_item", "data/awae_order2_item.xlsx")
-        # db.add("users", (
+        # db.add("user", (
         #     "Arnold", "Schwar", "arnold@gmail.com", "0404123456", 0
         # ))
-        # print(db.get_unique_values("products", "category"))
+        # print(db.get_unique_values("product", "category"))
         # print(db.search_product_by_name("", category = "Meal Kit", order_by = "unit_price ASC"))
         db.conn.close()
     print("System finished setting up")
-    # table_products = Table("products", table_cols["products"], conn, cur)
+    # table_products = Table("product", table_cols["product"], conn, cur)
     # table_accounts = Table("accounts", table_cols["accounts"], conn, cur)
 
     # table_products.drop()

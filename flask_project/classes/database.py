@@ -74,10 +74,10 @@ class Database(object):
 
     def search_product_by_name(self, name="", category = "", order_by="id ASC"):
         if category == "":
-            query = f"SELECT * FROM products WHERE name LIKE ? ORDER BY {order_by}"
+            query = f"SELECT * FROM product WHERE name LIKE ? ORDER BY {order_by}"
         else:
             category = f"'{category}'"
-            query = f"SELECT * FROM products WHERE name LIKE ? AND category={category} ORDER BY {order_by}"
+            query = f"SELECT * FROM product WHERE name LIKE ? AND category={category} ORDER BY {order_by}"
         params = (f"%{name}%",)   # user input to be validated; tuple is intentional
 
         self.cur.execute(query, params)
@@ -189,7 +189,7 @@ class Database(object):
         return entries
 
     def validate_user(self, username, password):
-        query = f"SELECT * from users WHERE username = ? AND password = ?"
+        query = f"SELECT * from user WHERE username = ? AND password = ?"
         params = (username, password)
         self.cur.execute(query, params)
         entries = self.cur.fetchall()
@@ -211,7 +211,7 @@ class Database(object):
     def gen_uuid(self):
         while True:
             uid = str(uuid.uuid4())[:7]
-            if uid not in self.get_unique_values("products", "id"):
+            if uid not in self.get_unique_values("product", "id"):
                 break
         return uid 
     

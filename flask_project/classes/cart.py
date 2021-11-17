@@ -49,7 +49,7 @@ class TempCart:
         with app.app_context():
             db = get_db()
         
-        product = db.get_entry_by_id("products", product_id)
+        product = db.get_entry_by_id("product", product_id)
         if not product:
             raise InvalidProduct(product_id)
         
@@ -66,7 +66,7 @@ class TempCart:
         product_old = list(product.values())
         product['stock'] -= quantity
         product_new = list(product.values())
-        db.update("products", product_old, product_new)
+        db.update("product", product_old, product_new)
 
     @property
     def items(self):
@@ -75,7 +75,7 @@ class TempCart:
 
         items = []
         for product_id, quantity in self.data:
-            product = db.get_entry_by_id("products", product_id)
+            product = db.get_entry_by_id("product", product_id)
             if product is None or product['is_deleted']:
                 continue
             items.append(CartItem(product, quantity))
@@ -86,7 +86,7 @@ class TempCart:
         return get_cart_summary(self)
 
 
-# Cart for logged in users
+# Cart for logged in user
 class Cart:
     def __init__(self, user_id):
         self.user_id = user_id
@@ -100,7 +100,7 @@ class Cart:
 
         items = []
         for cart_item in cart_items:
-            product = db.get_entry_by_id("products", cart_item["product_id"])
+            product = db.get_entry_by_id("product", cart_item["product_id"])
             item = CartItem(product, cart_item['quantity'])
             item.clear_errors()
             if product['is_deleted']:
@@ -120,7 +120,7 @@ class Cart:
         with app.app_context():
             db = get_db()
         
-        product = db.get_entry_by_id("products", product_id)
+        product = db.get_entry_by_id("product", product_id)
         if not product:
             raise InvalidProduct(product_id)
         
@@ -152,7 +152,7 @@ class Cart:
         product_old = list(product.values())
         product['stock'] -= quantity
         product_new = list(product.values())
-        db.update("products", product_old, product_new)
+        db.update("product", product_old, product_new)
     
     # Change cart quantity to new quantity
     # returns the final quantity that was possible to achieve
@@ -162,7 +162,7 @@ class Cart:
         with app.app_context():
             db = get_db()
         
-        product = db.get_entry_by_id("products", product_id)
+        product = db.get_entry_by_id("product", product_id)
         if not product:
             raise InvalidProduct(product_id)
         
@@ -202,7 +202,7 @@ class Cart:
         product_old = list(product.values())
         product['stock'] -= stock_diff
         product_new = list(product.values())
-        db.update("products", product_old, product_new)
+        db.update("product", product_old, product_new)
     
         return final_quantity
     
