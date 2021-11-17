@@ -88,7 +88,9 @@ $("document").ready(function() {
           </div>
           {% if default_billing_info %}
           <div class="col-auto text-end">
+            {% if current_user.is_authenticated %}
             <div class="btn btn-link btn-sm" id="prefill-shipping-default">Use default</div>
+            {% endif %}
           </div>
           {% endif %}
         </div>
@@ -141,7 +143,9 @@ $("document").ready(function() {
           </div>
           {% if default_payment_info %}
           <div class="col-auto mx-0 text-end">
+            {% if current_user.is_authenticated %}
             <div class="btn btn-link btn-sm" id="prefill-cc-default">Use default</div>
+            {% endif %}
           </div>
           {% endif %}
         </div>
