@@ -61,8 +61,8 @@ $("document").ready(function() {
 
     // if we got an error, check to see if it is a form error
     function on_error(xhr, options, error) {
-      if (xhr.status == 403) {
-        update_from_ajax(xhr.responseJSON);
+      if (xhr.status == 400) {
+        update_from_json(xhr.responseJSON);
       } else if (xhr.status == 302) {
         window.location = xhr.responseJSON.location;
       } else {
