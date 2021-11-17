@@ -21,7 +21,7 @@ def profile_orders():
     with app.app_context():
         db = get_db()
 
-    orders_db = db.get_entries_by_heading("order2", "user_id", current_user.get_id())
+    orders_db = db.get_entries_by_heading("order2", "user_id", current_user.get_id(), order_by="id DESC")
     orders = []
     for order_db in orders_db:
         orders.append(Order(order_db['id']))
