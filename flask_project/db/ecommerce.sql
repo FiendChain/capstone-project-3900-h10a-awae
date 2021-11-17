@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS "user" (
   "email" text NOT NULL,
   "phone" int NOT NULL,
   "is_admin" int NOT NULL,
-  "is_authenticated" int
+  "is_authenticated" int NOT NULL
 );
 
 
@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS "product" (
   "name" text NOT NULL,
   "unit_price" real NOT NULL,
   "brand" text,
-  "category" text,
+  "category" text NOT NULL,
   "description" text,
   "delivery_days" int NOT NULL,
   "warranty_days" int NOT NULL,
@@ -26,20 +26,13 @@ CREATE TABLE IF NOT EXISTS "product" (
   "is_deleted" int NOT NULL
 );
 
-
-
 CREATE TABLE IF NOT EXISTS "cart_item" (
   "id" integer PRIMARY KEY NOT NULL,
   "product_id" int NOT NULL,
   "user_id" int NOT NULL,
   "quantity" int NOT NULL,
-  FOREIGN KEY ("product_id") REFERENCES Product("id"),
-  FOREIGN KEY ("user_id") REFERENCES Cart("id")
-);
-
-CREATE TABLE IF NOT EXISTS "cart" (
-  "id" integer PRIMARY KEY NOT NULL,
-  "user_id" int UNIQUE NOT NULL
+  FOREIGN KEY ("product_id") REFERENCES product("id"),
+  FOREIGN KEY ("user_id") REFERENCES cart("id")
 );
 
 CREATE TABLE IF NOT EXISTS "billing" (
@@ -48,7 +41,8 @@ CREATE TABLE IF NOT EXISTS "billing" (
   "address" text,
   "country" text,
   "state" text,
-  "zip_code" text
+  "zip_code" text,
+  FOREIGN KEY ("user_id") REFERENCES user("id")
 );
 
 CREATE TABLE IF NOT EXISTS "payment" (
@@ -57,8 +51,10 @@ CREATE TABLE IF NOT EXISTS "payment" (
   "name" text,
   "number" text,
   "expiry" text,
-  "cvc" text
+  "cvc" text,
+  FOREIGN KEY ("user_id") REFERENCES user("id")
 );
+
 CREATE TABLE IF NOT EXISTS "billing_past" (
   "id" integer PRIMARY KEY NOT NULL,
   "address" text,
@@ -75,16 +71,16 @@ CREATE TABLE IF NOT EXISTS "payment_past" (
   "cvc" text
 );
 
-
 CREATE TABLE IF NOT EXISTS "order2" (
   "id" integer PRIMARY KEY NOT NULL,
   "user_id" int NOT NULL,
   "payment_past_id" int NOT NULL,
   "billing_past_id" int NOT NULL,
-  "subtotal" real,
-  "discount" real,
-  "total_cost" real,
-  "total_items" int,
+  "subtotal" real NOT NULL,
+  "discount" real NOT NULL,
+  "total_cost" real NOT NULL,
+  "total_items" int  NOT NULL,
+  FOREIGN KEY ("user_id") REFERENCES user("id"),
   FOREIGN KEY ("payment_past_id") REFERENCES payment_past("id"),
   FOREIGN KEY ("billing_past_id") REFERENCES billing_past("id")
 );
@@ -94,7 +90,7 @@ CREATE TABLE IF NOT EXISTS "order2_item" (
   "order2_id" int NOT NULL,
   "product_id" int NOT NULL,
   "quantity" int not NULL,
-  "price" int not NULL,
+  "price" real not NULL,
   FOREIGN KEY ("order2_id") REFERENCES order2("id"),
   FOREIGN KEY ("product_id") REFERENCES product("id")
 
@@ -103,16 +99,16 @@ CREATE TABLE IF NOT EXISTS "order2_item" (
 CREATE TABLE IF NOT EXISTS "cafepass" (
   "id" integer PRIMARY KEY NOT NULL,
   "user_id" int NOT NULL,
-  "paid" int,
-  "net_xp" int,
-  "level" int
+  "paid" int NOT NULL,
+  "net_xp" int NOT NULL,
+  "level" int NOT NULL,
+  FOREIGN KEY ("user_id") REFERENCES user("id")
 );
-
 
 CREATE TABLE IF NOT EXISTS "level" (
   "id" integer PRIMARY KEY NOT NULL,
-  "level" int,
-  "xp" int,
-  "discount_free" real,
-  "discount_paid" real
+  "level" int NOT NULL,
+  "xp" int NOT NULL,
+  "discount_free" real NOT NULL,
+  "discount_paid" real NOT NULL
 );
