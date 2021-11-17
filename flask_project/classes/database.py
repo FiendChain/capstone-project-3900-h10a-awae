@@ -78,8 +78,8 @@ class Database(object):
         else:
             category = f"'{category}'"
             query = f"SELECT * FROM products WHERE name LIKE ? AND category={category} ORDER BY {order_by}"
-        params = (f"%{name}%",)   # comma is intentional
-        # print(query)
+        params = (f"%{name}%",)   # user input to be validated; tuple is intentional
+
         self.cur.execute(query, params)
         entries = self.cur.fetchall()
         entries = [self.make_dict(self.cur, entry) for entry in entries]
@@ -97,9 +97,10 @@ class Database(object):
         # print(query, params)
         self.cur.execute(query, params)
         self.conn.commit()
-        print(f"Entry {entry_no_id[0]} added with id {self.cur.lastrowid}")
+        # print(f"Entry {entry_no_id[0]} added with id {self.cur.lastrowid}")
         return self.cur.lastrowid
         
+    # Unused
     def delete(self, table_name, entry):
         query = f"DELETE FROM {table_name} WHERE rowid = ?"
         params = int(entry[0]), # comma is intentional
@@ -108,6 +109,7 @@ class Database(object):
         print(f"Entry {entry[0]} deleted")
         return entry[0]
     
+    # Unused
     def delete_by_id(self, table_name, id):
         query = f"DELETE FROM {table_name} WHERE rowid = ?"
         params = int(id), # comma is intentional
@@ -145,8 +147,9 @@ class Database(object):
         return entries
 
     def get_entry_by_id(self, table_name, id):
-        query = f"SELECT * from {table_name} WHERE id = {id}"
-        self.cur.execute(query)
+        query = f"SELECT * from {table_name} WHERE id = ?"
+        params = (f"{id}",)
+        self.cur.execute(query, params)
         entries = self.cur.fetchall()
         if not entries:
             return None
@@ -158,8 +161,8 @@ class Database(object):
         return dict((cursor.description[idx][0], value) for idx, value in enumerate(row))
 
 
-    def get_entries_by_heading(self, table_name, heading, value):
-        query = f"SELECT * from {table_name} where {heading} = ?"
+    def get_entries_by_heading(self, table_name, heading, value, order_by="id ASC"):
+        query = f"SELECT * from {table_name} where {heading} = ? ORDER BY {order_by}"
         params = value,
         self.cur.execute(query, params)
         entries = self.cur.fetchall()

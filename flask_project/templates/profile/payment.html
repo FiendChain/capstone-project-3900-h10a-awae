@@ -2,7 +2,7 @@
 {% from "utility.html" import render_flash %}
 
 {% block head %}
-<title>Your Payments</title>
+<title>Payment Info</title>
 {% endblock %}
 
 {% block content %}
@@ -46,7 +46,7 @@ $("document").ready(function() {
     <ol class="breadcrumb mb-2">
       <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
       <li class="breadcrumb-item"><a href="{{ url_for('user_bp.profile') }}">Profile</a></li>
-      <li class="breadcrumb-item active">Your Payments</li>
+      <li class="breadcrumb-item active">Payment Info</li>
     </ol>
   </nav>
 </div>
@@ -54,7 +54,7 @@ $("document").ready(function() {
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-5">
-      <h3>Your Payments</h3>
+      <h3>Payment Info</h3>
       {{ render_flash() }}
       <form method="POST" action="{{ url_for('api_bp.profile_payment') }}" id="user-payment-form" class="wtf-ajax-form">
         {{ form.csrf_token }}

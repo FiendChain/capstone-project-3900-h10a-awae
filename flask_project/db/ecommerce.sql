@@ -3,10 +3,10 @@ PRAGMA foreign_keys = ON;
 CREATE TABLE IF NOT EXISTS "users" (
   "id" integer PRIMARY KEY NOT NULL,
   "username" text UNIQUE COLLATE NOCASE NOT NULL,
-  "password" text,
-  "email" text,
-  "phone" int,
-  "is_admin" int,
+  "password" text NOT NULL,
+  "email" text NOT NULL,
+  "phone" int NOT NULL,
+  "is_admin" int NOT NULL,
   "is_authenticated" int
 );
 
@@ -14,16 +14,16 @@ CREATE TABLE IF NOT EXISTS "users" (
 
 CREATE TABLE IF NOT EXISTS "products" (
   "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-  "name" text,
-  "unit_price" real,
+  "name" text NOT NULL,
+  "unit_price" real NOT NULL,
   "brand" text,
   "category" text,
   "description" text,
-  "delivery_days" int,
-  "warranty_days" int,
-  "stock" int,
+  "delivery_days" int NOT NULL,
+  "warranty_days" int NOT NULL,
+  "stock" int NOT NULL,
   "image_url" text,
-  "is_deleted" int
+  "is_deleted" int NOT NULL
 );
 
 
@@ -85,8 +85,8 @@ CREATE TABLE IF NOT EXISTS "order2" (
   "discount" real,
   "total_cost" real,
   "total_items" int,
-  FOREIGN KEY ("payment_past_id") REFERENCES Payment_past("id"),
-  FOREIGN KEY ("billing_past_id") REFERENCES Billing_past("id")
+  FOREIGN KEY ("payment_past_id") REFERENCES payment_past("id"),
+  FOREIGN KEY ("billing_past_id") REFERENCES billing_past("id")
 );
 
 CREATE TABLE IF NOT EXISTS "order2_item" (
@@ -94,6 +94,7 @@ CREATE TABLE IF NOT EXISTS "order2_item" (
   "order2_id" int NOT NULL,
   "product_id" int NOT NULL,
   "quantity" int not NULL,
+  "price" int not NULL,
   FOREIGN KEY ("order2_id") REFERENCES Order2("id"),
   FOREIGN KEY ("product_id") REFERENCES Products("id")
 

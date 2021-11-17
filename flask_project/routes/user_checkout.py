@@ -163,7 +163,7 @@ def cart_checkout_billing(checkout_id):
     order = (current_user.get_id(), payment_past_id, billing_past_id, checkout.subtotal, checkout.discount, checkout.total_cost, checkout.total_items)
     order_id = db.add("order2", order)
     for item in checkout.items:
-        order_item = (order_id, item.product["id"], item.quantity)
+        order_item = (order_id, item.product["id"], item.quantity, item.product["unit_price"])
         db.add("order2_item", order_item)
 
 

@@ -4,9 +4,10 @@ import datetime
 from server import app, get_db
 
 class OrderItem:
-    def __init__(self, product, quantity):
+    def __init__(self, product, quantity, price):
         self.product = product
         self.quantity = quantity
+        self.price = price
 
 class Order:
     # product = list of (product_id, quantity) pairs
@@ -31,7 +32,8 @@ class Order:
         for item_db in order_items_db:
             product = db.get_entry_by_id("products", item_db["product_id"]) 
             quantity = item_db['quantity']
-            self.items.append(OrderItem(product, quantity))
+            price = item_db['price']
+            self.items.append(OrderItem(product, quantity, price))
 
         self.user_id = order_db['user_id']
 

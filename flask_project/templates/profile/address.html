@@ -2,7 +2,7 @@
 {% from "utility.html" import render_flash %}
 
 {% block head %}
-<title>Your Addresses</title>
+<title>Billing Info</title>
 {% endblock %}
 
 {% block content %}
@@ -14,7 +14,7 @@
     <ol class="breadcrumb mb-2">
       <li class="breadcrumb-item"><a href="{{ url_for('user_bp.home') }}">Home</a></li>
       <li class="breadcrumb-item"><a href="{{ url_for('user_bp.profile') }}">Profile</a></li>
-      <li class="breadcrumb-item active">Your Addresses</li>
+      <li class="breadcrumb-item active">Billing Info</li>
     </ol>
   </nav>
 </div>
@@ -22,7 +22,7 @@
 <div class="container">
   <div class="row justify-content-center">
     <div class="col-auto">
-      <h3>Your Addresses</h3>
+      <h3>Billing Info</h3>
       {{ render_flash() }}
       <form method="POST" action="{{ url_for('api_bp.profile_address') }}" id="user-address-form" class="wtf-ajax-form">
         {{ form.csrf_token }}

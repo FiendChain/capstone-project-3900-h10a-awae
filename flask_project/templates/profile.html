@@ -63,22 +63,18 @@ $("document").ready(function() {
         'bi-shield-check') }}
 
     {{ render_tile(
-        "Your Addresses", 
+        "Billing Info", 
         "Edit addresses for orders", 
         url_for("user_bp.profile_address"),
         'bi-house') }}
 
     {{ render_tile(
-        "Your Payments", 
+        "Payment Info", 
         "Manage payment methods and settings", 
         url_for("user_bp.profile_payment"),
         'bi-credit-card') }}
 
-    {{ render_tile(
-        "Reviews", 
-        "View and manage your product reviews", 
-        url_for("user_bp.home"),
-        'bi-star') }}
+
 
     {{ render_tile(
         "Cafepass", 
