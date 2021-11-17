@@ -14,11 +14,13 @@
 <div class="container-fluid">
   <!--Recommended products-->
   {% if recommended_products %}
+  {% if current_user.is_authenticated %}
   <div class="container my-2">
     <h5 class="border-bottom mx-5 py-2">Recommended items</h5>
     {{ render_carousel(recommended_products, "recommended-products-carousel") }} 
   </div>
   <div class="my-5"></div>
+  {% endif %}
   {% endif %}
 
   <!--Featured items-->
