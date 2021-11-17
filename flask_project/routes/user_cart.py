@@ -61,7 +61,13 @@ def product_update():
         return jsonify(serialize_form(form)), 400
     
     cart = get_user_cart()
-    final_quantity = cart.update_product(form.id.data, form.quantity.data)
+    try:
+        final_quantity = cart.update_product(form.id.data, form.quantity.data)
+    except InvalidProduct:
+        return jsonify(serialize_form(form)), 400
+    except DelistedProduct:
+        return jsonify(dict(error="Delisted product")), 400
+
     summary = get_cart_summary(cart)
 
     return jsonify(dict(quantity=final_quantity, summary=summary))

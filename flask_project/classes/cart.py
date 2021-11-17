@@ -165,6 +165,9 @@ class Cart:
         product = db.get_entry_by_id("product", product_id)
         if not product:
             raise InvalidProduct(product_id)
+
+        if product['is_deleted']:
+            raise DelistedProduct()
         
         cart_item = db.get_entries_by_multiple_headings(
             "cart_item", 
