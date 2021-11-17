@@ -30,7 +30,7 @@ class Order:
         order_items_db = db.get_entries_by_heading("order2_item", "order2_id", order_db["id"])
         self.items = []
         for item_db in order_items_db:
-            product = db.get_entry_by_id("products", item_db["product_id"]) 
+            product = db.get_entry_by_id("product", item_db["product_id"]) 
             quantity = item_db['quantity']
             price = item_db['price']
             self.items.append(OrderItem(product, quantity, price))

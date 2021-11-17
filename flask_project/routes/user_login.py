@@ -103,7 +103,7 @@ def load_user(id):
         db = get_db()
 
     try:
-        user = db.get_entry_by_id("users", id)
+        user = db.get_entry_by_id("user", id)
     except:
         user = None
         

@@ -1,5 +1,5 @@
 """
-Routes for basic ecommerce functionalities available to register or unregistered users
+Routes for basic ecommerce functionalities available to register or unregistered user
 This includes browsing and visitng product pages and viewing orders
 """
 

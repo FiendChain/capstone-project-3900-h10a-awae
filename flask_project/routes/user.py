@@ -1,5 +1,5 @@
 """
-Routes for basic ecommerce functionalities available to register or unregistered users
+Routes for basic ecommerce functionalities available to register or unregistered user
 This includes browsing and visitng product pages and viewing orders
 """
 
@@ -18,10 +18,10 @@ def home():
         db = get_db()
         recommended_products = get_recommendations(db)
 
-        # Aggregate all products and quantity users have bought
+        # Aggregate all products and quantity user have bought
         # Display most popular products
         # (potentially) display how much was sold
-        popular_items = db.get_random_entries("products", 12)
+        popular_items = db.get_random_entries("product", 12)
     data = dict(recommended_products=recommended_products, popular_items=popular_items)
     
     return render_template("homepage.html", **data)
@@ -30,15 +30,15 @@ def home():
 def product_page(id):
     with app.app_context():
         db = get_db()
-        product = db.get_entry_by_id("products", id)
-        similar_items = db.get_random_entries("products", 12)
+        product = db.get_entry_by_id("product", id)
+        similar_items = db.get_random_entries("product", 12)
     return render_template('product.html', product=product, similar_items=similar_items)
 
 @user_bp.route('/search', methods=['GET', 'POST'])
 def search():
     with app.app_context():
         db = get_db()
-        valid_categories = db.get_unique_values("products", "category")
+        valid_categories = db.get_unique_values("product", "category")
         form = ProductSearchParams()
         dict_sort_by = {
             "price_low_to_high": "unit_price ASC",
@@ -62,7 +62,7 @@ def get_recommendations(db):
         order_items = db.get_entries_by_heading("order2_item", "order2_id", order["id"])
         for order_item in order_items:
             # Get product matching to order item
-            product = db.get_entry_by_id("products", order_item["product_id"])
+            product = db.get_entry_by_id("product", order_item["product_id"])
             if not product["is_deleted"]:
                 print(product["name"], product["category"])
                 recent_categories.append(product["category"])
@@ -78,7 +78,7 @@ def get_recommendations(db):
     sampled_categories = dict((x,sampled_categories.count(x)) for x in set(sampled_categories))
 
     for category, count in sampled_categories.items():
-        products = db.get_random_entries_with_condition("products", "category", category, count)
+        products = db.get_random_entries_with_condition("product", "category", category, count)
         for p in products:
             recommended_products.append(p)
     return recommended_products

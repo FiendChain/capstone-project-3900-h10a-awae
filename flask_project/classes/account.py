@@ -19,7 +19,7 @@ def get_login_user(username, password):
     if not db.validate_user(username, password):
         return None
     
-    user = db.get_entries_by_heading("users", "username", username)[0]
+    user = db.get_entries_by_heading("user", "username", username)[0]
     flask_user = get_flask_user_from_db(user)
     return flask_user
 
@@ -37,11 +37,11 @@ def create_registered_user(username, password, email, phone):
     user_data = (username, password, email, phone, is_admin, is_authenticated)
 
     try:
-        db.add("users", user_data)
+        db.add("user", user_data)
     except Exception:
         raise UsernameTaken(username)
 
-    user = db.get_entries_by_heading("users", "username", username)[0]
+    user = db.get_entries_by_heading("user", "username", username)[0]
     flask_user = get_flask_user_from_db(user)
 
     return flask_user
@@ -50,7 +50,7 @@ def get_guest_account(guest_id):
     with app.app_context():
         db = get_db()
     
-    user = db.get_entry_by_id("users", guest_id)
+    user = db.get_entry_by_id("user", guest_id)
 
     # if not a guest user, don't login
     if user is None or user['is_authenticated']:
@@ -76,12 +76,12 @@ def create_guest_account():
         user_data = (username, password, email, phone, is_admin, is_authenticated)
 
         try:
-            db.add("users", user_data)
+            db.add("user", user_data)
         except Exception as ex:
             continue
 
         break
 
-    user = db.get_entries_by_heading("users", "username", username)[0]
+    user = db.get_entries_by_heading("user", "username", username)[0]
     flask_user = get_flask_user_from_db(user)
     return flask_user

@@ -28,7 +28,7 @@ def profile_edit_login_security():
     id = current_user.get_id()
     with app.app_context():
         db = get_db()
-        user = db.get_entry_by_id("users", id)
+        user = db.get_entry_by_id("user", id)
         form.email.data = user["email"]
         form.phone.data = user["phone"]
     return render_template("profile/edit_login_security.html", form=form)
@@ -44,7 +44,7 @@ def profile_edit_login_security():
         db = get_db()
 
     user_id = current_user.get_id()
-    user = db.get_entry_by_id("users", user_id)
+    user = db.get_entry_by_id("user", user_id)
 
     if not db.validate_user(user["username"], form.password.data): # If entered password does not match password in database, return error
         form.password.errors.append("Incorrect password")
@@ -55,7 +55,7 @@ def profile_edit_login_security():
     user['email'] = form.email.data
     user['phone'] = form.phone.data
     user_new = list(user.values())
-    db.update("users", user_old, user_new)
+    db.update("user", user_old, user_new)
 
     flash("Successfully updated login details")
     return api_redirect(url_for("user_bp.profile"))

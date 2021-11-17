@@ -27,7 +27,7 @@ def add_product():
     form = ProductForm()
     with app.app_context():
         db = get_db()
-        valid_categories = db.get_unique_values("products", "category")
+        valid_categories = db.get_unique_values("product", "category")
     return render_template("admin/add_product.html", form=form, categories=valid_categories)
 
 # admin api endpoints
@@ -52,7 +52,7 @@ def add_product():
             form.description.data, form.delivery_days.data, form.warranty_days.data, form.stock.data, 
             image_url, form.is_deleted.data
         )
-        id = db.add("products", product)
+        id = db.add("product", product)
 
     return api_redirect(url_for("admin_bp.products"))
 
@@ -61,10 +61,10 @@ def add_product():
 def edit_product(id):
     with app.app_context():
         db = get_db()
-        product = db.get_entry_by_id("products", id)
+        product = db.get_entry_by_id("product", id)
         if not product:
             abort(404)
-        valid_categories = db.get_unique_values("products", "category")
+        valid_categories = db.get_unique_values("product", "category")
 
     form = ProductForm(data=product)
     return render_template("admin/edit_product.html", form=form, id=id, categories=valid_categories)
@@ -74,7 +74,7 @@ def edit_product(id):
 def edit_product(id):
     with app.app_context():
         db = get_db()
-        product = db.get_entry_by_id("products", id)
+        product = db.get_entry_by_id("product", id)
         if product is None:
             abort(404)
 
@@ -97,7 +97,7 @@ def edit_product(id):
             image_url, form.is_deleted.data
         )
 
-        db.update("products", product, product)
+        db.update("product", product, product)
 
     flash("Successfully updated product details")
     return api_redirect(url_for("admin_bp.edit_product", id=id))
@@ -108,14 +108,14 @@ def delete_product(id):
     with app.app_context():
         db = get_db()
 
-    product = db.get_entry_by_id("products", id)
+    product = db.get_entry_by_id("product", id)
     if not product:
         abort(404)
     
     product_old = list(product.values())
     product["is_deleted"] = 1 
     product_new = list(product.values())
-    db.update("products", product_old, product_new)
+    db.update("product", product_old, product_new)
 
     return redirect(url_for("admin_bp.products"))
 
@@ -125,13 +125,13 @@ def relist_product(id):
     with app.app_context():
         db = get_db()
 
-    product = db.get_entry_by_id("products", id)
+    product = db.get_entry_by_id("product", id)
     if not product:
         abort(404)
     
     product_old = list(product.values())
     product["is_deleted"] = 0 
     product_new = list(product.values())
-    db.update("products", product_old, product_new)
+    db.update("product", product_old, product_new)
 
     return redirect(url_for("admin_bp.products"))

@@ -1,6 +1,6 @@
 """
 Handle payment and billing address editing in profile
-Should only be used for registered users
+Should only be used for registered user
 """
 
 from server import get_db, app
@@ -12,7 +12,7 @@ def get_default_payment_info(user_id=None):
     
     with app.app_context():
         db = get_db()
-        user = db.get_entry_by_id("users", user_id)
+        user = db.get_entry_by_id("user", user_id)
         payment = db.get_entries_by_heading("payment", "user_id", user_id)
     
     if not user['is_authenticated']:
@@ -26,7 +26,7 @@ def get_default_billing_info(user_id=None):
     
     with app.app_context():
         db = get_db()
-        user = db.get_entry_by_id("users", user_id)
+        user = db.get_entry_by_id("user", user_id)
         billing = db.get_entries_by_heading("billing", "user_id", user_id)
 
     if not user['is_authenticated']:
@@ -41,7 +41,7 @@ def set_default_payment_info(name, number, expiry, cvc, user_id=None):
 
     with app.app_context():
         db = get_db()
-        user = db.get_entry_by_id("users", user_id)
+        user = db.get_entry_by_id("user", user_id)
         payment_old = db.get_entries_by_heading("payment", "user_id", user_id)
     
     if not user or not user['is_authenticated']:
@@ -66,7 +66,7 @@ def set_default_billing_payment_info(address, country, state, zip_code, user_id=
 
     with app.app_context():
         db = get_db()
-        user = db.get_entry_by_id("users", user_id)
+        user = db.get_entry_by_id("user", user_id)
         billing_old = db.get_entries_by_heading("billing", "user_id", user_id)
     
     if not user or not user['is_authenticated']:
@@ -92,7 +92,7 @@ def clear_default_payment_info(user_id=None):
     
     with app.app_context():
         db = get_db()
-        user = db.get_entry_by_id("users", user_id)
+        user = db.get_entry_by_id("user", user_id)
         payment = db.get_entries_by_heading("payment", "user_id", user_id)
     
     if not user or not user['is_authenticated']:
@@ -111,7 +111,7 @@ def clear_default_billing_info(user_id=None):
     
     with app.app_context():
         db = get_db()
-        user = db.get_entry_by_id("users", user_id)
+        user = db.get_entry_by_id("user", user_id)
         billing = db.get_entries_by_heading("billing", "user_id", user_id)
     
     if not user or not user['is_authenticated']:

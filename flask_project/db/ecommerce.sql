@@ -1,6 +1,6 @@
 PRAGMA foreign_keys = ON;
 
-CREATE TABLE IF NOT EXISTS "users" (
+CREATE TABLE IF NOT EXISTS "user" (
   "id" integer PRIMARY KEY NOT NULL,
   "username" text UNIQUE COLLATE NOCASE NOT NULL,
   "password" text NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS "users" (
 
 
 
-CREATE TABLE IF NOT EXISTS "products" (
+CREATE TABLE IF NOT EXISTS "product" (
   "id" integer PRIMARY KEY AUTOINCREMENT NOT NULL,
   "name" text NOT NULL,
   "unit_price" real NOT NULL,
@@ -95,8 +95,8 @@ CREATE TABLE IF NOT EXISTS "order2_item" (
   "product_id" int NOT NULL,
   "quantity" int not NULL,
   "price" int not NULL,
-  FOREIGN KEY ("order2_id") REFERENCES Order2("id"),
-  FOREIGN KEY ("product_id") REFERENCES Products("id")
+  FOREIGN KEY ("order2_id") REFERENCES order2("id"),
+  FOREIGN KEY ("product_id") REFERENCES product("id")
 
 );
 
