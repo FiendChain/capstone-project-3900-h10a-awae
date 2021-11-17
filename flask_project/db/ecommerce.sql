@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS "products" (
   "brand" text,
   "category" text,
   "description" text,
-  "delivery_days" int,
-  "warranty_days" int,
+  "delivery_days" int NOT NULL,
+  "warranty_days" int NOT NULL,
   "stock" int NOT NULL,
   "image_url" text,
   "is_deleted" int NOT NULL
@@ -85,8 +85,8 @@ CREATE TABLE IF NOT EXISTS "order2" (
   "discount" real,
   "total_cost" real,
   "total_items" int,
-  FOREIGN KEY ("payment_past_id") REFERENCES Paymemt_past("id"),
-  FOREIGN KEY ("billing_past_id") REFERENCES Billing_past("id")
+  FOREIGN KEY ("payment_past_id") REFERENCES payment_past("id"),
+  FOREIGN KEY ("billing_past_id") REFERENCES billing_past("id")
 );
 
 CREATE TABLE IF NOT EXISTS "order2_item" (
