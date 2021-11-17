@@ -94,6 +94,7 @@ CREATE TABLE IF NOT EXISTS "order2_item" (
   "order2_id" int NOT NULL,
   "product_id" int NOT NULL,
   "quantity" int not NULL,
+  "price" int not NULL,
   FOREIGN KEY ("order2_id") REFERENCES Order2("id"),
   FOREIGN KEY ("product_id") REFERENCES Products("id")
 
