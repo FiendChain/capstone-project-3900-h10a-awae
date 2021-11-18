@@ -21,5 +21,31 @@ Completed all my assigned sprint 1 user stories. Website reached satisfactory de
 Discusses how we would restructure the project to deal with the loss of two team members.
 
 Week 6
-Refined the aesthetic and UX of the frontend. Worked on the user stories for checkout and orders on the frontend.
+Refined the aesthetic and UX of the frontend. 
+Worked on the user stories for checkout and orders on the frontend.
 Discussed with remaining teammate what functionalities should be reduced in scope.
+Added support for guest accounts so that their orders would be stored in the database.
+
+Week 7 [26]
+Worked on cafepass system frontend. 
+Updated the checkout system and cart system with new purchasing process.
+
+Week 8 [19]
+Worked on saving billing and payment information. 
+Worked on cafepass backend functionality and frontend design provided by Arthur Sze. 
+Cart now empties when a checkout is completed and originated from the cart.
+Updated address editing page.
+Refactored the backend code after demo of sprint 2.
+Updated cart to be more interactive using Vue and VueX, and installed corresponding RESTful endpoints.
+
+Week 9 [12]
+Added delete option to default payment and billing information.
+Refactored frontend JavaScript code and RESTful api.
+Added delisted items functionality to maintain database consistency.
+Added alerts to give messages after form validation succeeded or failed.
+Finalised cafepass system frontend with proposed design provided by Arthur Sze.
+
+Week 10 [5]
+Prepared demo script for quick installation on a new system.
+Updated requirements.txt with correct libraries.
+Fixed bug in ajax form javascript library.
