@@ -2,9 +2,29 @@ Week 1
 In the first lab, we had formation of the group, introduced ourselves and identified each other's strengths. We then deliberated over the various group projects presented and selected the one which adhered to the most to our strengths, which was the e-commerce project.
 
 Week 2
+The group drafted the 8 project objectives and we started working on the user stories that would together encompass particular project objectives. I was personally responsible for our database objectives, including product search and being able to add/remove items from the database. I included an acceptance criteria to clarify any ambiguity.
 
 
 Week 3
-Due to an urgent committment I was unable to attend the regular lab session. However as Scrum Master I had setup a brief agenda so my teammates knew what to do during the lab, and they were kind enough to cover for my absence. We had a catch-up session on that same day to ensure I was up to date with what happened during the lab. We finalised the project proposal over the weekend, and I had updated all of our user stories on Jira and assigned user stories and subtasks to each member so we could start coding.
+Due to an urgent committment I was unable to attend the regular lab session. However as Scrum Master I had setup a brief agenda so my teammates knew what to do during the lab, and they were kind enough to cover for my absence. We had a catch-up session on that same day to ensure I was up to date with what happened during the lab, which was our tutor reviewing our project objectives and the feedback received. We finalised the project proposal over the weekend, and I had updated all of our user stories on Jira and assigned user stories and subtasks to each member so we could start coding.
 
 Week 4
+Starting off the first sprint, we had a group discussion of what frameworks, software and libraries to use, and as Scrum Master I asked for everyone's opinions before finally deciding. After much deliberation we settled on using Flask for our web framework as all our developers were most familiar with, as opposed to Django. For the database, since I was the only developer with experience in programming databases, I opted for sqlite3 because Python, the language we used to do our business logic in, had the needed library preinstalled already.
+
+Week 5
+Two of our group members suddenly dropped out at the beginning of the week, so I immediately organised a meeting with my other remaining group member and our tutor to reduce our project scope from 8 to 5 objectives. We now aimed to deliver two project objectives by the end of the first sprint. We also had to reorganise the roles, so I was mainly responsible for implementing the database, while my teammate did the frontend interface. Both of us coded the backend logic and developed on our own branches. At the end of the week we had another stand-up meeting to merge our changes into the master branch and fix any merge conflicts.
+
+Week 6
+The demonstration for our first sprint went well, having demonstrated two of the objectives achieved. In our second sprint we aimed to get an additional two objectives done: the purchasing system and cafepass system. As Scrum Master I assigned the roles in a similar fashion to the previous sprint, where one would develop the backend and the other teammate would work on the frontend interface. Sometimes, because the database was not updated yet, the frontend developer would create a "mock" database in order to test out the webpage functions; this resulted in extra work for them. So I, as the backend developer, made sure to get my database implementations done as early as possible to avoid this extra work.
+
+Week 7
+The purchasing system was complete, so the remaining objective for this sprint was the cafepass system. As the Scrum Master and person who suggested the original idea and familiar with this system, I drew up a visual diagram of what I wanted the cafepass to look like on the website, which would consist of a progression bar separated by many levels. It was a challenging task for the frontend developer but they were able to get the visual UI elements done by the end of the week. At the same time I worked on the business logic and database implementation for the cafepass, to complete our second sprint.
+
+Week 8
+We demonstrated the purchasing and cafepass system from our second sprint which went well. Our tutor offered some feedback regarding our UI so our frontend developer made a note of this for the next sprint. This meant we only had one objective remaining for our final sprint, the recommendation system, which was ideal so we could spend the remainder of the time working on the project report. We fixed up bugs and issues we found from the previous sprint we did not notice until now before starting the final sprint.
+
+Week 9
+For the last sprint, I worked on designing the recommendation system first and consulting with my teammate. Like previous sprints, I then assigned roles where I would do the business logic and database implementation. Due to the UI being relatively easy to implement for this objective, my partner did not have much else to do so they refactored our existing codebase and made some adjustments to other UI elements from previosu sprints.
+
+Week 10
+After finalising the last sprint, we did a practice runthrough of how we were going to demonstrate the 5 project objectives within the 18 minute timeframe. At the same time, we worked on the project report; I primarily worked on describing the functionalities of our website and some of the implementation challenges we encountered. In the final presentation, I introduced our project and demonstrated the first two objectives: account system and product database.
