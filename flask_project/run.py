@@ -1,17 +1,17 @@
-from server import app, login_manager
+def main():
+    import argparse 
 
-import routes
-from routes import user_bp, admin_bp, api_bp, admin_api_bp
-
-import argparse 
-
-if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--no-livereload", action="store_true", help="Disable live reload when changes are made to server")
     parser.add_argument("--host", default="127.0.0.1", type=str, help="IP address of server")
-    parser.add_argument("--port", default=5002, type=int, help="Port of server")
+    parser.add_argument("--server-port", default=5002, type=int, help="Port of server")
+    parser.add_argument("--livereload-port", default=5003, type=int, help="Port of livereload server")
     parser.add_argument("--debug", action="store_true", help="Enable server debugging output")
     args = parser.parse_args()
+
+    from server import app, login_manager
+    import routes
+    from routes import user_bp, admin_bp, api_bp, admin_api_bp
 
     app.jinja_env.auto_reload = not args.no_livereload
 
@@ -31,4 +31,7 @@ if __name__ == "__main__":
     else:
         from livereload import Server
         server = Server(app.wsgi_app)
-        server.serve(host=args.host, port=args.port, debug=args.debug, liveport=args.port)
+        server.serve(host=args.host, port=args.server_port, debug=args.debug, liveport=args.livereload_port)
+
+if __name__ == "__main__":
+    main()
